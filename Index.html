@@ -1,1 +1,244 @@
-
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101827">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Congés & Horaires</title>
+<style>
+:root{--bg:#f3f6fb;--card:#fff;--ink:#172033;--muted:#6b7280;--line:#e5eaf2;--navy:#101827;--blue:#356df3;--green:#15966a;--red:#d64545;--orange:#dc8618;--purple:#805ad5;--shadow:0 8px 28px rgba(25,42,70,.07)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;padding-bottom:calc(86px + env(safe-area-inset-bottom))}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+header{background:linear-gradient(135deg,#101827,#1c3154);color:#fff;padding:24px 18px 22px;border-radius:0 0 26px 26px}
+header .top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+header h1{font-size:24px;line-height:1.15;margin:0;font-weight:800;letter-spacing:-.5px}
+header p{margin:8px 0 0;color:#c9d5e8;font-size:13px}
+.year-pill{border:1px solid #ffffff35;background:#ffffff12;color:white;border-radius:12px;padding:9px 12px;font-weight:800}
+.wrap{max-width:980px;margin:auto;padding:16px}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:-4px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px;box-shadow:var(--shadow);min-width:0}
+.stat .label{font-size:12px;color:var(--muted);font-weight:650}
+.stat .value{font-size:26px;font-weight:850;letter-spacing:-.7px;margin-top:6px}
+.stat .sub{font-size:11px;color:var(--muted);margin-top:3px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin-top:14px;box-shadow:var(--shadow)}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.panel h2{font-size:17px;margin:0;letter-spacing:-.2px}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+.btn{border:0;border-radius:12px;padding:11px 14px;font-weight:750;background:var(--blue);color:white}
+.btn.secondary{background:#edf2ff;color:#244fc5}
+.btn.dark{background:#202c42;color:white}
+.btn.ghost{background:#f3f5f9;color:#344054}
+.btn.danger{background:#fff0f0;color:#b52e2e}
+.btn.sm{padding:8px 10px;font-size:12px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field label{font-size:12px;color:#596579;font-weight:750}
+.field input,.field select,.field textarea{width:100%;border:1px solid #d9e0eb;border-radius:12px;background:#fff;color:var(--ink);padding:12px;min-height:44px;outline:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px #356df31a}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.form-grid .full{grid-column:1/-1}
+.nav{position:fixed;z-index:20;bottom:0;left:0;right:0;padding:8px 8px calc(8px + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(5,1fr);gap:4px;background:#ffffffed;backdrop-filter:blur(18px);border-top:1px solid #dfe5ef}
+.nav button{border:0;background:transparent;color:#758096;border-radius:12px;padding:8px 2px 6px;font-size:10px;font-weight:750;display:flex;flex-direction:column;align-items:center;gap:4px}
+.nav button span{font-size:19px;line-height:1}
+.nav button.active{color:var(--blue);background:#edf2ff}
+.view{display:none}
+.view.active{display:block}
+.calendar-tools{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.calendar-tools select{border:1px solid var(--line);border-radius:10px;padding:9px;background:#fff;font-weight:750}
+.months{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.month{border:1px solid var(--line);border-radius:15px;padding:10px 8px;background:#fff;min-width:0}
+.month h3{font-size:13px;margin:0 0 9px;text-align:center}
+.weekdays,.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px}
+.weekdays span{text-align:center;font-size:9px;color:#929bad;padding-bottom:5px;font-weight:700}
+.day{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;border:0;border-radius:6px;background:transparent;color:#344054;font-size:10px;position:relative;padding:0;min-width:0}
+.day.empty{pointer-events:none}
+.day.today{outline:1.5px solid var(--blue);font-weight:900}
+.day.leave{background:#d8f7e8;color:#08764e;font-weight:850}
+.day.holiday{background:#ffe1e1;color:#b42323;font-weight:850}
+.day.overtime{box-shadow:inset 0 -3px 0 var(--orange)}
+.day.manual{box-shadow:inset 0 0 0 1.5px var(--purple)}
+.day.selected{background:#356df3!important;color:#fff!important;outline:2px solid #9bb7ff}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:11px;color:var(--muted);margin-top:12px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:4px}
+.month-detail{display:grid;grid-template-columns:1fr;gap:8px}
+.day-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}
+.day-row:last-child{border-bottom:0}
+.day-row strong{font-size:13px}
+.tag{font-size:10px;font-weight:800;border-radius:7px;padding:5px 7px;white-space:nowrap}
+.tag.leave{background:#d8f7e8;color:#08764e}
+.tag.holiday{background:#ffe1e1;color:#b42323}
+.tag.overtime{background:#fff0d8;color:#9a5a00}
+.tag.work{background:#e8efff;color:#2854bf}
+.tag.off{background:#f0f2f6;color:#687386}
+.list-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.list-item:last-child{border-bottom:0}
+.list-item .main{min-width:0}
+.list-item .main strong{display:block;font-size:13px}
+.list-item .main small{display:block;color:var(--muted);font-size:11px;margin-top:4px}
+.empty-state{text-align:center;padding:24px 12px;color:var(--muted);font-size:13px}
+.notice{background:#eef4ff;border:1px solid #d7e4ff;color:#31549b;padding:12px;border-radius:13px;font-size:12px;line-height:1.45}
+.notice.warn{background:#fff8e8;border-color:#f5e1ad;color:#805b12}
+.notice.good{background:#e9fbf2;border-color:#c4f0d9;color:#116747}
+.switchrow{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.switchrow:last-child{border:0}
+.switchrow strong{font-size:13px}
+.switchrow small{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+.switch{width:46px;height:27px;appearance:none;background:#d5dbe5;border-radius:99px;position:relative;flex-shrink:0;transition:.2s}
+.switch:checked{background:var(--blue)}
+.switch:before{content:"";position:absolute;width:21px;height:21px;left:3px;top:3px;background:#fff;border-radius:50%;box-shadow:0 1px 4px #0002;transition:.2s}
+.switch:checked:before{left:22px}
+.toast{position:fixed;left:16px;right:16px;bottom:calc(82px + env(safe-area-inset-bottom));background:#142238;color:white;border-radius:13px;padding:13px 15px;z-index:40;box-shadow:var(--shadow);font-size:13px;display:none}
+.toast.show{display:block;animation:pop .2s ease}
+@keyframes pop{from{transform:translateY(8px);opacity:.5}to{transform:none;opacity:1}}
+dialog{border:0;border-radius:22px;padding:0;width:min(540px,calc(100% - 24px));max-height:88vh;overflow:auto;box-shadow:0 20px 80px #10182755}
+dialog::backdrop{background:#10182788;backdrop-filter:blur(3px)}
+.modal-head{padding:18px 18px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.modal-head h2{font-size:18px;margin:0}
+.modal-body{padding:18px}
+.close{border:0;background:#f1f4f8;border-radius:10px;width:36px;height:36px;font-size:20px}
+.footer-note{font-size:11px;color:var(--muted);line-height:1.5;margin-top:12px}
+.big-number{font-size:30px;font-weight:850;letter-spacing:-1px}
+.progress{height:8px;background:#edf0f5;border-radius:20px;overflow:hidden;margin-top:10px}
+.progress div{height:100%;background:var(--green);border-radius:20px}
+.hidden{display:none!important}
+@media(max-width:640px){.wrap{padding:12px}.months{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.month{padding:9px 6px}.day{font-size:10px}.stats{gap:8px}.stat{padding:13px}.stat .value{font-size:24px}.panel{padding:14px;margin-top:12px}header{padding:22px 16px 20px}header h1{font-size:22px}.form-grid{gap:10px}.months .day{border-radius:5px}}
+@media(min-width:800px){.stats{grid-template-columns:repeat(4,minmax(0,1fr))}.months{grid-template-columns:repeat(4,minmax(0,1fr))}.wrap{padding:20px}.nav{left:50%;right:auto;transform:translateX(-50%);width:min(640px,100%);border:1px solid var(--line);border-bottom:0;border-radius:18px 18px 0 0}}
+</style>
+</head>
+<body>
+<header>
+ <div class="top"><div><h1>Congés & Horaires</h1><p>Ton planning, tes congés, tes heures — au même endroit.</p></div><select class="year-pill" id="headerYear" aria-label="Année"></select></div>
+</header>
+<main class="wrap">
+ <section id="view-home" class="view active">
+  <div class="stats">
+   <div class="stat"><div class="label">Congés disponibles</div><div class="value" id="statBalance">27 j</div><div class="sub" id="statLeaveSub">sur 27 jours au départ</div></div>
+   <div class="stat"><div class="label">Heures supplémentaires</div><div class="value" id="statOvertime">0 h</div><div class="sub">Total enregistré</div></div>
+   <div class="stat"><div class="label">Prochain jour férié</div><div class="value" style="font-size:18px" id="statHoliday">—</div><div class="sub" id="statHolidaySub">Luxembourg</div></div>
+   <div class="stat"><div class="label">Prochain horaire</div><div class="value" id="statShift">6 h–14 h</div><div class="sub" id="statShiftSub">Semaine A</div></div>
+  </div>
+  <div class="panel">
+   <div class="panel-head"><h2>À venir</h2><button class="btn secondary sm" onclick="go('calendar')">Voir le calendrier</button></div>
+   <div id="upcoming"></div>
+  </div>
+  <div class="panel">
+   <div class="panel-head"><h2>Cette semaine</h2><span class="muted small" id="weekLabel"></span></div>
+   <div class="row" style="align-items:stretch">
+    <div style="flex:1;min-width:130px;background:#f3f6fc;border-radius:14px;padding:13px"><div class="muted small">Horaire prévu</div><div style="font-size:20px;font-weight:850;margin-top:5px" id="weekHours">40 h</div></div>
+    <div style="flex:1;min-width:130px;background:#f3f6fc;border-radius:14px;padding:13px"><div class="muted small">Heures supp. cette année</div><div style="font-size:20px;font-weight:850;margin-top:5px" id="weekOvertime">0 h</div></div>
+   </div>
+   <p class="footer-note">Les horaires sont calculés sur une alternance de semaines A/B. Tu peux changer la semaine de départ dans Configuration.</p>
+  </div>
+  <div class="panel">
+   <div class="panel-head"><h2>Raccourcis</h2></div>
+   <div class="row"><button class="btn" onclick="openEntry(null,'leave')">＋ Ajouter un congé</button><button class="btn secondary" onclick="openEntry(null,'overtime')">＋ Heures supp.</button><button class="btn ghost" onclick="go('settings')">⚙ Configuration</button></div>
+  </div>
+ </section>
+ <section id="view-calendar" class="view">
+  <div class="panel">
+   <div class="panel-head"><h2>Calendrier annuel</h2><button class="btn secondary sm" onclick="openEntry(null,'leave')">＋ Congé</button></div>
+   <div class="calendar-tools"><button class="btn ghost sm" onclick="changeYear(-1)">‹ Année</button><strong id="calendarYearLabel"></strong><button class="btn ghost sm" onclick="changeYear(1)">Année ›</button></div>
+   <div class="months" id="months"></div>
+   <div class="legend"><span><i class="dot" style="background:#d8f7e8"></i>Congé</span><span><i class="dot" style="background:#ffe1e1"></i>Jour férié</span><span><i class="dot" style="background:#fff0d8"></i>Heures supp.</span><span><i class="dot" style="background:#e8efff"></i>Horaire modifié</span><span><i class="dot" style="background:#fff;border:1px solid #356df3"></i>Aujourd'hui</span></div>
+   <p class="footer-note">Appuie sur une date pour consulter ou modifier ta journée. Les jours fériés luxembourgeois sont intégrés au calendrier et peuvent être actualisés dans Configuration.</p>
+  </div>
+  <div class="panel">
+   <div class="panel-head"><h2>Journée sélectionnée</h2><span class="muted small" id="selectedDateLabel">Choisis une date</span></div>
+   <div id="selectedDay"><div class="empty-state">Appuie sur un jour du calendrier pour voir les détails.</div></div>
+  </div>
+ </section>
+ <section id="view-leave" class="view">
+  <div class="panel">
+   <div class="panel-head"><h2>Mon solde de congés</h2></div>
+   <div class="row" style="align-items:center;gap:18px"><div><div class="big-number" id="leaveBalanceBig">27 j</div><div class="muted small">disponibles</div></div><div style="flex:1;min-width:130px"><div class="row" style="justify-content:space-between"><span class="small muted">Jours consommés</span><strong id="leaveUsed">0 j</strong></div><div class="progress"><div id="leaveProgress" style="width:0%"></div></div><div class="small muted" style="margin-top:6px" id="leaveEntitlement">Droit initial : 27 jours</div></div></div>
+   <div class="row" style="margin-top:15px"><button class="btn" onclick="openEntry(null,'leave')">＋ Encoder un congé</button><button class="btn secondary" onclick="openEntry(null,'absence')">＋ Absence</button></div>
+  </div>
+  <div class="panel"><div class="panel-head"><h2>Congés et absences enregistrés</h2><select id="leaveFilter" onchange="renderLeave()"><option value="all">Tout</option><option value="leave">Congés</option><option value="absence">Absences</option></select></div><div id="leaveList"></div></div>
+ </section>
+ <section id="view-hours" class="view">
+  <div class="panel">
+   <div class="panel-head"><h2>Heures supplémentaires</h2><button class="btn sm" onclick="openEntry(null,'overtime')">＋ Ajouter</button></div>
+   <div class="stats" style="margin:0">
+    <div class="stat"><div class="label">Total enregistré</div><div class="value" id="hoursTotal">0 h</div></div>
+    <div class="stat"><div class="label">À récupérer</div><div class="value" id="hoursRecover">0 h</div></div>
+    <div class="stat"><div class="label">Payées</div><div class="value" id="hoursPaid">0 h</div></div>
+    <div class="stat"><div class="label">Cette année</div><div class="value" id="hoursYear">0 h</div></div>
+   </div>
+   <p class="footer-note">Encode les heures réellement effectuées. L'application les suit sans appliquer automatiquement de majoration salariale.</p>
+  </div>
+  <div class="panel"><div class="panel-head"><h2>Historique</h2><select id="hoursFilter" onchange="renderHours()"><option value="all">Toutes les années</option><option value="year">Année affichée</option></select></div><div id="hoursList"></div></div>
+ </section>
+ <section id="view-settings" class="view">
+  <div class="panel">
+   <div class="panel-head"><h2>Configuration des horaires</h2></div>
+   <div class="notice">Par défaut, les semaines alternent du lundi au vendredi : semaine A de 6 h à 14 h, puis semaine B de 8 h à 16 h. La semaine A de référence commence le lundi 5 octobre 2026, pour que la semaine du 5 octobre soit bien en 6 h–14 h.</div>
+   <div class="form-grid" style="margin-top:14px">
+    <div class="field"><label for="anchorDate">Lundi de référence (semaine A)</label><input type="date" id="anchorDate" value="2026-10-05"></div>
+    <div class="field"><label for="weekStart">Première semaine affichée</label><select id="weekStart"><option value="A">Semaine A · 6 h–14 h</option><option value="B">Semaine B · 8 h–16 h</option></select></div>
+    <div class="field"><label for="shiftAStart">Semaine A — début</label><input id="shiftAStart" type="time" value="06:00"></div>
+    <div class="field"><label for="shiftAEnd">Semaine A — fin</label><input id="shiftAEnd" type="time" value="14:00"></div>
+    <div class="field"><label for="shiftBStart">Semaine B — début</label><input id="shiftBStart" type="time" value="08:00"></div>
+    <div class="field"><label for="shiftBEnd">Semaine B — fin</label><input id="shiftBEnd" type="time" value="16:00"></div>
+    <div class="field"><label for="workDays">Jours de travail</label><input value="Lundi au vendredi" disabled></div>
+    <div class="field"><label for="weeklyHours">Heures prévues par semaine</label><input id="weeklyHours" type="number" min="0" max="80" step="0.5" value="40"></div>
+    <div class="field full"><button class="btn" onclick="saveSettings()">Enregistrer les horaires</button></div>
+   </div>
+  </div>
+  <div class="panel">
+   <div class="panel-head"><h2>Congés</h2></div>
+   <div class="form-grid">
+    <div class="field"><label for="initialLeave">Solde initial (jours)</label><input id="initialLeave" type="number" min="0" max="365" step="0.5" value="27"></div>
+    <div class="field"><label for="leaveYear">Année du solde</label><select id="leaveYear"></select></div>
+    <div class="field full"><button class="btn" onclick="saveLeaveSettings()">Enregistrer le solde</button></div>
+   </div>
+  </div>
+  <div class="panel">
+   <div class="panel-head"><h2>Jours fériés du Luxembourg</h2><span class="tag holiday">Luxembourg</span></div>
+   <p class="small muted">Calendrier légal intégré pour 2026 et 2027. Les jours fériés sont affichés automatiquement selon l'année choisie. Vérifie les publications officielles pour les années ultérieures.</p>
+   <div id="holidaySettingsList"></div>
+   <div class="row" style="margin-top:12px"><button class="btn secondary" onclick="addHoliday()">＋ Ajouter un jour férié</button><button class="btn ghost" onclick="resetHolidays()">Restaurer les jours fériés intégrés</button></div>
+  </div>
+  <div class="panel">
+   <div class="panel-head"><h2>Sauvegarde et restauration</h2></div>
+   <div class="notice good">Tes données sont sauvegardées automatiquement sur cet appareil. Exporte régulièrement un fichier de sauvegarde, notamment avant d'effacer l'historique du navigateur ou de changer d'iPhone.</div>
+   <div class="row" style="margin-top:14px"><button class="btn" onclick="exportBackup()">⬇ Exporter ma sauvegarde</button><button class="btn secondary" onclick="document.getElementById('importFile').click()">⬆ Restaurer une sauvegarde</button><input type="file" id="importFile" accept=".json,application/json" class="hidden" onchange="importBackup(event)"></div>
+   <div class="row" style="margin-top:10px"><button class="btn ghost" onclick="exportCalendarCSV()">Exporter les journées en CSV</button><button class="btn danger" onclick="resetAll()">Réinitialiser l'application</button></div>
+   <p class="footer-note">Cette version fonctionne sans compte ni serveur. La sauvegarde reste sur cet appareil jusqu'à exportation. Une sauvegarde JSON permet de transférer tes données sur un autre appareil.</p>
+  </div>
+ </section>
+</main>
+<nav class="nav" aria-label="Navigation principale">
+ <button class="active" data-view="home" onclick="go('home')"><span>⌂</span>Accueil</button>
+ <button data-view="calendar" onclick="go('calendar')"><span>▦</span>Calendrier</button>
+ <button data-view="leave" onclick="go('leave')"><span>☑</span>Congés</button>
+ <button data-view="hours" onclick="go('hours')"><span>◷</span>Heures supp.</button>
+ <button data-view="settings" onclick="go('settings')"><span>⚙</span>Réglages</button>
+</nav>
+<div class="toast" id="toast" role="status"></div>
+<dialog id="entryDialog">
+ <div class="modal-head"><h2 id="entryTitle">Ajouter une entrée</h2><button class="close" onclick="closeEntry()" aria-label="Fermer">×</button></div>
+ <div class="modal-body">
+  <form id="entryForm" onsubmit="saveEntry(event)">
+   <input type="hidden" id="entryId">
+   <div class="form-grid">
+    <div class="field full"><label for="entryDate">Date</label><input id="entryDate" type="date" required></div>
+    <div class="field full"><label for="entryType">Type d'entrée</label><select id="entryType" onchange="updateEntryFields()"><option value="leave">Congé</option><option value="absence">Absence</option><option value="overtime">Heures supplémentaires</option><option value="shift">Horaire exceptionnel</option><option value="holiday">Jour férié personnalisé</option></select></div>
+    <div class="field" id="leaveAmountWrap"><label for="leaveAmount">Durée du congé</label><select id="leaveAmount"><option value="1">Journée complète (1 j)</option><option value="0.5">Demi-journée (0,5 j)</option></select></div>
+    <div class="field" id="leavePeriodWrap"><label for="leavePeriod">Demi-journée</label><select id="leavePeriod"><option value="morning">Matin</option><option value="afternoon">Après-midi</option></select></div>
+    <div class="field" id="overtimeAmountWrap"><label for="overtimeAmount">Nombre d'heures</label><input id="overtimeAmount" type="number" min="0.25" max="100" step="0.25" value="1"></div>
+    <div class="field" id="overtimeStatusWrap"><label for="overtimeStatus">Statut</label><select id="overtimeStatus"><option value="recover">À récupérer</option><option value="paid">Payées</option><option value="done">Enregistrées</option></select></div>
+    <div class="field" id="shiftStartWrap"><label for="entryShiftStart">Début</label><input id="entryShiftStart" type="time" value="06:00"></div>
+    <div class="field" id="shiftEndWrap"><label for="entryShiftEnd">Fin</label><input id="entryShiftEnd" type="time" value="14:00"></div>
+    <div class="field full"><label for="entryNote">Note (facultatif)</label><textarea id="entryNote" rows="2" placeholder="Ex. rendez-vous, récupération…"></textarea></div>
+    <div class="field full"><label class="row" style="justify-content:flex-start"><input type="checkbox" id="entryUseHoliday" style="width:18px;min-height:18px"> Marquer aussi comme jour férié</label></div>
+   </div>
+   <div class="row" style="margin-top:16px;justify-content:space-between"><button type="button" class="btn danger" id="deleteEntryBtn" onclick="deleteCurrentEntry()" style="display:none">Supprimer</button><div class="row" style="margin-left:auto"><button type="button" class="btn ghost" onclick="closeEntry()">Annuler</button><button type="submit" class="btn">Enregistrer</button></div></div>
+  </form>
+ </div>
+</dialog>
