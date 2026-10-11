@@ -7,18 +7,46 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Congés & Horaires</title>
+<meta name="description" content="Planning, congés et heures supplémentaires">
 <style>
 :root{--bg:#f3f6fb;--card:#fff;--ink:#172033;--muted:#6b7280;--line:#e5eaf2;--navy:#101827;--blue:#356df3;--green:#15966a;--red:#d64545;--orange:#dc8618;--purple:#805ad5;--shadow:0 8px 28px rgba(25,42,70,.07)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;padding-bottom:calc(86px + env(safe-area-inset-bottom))}button,input,select,textarea{font:inherit}button{cursor:pointer}header{background:linear-gradient(135deg,#101827,#1c3154);color:#fff;padding:24px 18px 22px;border-radius:0 0 26px 26px}header .top{display:flex;align-items:center;justify-content:space-between;gap:12px}header h1{font-size:24px;line-height:1.15;margin:0;font-weight:800;letter-spacing:-.5px}header p{margin:8px 0 0;color:#c9d5e8;font-size:13px}.year-pill{border:1px solid #ffffff35;background:#ffffff12;color:white;border-radius:12px;padding:9px 12px;font-weight:800}.wrap{max-width:980px;margin:auto;padding:16px}.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:-4px}.stat{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px;box-shadow:var(--shadow);min-width:0}.stat .label{font-size:12px;color:var(--muted);font-weight:650}.stat .value{font-size:26px;font-weight:850;letter-spacing:-.7px;margin-top:6px}.stat .sub{font-size:11px;color:var(--muted);margin-top:3px}.panel{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin-top:14px;box-shadow:var(--shadow)}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}.panel h2{font-size:17px;margin:0;letter-spacing:-.2px}.muted{color:var(--muted)}.small{font-size:12px}.btn{border:0;border-radius:12px;padding:11px 14px;font-weight:750;background:var(--blue);color:white}.btn.secondary{background:#edf2ff;color:#244fc5}.btn.dark{background:#202c42;color:white}.btn.ghost{background:#f3f5f9;color:#344054}.btn.danger{background:#fff0f0;color:#b52e2e}.btn.sm{padding:8px 10px;font-size:12px}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.field{display:flex;flex-direction:column;gap:6px;min-width:0}.field label{font-size:12px;color:#596579;font-weight:750}.field input,.field select,.field textarea{width:100%;border:1px solid #d9e0eb;border-radius:12px;background:#fff;color:var(--ink);padding:12px;min-height:44px;outline:none}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px #356df31a}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.form-grid .full{grid-column:1/-1}.nav{position:fixed;z-index:20;bottom:0;left:0;right:0;padding:8px 8px calc(8px + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(5,1fr);gap:4px;background:#ffffffed;backdrop-filter:blur(18px);border-top:1px solid #dfe5ef}.nav button{border:0;background:transparent;color:#758096;border-radius:12px;padding:8px 2px 6px;font-size:10px;font-weight:750;display:flex;flex-direction:column;align-items:center;gap:4px}.nav button span{font-size:19px;line-height:1}.nav button.active{color:var(--blue);background:#edf2ff}.view{display:none}.view.active{display:block}.calendar-tools{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}.calendar-tools select{border:1px solid var(--line);border-radius:10px;padding:9px;background:#fff;font-weight:750}.months{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.month{border:1px solid var(--line);border-radius:15px;padding:10px 8px;background:#fff;min-width:0}.month h3{font-size:13px;margin:0 0 9px;text-align:center}.weekdays,.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px}.weekdays span{text-align:center;font-size:9px;color:#929bad;padding-bottom:5px;font-weight:700}.day{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;border:0;border-radius:6px;background:transparent;color:#344054;font-size:10px;position:relative;padding:0;min-width:0}.day.empty{pointer-events:none}.day.today{outline:1.5px solid var(--blue);font-weight:900}.day.leave{background:#d8f7e8;color:#08764e;font-weight:850}.day.holiday{background:#ffe1e1;color:#b42323;font-weight:850}.day.overtime{box-shadow:inset 0 -3px 0 var(--orange)}.day.manual{box-shadow:inset 0 0 0 1.5px var(--purple)}.day.selected{background:#356df3!important;color:#fff!important;outline:2px solid #9bb7ff}.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:11px;color:var(--muted);margin-top:12px}.dot{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:4px}.month-detail{display:grid;grid-template-columns:1fr;gap:8px}.day-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}.day-row:last-child{border-bottom:0}.day-row strong{font-size:13px}.tag{font-size:10px;font-weight:800;border-radius:7px;padding:5px 7px;white-space:nowrap}.tag.leave{background:#d8f7e8;color:#08764e}.tag.holiday{background:#ffe1e1;color:#b42323}.tag.overtime{background:#fff0d8;color:#9a5a00}.tag.work{background:#e8efff;color:#2854bf}.tag.off{background:#f0f2f6;color:#687386}.list-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}.list-item:last-child{border-bottom:0}.list-item .main{min-width:0}.list-item .main strong{display:block;font-size:13px}.list-item .main small{display:block;color:var(--muted);font-size:11px;margin-top:4px}.empty-state{text-align:center;padding:24px 12px;color:var(--muted);font-size:13px}.notice{background:#eef4ff;border:1px solid #d7e4ff;color:#31549b;padding:12px;border-radius:13px;font-size:12px;line-height:1.45}.notice.warn{background:#fff8e8;border-color:#f5e1ad;color:#805b12}.notice.good{background:#e9fbf2;border-color:#c4f0d9;color:#116747}.switchrow{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}.switchrow:last-child{border:0}.switchrow strong{font-size:13px}.switchrow small{display:block;color:var(--muted);font-size:11px;margin-top:3px}.switch{width:46px;height:27px;appearance:none;background:#d5dbe5;border-radius:99px;position:relative;flex-shrink:0;transition:.2s}.switch:checked{background:var(--blue)}.switch:before{content:"";position:absolute;width:21px;height:21px;left:3px;top:3px;background:#fff;border-radius:50%;box-shadow:0 1px 4px #0002;transition:.2s}.switch:checked:before{left:22px}.toast{position:fixed;left:16px;right:16px;bottom:calc(82px + env(safe-area-inset-bottom));background:#142238;color:white;border-radius:13px;padding:13px 15px;z-index:40;box-shadow:var(--shadow);font-size:13px;display:none}.toast.show{display:block;animation:pop .2s ease}@keyframes pop{from{transform:translateY(8px);opacity:.5}to{transform:none;opacity:1}}dialog{border:0;border-radius:22px;padding:0;width:min(540px,calc(100% - 24px));max-height:88vh;overflow:auto;box-shadow:0 20px 80px #10182755}dialog::backdrop{background:#10182788;backdrop-filter:blur(3px)}.modal-head{padding:18px 18px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}.modal-head h2{font-size:18px;margin:0}.modal-body{padding:18px}.close{border:0;background:#f1f4f8;border-radius:10px;width:36px;height:36px;font-size:20px}.footer-note{font-size:11px;color:var(--muted);line-height:1.5;margin-top:12px}.big-number{font-size:30px;font-weight:850;letter-spacing:-1px}.progress{height:8px;background:#edf0f5;border-radius:20px;overflow:hidden;margin-top:10px}.progress div{height:100%;background:var(--green);border-radius:20px}.hidden{display:none!important}
 @media(max-width:640px){.wrap{padding:12px}.months{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.month{padding:9px 6px}.day{font-size:10px}.stats{gap:8px}.stat{padding:13px}.stat .value{font-size:24px}.panel{padding:14px;margin-top:12px}header{padding:22px 16px 20px}header h1{font-size:22px}.form-grid{gap:10px}.months .day{border-radius:5px}}
 @media(min-width:800px){.stats{grid-template-columns:repeat(4,minmax(0,1fr))}.months{grid-template-columns:repeat(4,minmax(0,1fr))}.wrap{padding:20px}.nav{left:50%;right:auto;transform:translateX(-50%);width:min(640px,100%);border:1px solid var(--line);border-bottom:0;border-radius:18px 18px 0 0}}
+
+/* Écran de verrouillage et réglages de sécurité */
+.lock-screen{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:22px;background:linear-gradient(145deg,#101827,#203c66);color:#172033}
+.lock-card{width:min(100%,390px);background:#fff;border-radius:24px;padding:25px;box-shadow:0 22px 80px #0005;text-align:center}
+.lock-logo{width:64px;height:64px;border-radius:20px;background:#edf2ff;color:#356df3;display:grid;place-items:center;font-size:30px;margin:0 auto 14px}
+.lock-card h2{font-size:23px;margin:0 0 7px}.lock-card p{font-size:13px;line-height:1.5;color:#667085;margin:0 0 18px}
+.lock-card input{width:100%;padding:14px;border:1px solid #d9e0eb;border-radius:12px;font-size:20px;text-align:center;letter-spacing:5px;margin-bottom:10px}
+.lock-card button{width:100%;margin-top:8px}.lock-error{min-height:18px;color:#b42318;font-size:12px;margin-top:8px}
+.lock-note{font-size:10px!important;margin-top:16px!important;margin-bottom:0!important}
+
 </style>
 </head>
 <body>
+
+<div id="lockScreen" class="lock-screen" role="dialog" aria-modal="true" aria-labelledby="lockTitle">
+ <div class="lock-card">
+  <div class="lock-logo">🔒</div>
+  <h2 id="lockTitle">Congés &amp; Horaires</h2>
+  <p>Entre ton code pour accéder à ton planning.</p>
+  <form id="unlockForm">
+   <input id="unlockPin" type="password" inputmode="numeric" autocomplete="current-password" maxlength="32" placeholder="Mot de passe" aria-label="Mot de passe" required>
+   <button class="btn" type="submit">Déverrouiller</button>
+  </form>
+  <button class="btn secondary" id="faceIdUnlock" type="button" style="display:none"> Déverrouiller avec Face ID</button>
+  <div id="lockError" class="lock-error" aria-live="polite"></div>
+  <p class="lock-note">Code initial : 1157. Tu pourras le modifier dans Réglages. Face ID nécessite Safari/HTTPS et un appareil compatible.</p>
+ </div>
+</div>
+
 <header>
  <div class="top"><div><h1>Congés & Horaires</h1><p>Ton planning, tes congés, tes heures — au même endroit.</p></div><select class="year-pill" id="headerYear" aria-label="Année"></select></div>
 </header>
 <main class="wrap">
+ <div id="appError" class="notice warn" style="display:none;margin-bottom:12px" role="alert"></div>
  <section id="view-home" class="view active">
   <div class="stats">
    <div class="stat"><div class="label">Congés disponibles</div><div class="value" id="statBalance">27 j</div><div class="sub" id="statLeaveSub">sur 27 jours au départ</div></div>
@@ -106,6 +134,18 @@
    <p class="small muted">Calendrier légal intégré pour 2026 et 2027. Les jours fériés sont affichés automatiquement selon l'année choisie. Vérifie les publications officielles pour les années ultérieures.</p>
    <div id="holidaySettingsList"></div>
    <div class="row" style="margin-top:12px"><button class="btn secondary" onclick="addHoliday()">＋ Ajouter un jour férié</button><button class="btn ghost" onclick="resetHolidays()">Restaurer les jours fériés intégrés</button></div>
+  </div>
+  <div class="panel">
+   <div class="panel-head"><h2>🔐 Sécurité de l’application</h2></div>
+   <div class="notice">Le code protège l’ouverture de l’application sur cet appareil. Pour une protection plus forte des données, il faut un serveur sécurisé. Face ID est proposé si ton iPhone et ton navigateur prennent en charge les clés d’accès.</div>
+   <div class="form-grid" style="margin-top:12px">
+    <div class="field"><label for="newPin">Nouveau mot de passe / code</label><input id="newPin" type="password" autocomplete="new-password" minlength="4" maxlength="32" placeholder="4 caractères minimum"></div>
+    <div class="field"><label for="confirmPin">Confirmer</label><input id="confirmPin" type="password" autocomplete="new-password" minlength="4" maxlength="32" placeholder="Confirmer le code"></div>
+    <div class="field full"><button type="button" class="btn" onclick="changePin()">Enregistrer le mot de passe</button></div>
+    <div class="field full"><button type="button" class="btn secondary" id="setupFaceId" onclick="setupFaceID()">Configurer Face ID</button></div>
+    <div class="field full"><button type="button" class="btn ghost" onclick="lockApp()">Verrouiller maintenant</button></div>
+   </div>
+   <div class="footer-note">Le mot de passe et l’activation Face ID sont enregistrés dans le stockage local de ce navigateur. Ne les considère pas comme une sécurité serveur.</div>
   </div>
   <div class="panel">
    <div class="panel-head"><h2>Sauvegarde et restauration</h2></div>
@@ -215,8 +255,43 @@ function exportCalendarCSV(){let rows=[['Date','Jour','Type','Détail','Début',
 function resetAll(){if(!confirm('Cela effacera toutes les entrées et réglages enregistrés sur cet appareil. As-tu exporté une sauvegarde ?'))return;data=defaultData();persist();currentYear=2026;selectedDate=iso(new Date());renderSettingsForm();renderYearSelects();renderAll();toast('Application réinitialisée.')}
 function renderSettingsForm(){let s=data.settings;for(let [id,key] of [['anchorDate','anchorDate'],['weekStart','weekStart'],['shiftAStart','shiftAStart'],['shiftAEnd','shiftAEnd'],['shiftBStart','shiftBStart'],['shiftBEnd','shiftBEnd'],['weeklyHours','weeklyHours'],['initialLeave','initialLeave'],['leaveYear','leaveYear']]){let el=document.getElementById(id);if(el)el.value=s[key]??''}}
 function escapeHtml(str){return String(str??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function init(){renderYearSelects();renderSettingsForm();renderAll();document.getElementById('headerYear').value=String(currentYear);document.getElementById('entryDialog').addEventListener('click',e=>{if(e.target.id==='entryDialog')closeEntry()})}
-init();
+
+// Sécurité locale : code par défaut 1157 et déverrouillage WebAuthn/Face ID en option.
+const PIN_KEY='conges_horaires_pin_v1';
+const FACE_KEY='conges_horaires_face_credential_v1';
+function getPin(){try{return localStorage.getItem(PIN_KEY)||'1157'}catch(e){return '1157'}}
+function b64url(bytes){let s='';for(const b of new Uint8Array(bytes))s+=String.fromCharCode(b);return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+function fromB64url(s){s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';let raw=atob(s),out=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)out[i]=raw.charCodeAt(i);return out}
+function randomBytes(n=32){let a=new Uint8Array(n);crypto.getRandomValues(a);return a}
+function lockApp(){document.getElementById('lockScreen').style.display='flex';document.getElementById('unlockPin').value='';document.getElementById('lockError').textContent='';document.getElementById('unlockPin').focus()}
+function unlockApp(){document.getElementById('lockScreen').style.display='none';document.getElementById('lockError').textContent=''}
+document.getElementById('unlockForm').addEventListener('submit',function(ev){ev.preventDefault();if(document.getElementById('unlockPin').value===getPin()){unlockApp()}else{document.getElementById('lockError').textContent='Mot de passe incorrect.';document.getElementById('unlockPin').select()}});
+async function setupFaceID(){
+ const msg=document.getElementById('lockError');
+ if(!window.isSecureContext||!navigator.credentials||!window.PublicKeyCredential){toast('Face ID / clé d’accès n’est pas pris en charge ici. Ouvre le site HTTPS dans Safari sur ton iPhone.');return}
+ try{
+  const host=location.hostname;
+  const cred=await navigator.credentials.create({publicKey:{challenge:randomBytes(),rp:{name:'Congés & Horaires',id:host},user:{id:randomBytes(16),name:'utilisateur',displayName:'Utilisateur Congés & Horaires'},pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{authenticatorAttachment:'platform',residentKey:'preferred',userVerification:'required'},timeout:60000,attestation:'none'}});
+  if(!cred)throw new Error('Annulé');
+  localStorage.setItem(FACE_KEY,b64url(cred.rawId));
+  document.getElementById('faceIdUnlock').style.display='block';
+  toast('Face ID / clé d’accès configuré sur cet appareil.');
+ }catch(e){toast('Configuration Face ID impossible ou annulée. Vérifie que le site est en HTTPS et réessaie dans Safari.');}
+}
+async function unlockWithFaceID(){
+ try{
+  const saved=localStorage.getItem(FACE_KEY);if(!saved){toast('Configure d’abord Face ID dans Réglages.');return}
+  const assertion=await navigator.credentials.get({publicKey:{challenge:randomBytes(),rpId:location.hostname,allowCredentials:[{type:'public-key',id:fromB64url(saved)}],userVerification:'required',timeout:60000}});
+  if(assertion&&b64url(assertion.rawId)===saved)unlockApp();else document.getElementById('lockError').textContent='Face ID n’a pas confirmé l’accès.';
+ }catch(e){document.getElementById('lockError').textContent='Face ID annulé ou indisponible. Utilise ton mot de passe.';}
+}
+document.getElementById('faceIdUnlock').addEventListener('click',unlockWithFaceID);
+function updateFaceButton(){try{document.getElementById('faceIdUnlock').style.display=localStorage.getItem(FACE_KEY)?'block':'none'}catch(e){}}
+function changePin(){let a=document.getElementById('newPin').value,b=document.getElementById('confirmPin').value;if(a.length<4){toast('Choisis un mot de passe d’au moins 4 caractères.');return}if(a!==b){toast('Les deux mots de passe ne correspondent pas.');return}try{localStorage.setItem(PIN_KEY,a);document.getElementById('newPin').value='';document.getElementById('confirmPin').value='';toast('Mot de passe modifié.')}catch(e){toast('Impossible d’enregistrer le mot de passe sur cet appareil.')}}
+window.addEventListener('error',function(e){const box=document.getElementById('appError');if(box){box.style.display='block';box.textContent='Une erreur JavaScript empêche certaines fonctions de marcher : '+(e.message||'erreur inconnue')}});
+
+function init(){updateFaceButton();renderYearSelects();renderSettingsForm();renderAll();document.getElementById('headerYear').value=String(currentYear);document.getElementById('entryDialog').addEventListener('click',e=>{if(e.target.id==='entryDialog')closeEntry()})}
+try{init()}catch(err){const box=document.getElementById("appError");if(box){box.style.display="block";box.textContent="Erreur au démarrage : "+(err.message||err)}else alert("Erreur au démarrage de l’application.")}
 </script>
 </body>
 </html>
