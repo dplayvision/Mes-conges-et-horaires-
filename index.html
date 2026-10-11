@@ -49,6 +49,25 @@ header{background:linear-gradient(135deg,#ffffff,#f0f5ff)!important;color:#202b3
 .day-photo-modal-card{box-shadow:0 12px 35px rgba(25,42,70,.15)!important}
 .lock-card{box-shadow:0 12px 40px rgba(25,42,70,.12)!important}
 .close{background:#edf2f8!important;color:#263449!important}
+
+@page{size:A4 landscape;margin:8mm}
+@media print{
+ html,body{background:#fff!important;color:#111!important;margin:0!important;padding:0!important;width:100%!important;height:auto!important;overflow:visible!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ body *{visibility:hidden!important}
+ #view-summary,#view-summary *{visibility:visible!important}
+ #view-summary{display:block!important;position:absolute!important;left:0!important;top:0!important;width:100%!important;margin:0!important;padding:0!important}
+ #view-summary .panel{border:0!important;box-shadow:none!important;border-radius:0!important;padding:0!important;margin:0!important}
+ #view-summary .panel-head{margin:0 0 5mm!important}
+ #view-summary .panel h2{font-size:17pt!important}
+ #view-summary .summary-controls,#view-summary p{display:none!important}
+ #view-summary .summary-wrap{overflow:visible!important;width:100%!important}
+ #view-summary .summary-table{width:100%!important;min-width:0!important;table-layout:fixed!important;border-collapse:collapse!important;border-spacing:0!important;font-size:9pt!important}
+ #view-summary .summary-table th,#view-summary .summary-table td{padding:5px 4px!important;border:1px solid #d7dce5!important;white-space:normal!important;position:static!important;overflow-wrap:anywhere!important}
+ #view-summary .summary-table th:first-child,#view-summary .summary-table td:first-child{position:static!important}
+ #view-summary .summary-table tfoot{display:table-footer-group!important}
+ #view-summary .summary-table tr{break-inside:avoid!important;page-break-inside:avoid!important}
+ .nav,header,.stats,.toast,#lockScreen,dialog{display:none!important}
+}
 </style>
 </head>
 <body>
@@ -120,7 +139,7 @@ header{background:linear-gradient(135deg,#ffffff,#f0f5ff)!important;color:#202b3
  <section id="view-summary" class="view">
   <div class="panel">
    <div class="panel-head"><h2>📊 Synthèse annuelle</h2><span class="muted small">Vue par mois</span></div>
-   <div class="summary-controls"><label for="summaryYear" class="small muted">Année</label><select id="summaryYear" onchange="currentYear=Number(this.value);document.getElementById('headerYear').value=String(currentYear);renderSummary();renderCalendar();renderHome();renderHours();renderHolidaySettings()"></select><button class="btn ghost sm" onclick="exportCalendarCSV()">Exporter CSV</button></div>
+   <div class="summary-controls"><label for="summaryYear" class="small muted">Année</label><select id="summaryYear" onchange="currentYear=Number(this.value);document.getElementById('headerYear').value=String(currentYear);renderSummary();renderCalendar();renderHome();renderHours();renderHolidaySettings()"></select><button class="btn ghost sm" onclick="exportSummaryCSV()">Télécharger CSV</button><button class="btn secondary sm" onclick="downloadSummaryPDF()">Télécharger / Imprimer PDF</button></div>
    <p class="small muted">Tableau récapitulatif des congés, jours fériés, heures supplémentaires, maladies, repos et jours travaillés. Les couleurs des colonnes Congé, Férié, Heures supp. et Maladie suivent automatiquement celles que tu choisis dans Réglages → Couleurs du calendrier.</p>
    <div class="summary-wrap" id="summaryTable"><div class="empty-state">Chargement de la synthèse…</div></div>
   </div>
@@ -597,6 +616,21 @@ function removeHoliday(date,name){if(!confirm('Supprimer ce jour férié personn
 function resetHolidays(){if(!confirm('Restaurer les 11 jours fériés légaux calculés automatiquement pour toutes les années ? Les jours fériés personnalisés seront conservés.'))return;data.holidays={};persist();renderAll();toast('Jours fériés légaux recalculés pour toutes les années.')}
 function exportBackup(){try{persist();let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`sauvegarde-conges-horaires-${iso(new Date())}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Sauvegarde exportée. Garde le fichier JSON dans Fichiers.')}catch(e){toast('Impossible de créer la sauvegarde. Réessaie.')}}
 function importBackup(ev){let file=ev.target.files?.[0];if(!file)return;let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(!x||!x.settings||!Array.isArray(x.entries))throw new Error('invalid');if(!confirm('Restaurer cette sauvegarde remplacera les données actuelles. Continuer ?'))return;data={...defaultData(),...x,settings:{...defaultData().settings,...x.settings},entries:x.entries,holidays:x.holidays||defaultData().holidays,customHolidays:x.customHolidays||[]};persist();renderSettingsForm();renderAll();toast('Sauvegarde restaurée.')}catch(e){toast('Fichier de sauvegarde invalide.')}finally{ev.target.value=''}};r.readAsText(file)}
+function downloadSummaryPDF(){
+ const summary=document.getElementById('view-summary');
+ const oldActive=summary.classList.contains('active');
+ document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+ summary.classList.add('active');
+ renderSummary();
+ setTimeout(()=>{window.print();if(!oldActive){summary.classList.remove('active');const activeNav=document.querySelector('.nav button.active');if(activeNav){const target=activeNav.getAttribute('onclick')||'';const m=target.match(/showView\('([^']+)'/);if(m)document.getElementById('view-'+m[1])?.classList.add('active')} }},120);
+}
+function exportSummaryCSV(){
+ const table=document.querySelector('#summaryTable .summary-table');if(!table){toast('La synthèse n’est pas encore prête.');return}
+ const rows=Array.from(table.rows).map(tr=>Array.from(tr.cells).map(td=>td.innerText.trim()));
+ const csv='\ufeff'+rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';')).join('\r\n');
+ const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`synthese-conges-${currentYear}.csv`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Synthèse CSV téléchargée.');
+}
+
 function exportCalendarCSV(){let rows=[['Date','Jour','Type','Détail','Début','Fin','Heures supp.','Statut','Note']];let start=new Date(currentYear,0,1,12),end=new Date(currentYear+1,0,1,12);for(let d=new Date(start);d<end;d.setDate(d.getDate()+1)){let date=iso(d),hol=holidayFor(date),entries=dayEntries(date);if(hol)rows.push([date,fmtDate(date,{weekday:'long'}),'Jour férié',hol.name,'','','','','']);if(isWorkday(date)){let e=entries.find(x=>x.type==='shift'),s=e?{start:e.start,end:e.end}:shiftFor(date);rows.push([date,fmtDate(date,{weekday:'long'}),e?'Horaire exceptionnel':'Horaire prévu',`Semaine ${shiftFor(date).label}`,s.start,s.end,'','',''])}entries.forEach(e=>rows.push([date,fmtDate(date,{weekday:'long'}),TYPES[e.type],e.type==='leave'?`${e.amount} jour(s)`:e.type==='overtime'?`${e.hours} h`:'',e.start||(e.type==='appointment'?e.time||'':''),e.end||'',e.hours||'',e.status||'',e.note||'']))}let csv='\ufeff'+rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';')).join('\r\n'),blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`calendrier-conges-${currentYear}.csv`;a.click();URL.revokeObjectURL(url);toast('Calendrier CSV exporté.')}
 function resetAll(){if(!confirm('Cela effacera toutes les entrées et réglages enregistrés sur cet appareil. As-tu exporté une sauvegarde ?'))return;data=defaultData();persist();currentYear=2026;selectedDate=iso(new Date());renderSettingsForm();renderYearSelects();renderAll();toast('Application réinitialisée.')}
 
