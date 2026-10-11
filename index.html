@@ -194,7 +194,7 @@
    <div class="form-grid">
     <div class="field full"><label for="leavePhotoTitle">Nom de la feuille</label><input id="leavePhotoTitle" maxlength="100" placeholder="Ex. Congés pris 2026"></div>
     <div class="field full"><label for="leavePhotoDate">Date à associer au calendrier</label><input id="leavePhotoDate" type="date" required><small class="muted">Cette date sera marquée 📷 dans le calendrier. En touchant le jour, tu pourras ouvrir la photo.</small></div>
-    <div class="field full"><label for="leavePhotoInput">Choisir une photo ou un scan depuis le GSM</label><input id="leavePhotoInput" type="file" accept="image/*" capture="environment"></div>
+    <div class="field full"><label for="leavePhotoInput">Choisir une photo ou un scan depuis le GSM</label><input id="leavePhotoInput" type="file" accept="image/*"></div>
     <div class="field full"><label for="leavePhotoNote">Note (facultatif)</label><input id="leavePhotoNote" maxlength="300" placeholder="Ex. document signé par l'employeur"></div>
     <div class="field full"><button class="btn" type="button" onclick="saveLeavePhoto()">💾 Enregistrer la photo</button></div>
    </div>
@@ -340,7 +340,7 @@ async function listLeavePhotos(){
 function renderLeavePhotos(items){
  const list=document.getElementById('leavePhotoList');if(!list)return;
  if(!items.length){list.innerHTML='<div class="empty-state">Aucune feuille de congés enregistrée.</div>';return}
- list.innerHTML=items.map(p=>`<div class="list-item"><div class="main"><strong>${escapeHtml(p.title||'Feuille de congés')}</strong><small>${escapeHtml(fmtDate(p.calendarDate||p.date,{day:'numeric',month:'short',year:'numeric'}))}${p.note?' · '+escapeHtml(p.note):''}${p.calendarDate?' · 📅 Liée au calendrier':''}</small><div style="margin-top:8px"><img src="${p.dataUrl}" alt="${escapeHtml(p.title||'Photo de congés')}" style="display:block;max-width:100%;max-height:220px;object-fit:contain;border:1px solid var(--line);border-radius:10px;cursor:zoom-in" onclick="openCalendarPhoto('${p.id}')"></div></div><div class="row">${p.calendarDate?`<button class="btn secondary sm" onclick="openCalendarPhoto('${p.id}')">👁 Ouvrir</button>`:''}<button class="btn secondary sm" onclick="downloadLeavePhoto('${p.id}')">Exporter</button><button class="btn danger sm" onclick="deleteLeavePhoto('${p.id}')">Supprimer</button></div></div>`).join('');
+ list.innerHTML=items.map(p=>`<div class="list-item"><div class="main"><strong>${escapeHtml(p.title||'Feuille de congés')}</strong><small>${escapeHtml(fmtDate(p.calendarDate||p.date,{day:'numeric',month:'short',year:'numeric'}))}${p.note?' · '+escapeHtml(p.note):''}${p.calendarDate?' · 📅 Liée au calendrier':''}</small><div style="margin-top:8px"><img src="${p.dataUrl}" alt="${escapeHtml(p.title||'Photo de congés')}" style="display:block;max-width:100%;max-height:220px;object-fit:contain;border:1px solid var(--line);border-radius:10px;cursor:zoom-in" onclick="openCalendarPhoto('${p.id}')"></div></div><div class="row">${p.calendarDate?`<button class="btn secondary sm" onclick="openCalendarPhoto('${p.id}')">👁 Ouvrir</button>`:''}<button class="btn secondary sm" onclick="editLeavePhoto('${p.id}')">✏️ Modifier</button><button class="btn secondary sm" onclick="downloadLeavePhoto('${p.id}')">Exporter</button><button class="btn danger sm" onclick="deleteLeavePhoto('${p.id}')">Supprimer</button></div></div>`).join('');
 }
 
 function initLeavePhotoDate(){const el=document.getElementById('leavePhotoDate');if(el&&!el.value)el.value=(typeof selectedDate!=='undefined'&&selectedDate)||iso(new Date());}
@@ -360,6 +360,28 @@ async function saveLeavePhoto(){
   status.textContent='Photo enregistrée et liée au '+fmtDate(calendarDate)+'. Le jour du calendrier affichera 📷 ; touche cette date pour ouvrir la photo.';
   await listLeavePhotos();await refreshCalendarPhotoThumbnails();renderCalendar();toast('Photo enregistrée et ajoutée au calendrier.');
  }catch(e){status.textContent='Stockage photo indisponible : '+(e&&e.message?e.message:'erreur inconnue')+'. Ouvre l’application depuis son adresse GitHub Pages dans Safari (pas dans un aperçu) et vérifie que le stockage du site est autorisé.';toast('Enregistrement photo impossible.')}
+}
+async function editLeavePhoto(id){
+ try{
+  const db=await openPhotoDB();
+  const photo=await new Promise((resolve,reject)=>{const req=db.transaction(PHOTO_STORE,'readonly').objectStore(PHOTO_STORE).get(id);req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)});
+  if(!photo){toast('Photo introuvable.');return}
+  const title=prompt('Nom de la photo :',photo.title||'Feuille de congés');if(title===null)return;
+  const date=prompt('Date à associer au calendrier (AAAA-MM-JJ) :',photo.calendarDate||photo.date||iso(new Date()));if(date===null)return;
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||Number.isNaN(new Date(date+'T12:00:00').getTime())){toast('Date invalide. Utilise le format AAAA-MM-JJ.');return}
+  const note=prompt('Note (facultatif) :',photo.note||'');if(note===null)return;
+  photo.title=title.trim()||'Feuille de congés';photo.date=date;photo.calendarDate=date;photo.note=note.trim();
+  if(confirm('Veux-tu aussi remplacer l’image par une autre photo de ton GSM ?')){
+   const picker=document.createElement('input');picker.type='file';picker.accept='image/*';
+   picker.onchange=async()=>{const file=picker.files&&picker.files[0];if(!file)return;if(!file.type.startsWith('image/')){toast('Choisis un fichier image.');return}try{photo.dataUrl=await readFileAsDataURL(file);photo.mime=file.type;await storeEditedLeavePhoto(photo);toast('Photo et informations modifiées.')}catch(e){toast('Impossible d’enregistrer la modification.')}};
+   picker.click();
+  }else{await storeEditedLeavePhoto(photo);toast('Informations de la photo modifiées.')}
+ }catch(e){toast('Impossible de modifier cette photo.')}
+}
+async function storeEditedLeavePhoto(photo){
+ const db=await openPhotoDB();
+ await new Promise((resolve,reject)=>{const tx=db.transaction(PHOTO_STORE,'readwrite');tx.objectStore(PHOTO_STORE).put(photo);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error||new Error('Modification impossible'));tx.onabort=()=>reject(tx.error||new Error('Modification annulée'))});
+ await listLeavePhotos();await refreshCalendarPhotoThumbnails();renderCalendar();if(typeof renderLeave==='function')renderLeave();
 }
 async function deleteLeavePhoto(id){
  if(!confirm('Supprimer définitivement cette photo de congés ?'))return;
