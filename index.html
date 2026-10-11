@@ -542,12 +542,17 @@ function renderSummary(){
   for(let n=1;n<=days;n++){
    const date=iso(new Date(currentYear,m,n,12)), dow=new Date(date+'T12:00:00').getDay();
    const entries=dayEntries(date), hol=holidayFor(date);
-   sums.leave+=entries.filter(e=>e.type==='leave'||e.type==='mel_leave').reduce((a,e)=>a+Number(e.amount||1),0);
-   sums.sick+=entries.filter(e=>e.type==='sickness'||e.type==='absence').reduce((a,e)=>a+Number(e.amount||1),0);
+   const isWeekday=dow>=1&&dow<=5;
+   // Les congés, maladies/absences et jours fériés ne sont comptés que du lundi au vendredi.
+   // Les heures supplémentaires restent comptées même si elles sont enregistrées le week-end.
+   if(isWeekday){
+    sums.leave+=entries.filter(e=>e.type==='leave'||e.type==='mel_leave').reduce((a,e)=>a+Number(e.amount||1),0);
+    sums.sick+=entries.filter(e=>e.type==='sickness'||e.type==='absence').reduce((a,e)=>a+Number(e.amount||1),0);
+    if(hol)sums.holiday+=1;
+    if(!hol&&!entries.some(e=>['leave','mel_leave','sickness','absence'].includes(e.type))) sums.work++;
+   }
    sums.overtime+=entries.filter(e=>e.type==='overtime').reduce((a,e)=>a+Number(e.hours||0),0);
-   if(hol)sums.holiday+=1;
    if(dow===0||dow===6) sums.rest++;
-   else if(!hol&&!entries.some(e=>['leave','mel_leave','sickness','absence'].includes(e.type))) sums.work++;
   }
   Object.keys(totals).forEach(k=>totals[k]+=sums[k]);
   const workBreakdown=[`${sums.work} j travaillé${sums.work>1?'s':''}`,sums.holiday?`${fmtNum(sums.holiday)} férié${sums.holiday>1?'s':''}`:'',sums.leave?`${fmtNum(sums.leave)} congé${sums.leave>1?'s':''}`:'',sums.sick?`${fmtNum(sums.sick)} maladie/absence${sums.sick>1?'s':''}`:''].filter(Boolean).join(' + ');
