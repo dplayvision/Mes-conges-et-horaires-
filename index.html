@@ -27,9 +27,14 @@
 .lock-note{font-size:10px!important;margin-top:16px!important;margin-bottom:0!important}
 
 .day{overflow:hidden}
-.day .calendar-photo-thumb{position:absolute;inset:1px;width:calc(100% - 2px);height:calc(100% - 2px);object-fit:cover;border-radius:5px;opacity:.88;pointer-events:none}
-.day .calendar-photo-number{position:absolute;right:1px;bottom:0;background:#172033d9;color:#fff;border-radius:4px;padding:0 2px;font-size:8px;line-height:11px;z-index:2}
-.day.has-calendar-photo{color:#fff;text-shadow:0 1px 3px #000;font-weight:900}
+.day .calendar-photo-thumb{display:none}
+.day .calendar-photo-number{position:absolute;right:2px;bottom:1px;background:#172033d9;color:#fff;border-radius:4px;padding:1px 3px;font-size:9px;line-height:12px;z-index:2}
+.day.has-calendar-photo{font-weight:900}
+.day .calendar-photo-open{position:absolute;inset:0;display:block;width:100%;height:100%;padding:0;border:0;background:transparent;cursor:pointer;z-index:3}
+.day-photo-modal{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:99999;display:flex;align-items:center;justify-content:center;padding:18px}
+.day-photo-modal-card{background:var(--card,#fff);color:var(--text,#111);border-radius:14px;padding:14px;max-width:900px;width:100%;max-height:92vh;overflow:auto;box-shadow:0 20px 60px #0006}
+.day-photo-modal-card img{display:block;max-width:100%;max-height:70vh;object-fit:contain;margin:10px auto;border-radius:8px}
+.day-photo-modal-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 .calendar-photo-tools{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:12px;background:var(--card)}
 .calendar-photo-preview{display:block;max-width:100%;max-height:260px;object-fit:contain;border-radius:10px;margin-top:8px}
 </style>
@@ -345,7 +350,7 @@ async function renderCalendarDayPhoto(date){
  try{
   const photos=await getCalendarPhotosForDate(date);
   if(status)status.textContent=photos.length?`${photos.length} photo(s) liée(s) à cette journée.`:'Aucune photo liée à cette journée.';
-  preview.innerHTML=photos.map(p=>`<div style="margin-top:8px"><img class="calendar-photo-preview" src="${p.dataUrl}" alt="Photo du ${escapeHtml(fmtDate(date))}"><div class="row" style="margin-top:6px"><button class="btn secondary sm" type="button" onclick="downloadLeavePhoto('${p.id}')">Exporter</button><button class="btn danger sm" type="button" onclick="deleteCalendarDayPhoto('${p.id}','${date}')">Supprimer la photo</button></div></div>`).join('');
+  preview.innerHTML=photos.map(p=>`<div style="margin-top:8px"><button class="btn secondary sm" type="button" onclick="openCalendarPhoto('${p.id}')" style="display:block;text-align:left">🔍 Ouvrir la photo en grand</button><img class="calendar-photo-preview" src="${p.dataUrl}" alt="Photo du ${escapeHtml(fmtDate(date))}" onclick="openCalendarPhoto('${p.id}')" style="cursor:zoom-in"><div class="row" style="margin-top:6px"><button class="btn secondary sm" type="button" onclick="downloadLeavePhoto('${p.id}')">Exporter</button><button class="btn danger sm" type="button" onclick="deleteCalendarDayPhoto('${p.id}','${date}')">Supprimer la photo</button></div></div>`).join('');
  }catch(e){if(status)status.textContent='Lecture des photos impossible dans ce navigateur.'}
 }
 async function saveCalendarDayPhoto(){
@@ -370,16 +375,31 @@ async function deleteCalendarDayPhoto(id,date){
   await renderCalendarDayPhoto(date);await refreshCalendarPhotoThumbnails();listLeavePhotos();toast('Photo retirée du calendrier.');
  }catch(e){toast('Impossible de retirer la photo.')}
 }
+
+async function openCalendarPhoto(id){
+ try{
+  const db=await openPhotoDB();
+  const photo=await new Promise((resolve,reject)=>{const req=db.transaction(PHOTO_STORE,'readonly').objectStore(PHOTO_STORE).get(id);req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)});
+  if(!photo){toast('Photo introuvable.');return}
+  const prior=document.getElementById('calendarPhotoModal');if(prior)prior.remove();
+  const modal=document.createElement('div');modal.id='calendarPhotoModal';modal.className='day-photo-modal';
+  modal.innerHTML=`<div class="day-photo-modal-card" role="dialog" aria-modal="true" aria-label="Photo du jour de congé"><div class="row" style="align-items:center;justify-content:space-between"><strong>📷 Photo du ${escapeHtml(fmtDate(photo.calendarDate||photo.date))}</strong><button type="button" class="btn secondary sm" onclick="closeCalendarPhoto()">✕ Fermer</button></div><img src="${photo.dataUrl}" alt="Photo du jour de congé"><div class="day-photo-modal-actions"><button type="button" class="btn secondary" onclick="downloadLeavePhoto('${photo.id}')">Exporter</button><button type="button" class="btn danger" onclick="deleteCalendarDayPhoto('${photo.id}','${photo.calendarDate||photo.date}').then(()=>closeCalendarPhoto())">Supprimer</button></div></div>`;
+  modal.addEventListener('click',ev=>{if(ev.target===modal)closeCalendarPhoto()});
+  document.body.appendChild(modal);
+ }catch(e){toast('Impossible d’ouvrir la photo.')}
+}
+function closeCalendarPhoto(){const modal=document.getElementById('calendarPhotoModal');if(modal)modal.remove()}
+
 async function refreshCalendarPhotoThumbnails(){
  try{
   const db=await openPhotoDB();
   const photos=await new Promise((resolve,reject)=>{const req=db.transaction(PHOTO_STORE,'readonly').objectStore(PHOTO_STORE).getAll();req.onsuccess=()=>resolve(req.result||[]);req.onerror=()=>reject(req.error)});
   const byDate={};photos.filter(p=>p.calendarDate&&p.dataUrl).forEach(p=>{if(!byDate[p.calendarDate])byDate[p.calendarDate]=p});
   document.querySelectorAll('.day[data-date]').forEach(btn=>{
-   const p=byDate[btn.dataset.date],old=btn.querySelector('.calendar-photo-thumb'),badge=btn.querySelector('.calendar-photo-number');
-   if(old)old.remove();if(badge)badge.remove();btn.classList.toggle('has-calendar-photo',!!p);
-   if(p){const img=document.createElement('img');img.className='calendar-photo-thumb';img.src=p.dataUrl;img.alt='Photo';btn.prepend(img);
-    const num=document.createElement('span');num.className='calendar-photo-number';num.textContent=btn.dataset.date.split('-')[2].replace(/^0/,'');btn.appendChild(num);}
+   const p=byDate[btn.dataset.date],old=btn.querySelector('.calendar-photo-thumb'),badge=btn.querySelector('.calendar-photo-number'),open=btn.querySelector('.calendar-photo-open');
+   if(old)old.remove();if(badge)badge.remove();if(open)open.remove();btn.classList.toggle('has-calendar-photo',!!p);
+   if(p){const num=document.createElement('span');num.className='calendar-photo-number';num.textContent='📷';num.setAttribute('aria-label','Photo disponible');btn.appendChild(num);
+    const target=document.createElement('button');target.type='button';target.className='calendar-photo-open';target.title='Ouvrir la photo du '+btn.dataset.date;target.setAttribute('aria-label','Ouvrir la photo du '+btn.dataset.date);target.onclick=(ev)=>{ev.stopPropagation();openCalendarPhoto(p.id)};btn.appendChild(target);}
   });
  }catch(e){}
 }
