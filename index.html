@@ -25,6 +25,13 @@
 .lock-card input{width:100%;padding:14px;border:1px solid #d9e0eb;border-radius:12px;font-size:20px;text-align:center;letter-spacing:5px;margin-bottom:10px}
 .lock-card button{width:100%;margin-top:8px}.lock-error{min-height:18px;color:#b42318;font-size:12px;margin-top:8px}
 .lock-note{font-size:10px!important;margin-top:16px!important;margin-bottom:0!important}
+
+.day{overflow:hidden}
+.day .calendar-photo-thumb{position:absolute;inset:1px;width:calc(100% - 2px);height:calc(100% - 2px);object-fit:cover;border-radius:5px;opacity:.88;pointer-events:none}
+.day .calendar-photo-number{position:absolute;right:1px;bottom:0;background:#172033d9;color:#fff;border-radius:4px;padding:0 2px;font-size:8px;line-height:11px;z-index:2}
+.day.has-calendar-photo{color:#fff;text-shadow:0 1px 3px #000;font-weight:900}
+.calendar-photo-tools{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:12px;background:var(--card)}
+.calendar-photo-preview{display:block;max-width:100%;max-height:260px;object-fit:contain;border-radius:10px;margin-top:8px}
 </style>
 </head>
 <body>
@@ -153,7 +160,7 @@
    <p class="small muted">Ajoute une photo ou un scan de ta feuille de congés pris. Les images sont enregistrées dans IndexedDB sur cet appareil, séparément du stockage local des réglages.</p>
    <div class="form-grid">
     <div class="field full"><label for="leavePhotoTitle">Nom de la feuille</label><input id="leavePhotoTitle" maxlength="100" placeholder="Ex. Congés pris 2026"></div>
-    <div class="field full"><label for="leavePhotoInput">Choisir une photo depuis le GSM</label><input id="leavePhotoInput" type="file" accept="image/*" capture="environment"></div>
+    <div class="field full"><label for="leavePhotoInput">Choisir une photo depuis le GSM</label><input id="leavePhotoInput" type="file" accept="image/*"></div>
     <div class="field full"><label for="leavePhotoNote">Note (facultatif)</label><input id="leavePhotoNote" maxlength="300" placeholder="Ex. document signé par l'employeur"></div>
     <div class="field full"><button class="btn" type="button" onclick="saveLeavePhoto()">💾 Enregistrer la photo</button></div>
    </div>
@@ -261,10 +268,10 @@ function applyMultiSelection(){
 }
 document.getElementById('bulkType')?.addEventListener('change',updateBulkFields);
 
-function renderCalendar(){document.getElementById('calendarYearLabel').textContent=currentYear;let out='';for(let m=0;m<12;m++){let first=new Date(currentYear,m,1,12),days=new Date(currentYear,m+1,0,12).getDate(),offset=(first.getDay()+6)%7;out+=`<div class="month"><h3>${MONTHS[m]}</h3><div class="weekdays">${DAYS.map(x=>`<span>${x}</span>`).join('')}</div><div class="days">`;for(let i=0;i<offset;i++)out+='<span class="day empty"></span>';for(let day=1;day<=days;day++){let date=iso(new Date(currentYear,m,day,12)),hol=holidayFor(date),entries=dayEntries(date),cl=[],shift=shiftFor(date);if(isWorkday(date)&&!hol&&!entries.some(e=>e.type==='leave'))cl.push(shift.label==='A'?'week-a':'week-b');if(hol)cl.push('holiday');else if(entries.some(e=>e.type==='leave'))cl.push('leave');if(entries.some(e=>e.type==='overtime'))cl.push('overtime');if(entries.some(e=>e.type==='shift'))cl.push('manual');if(entries.some(e=>e.type==='appointment'))cl.push('appointment');if(date===iso(new Date()))cl.push('today');if(date===selectedDate)cl.push('selected');if(multiSelectionEnabled&&multiSelectedDates.has(date))cl.push('multi-selected');let effectiveShift=periodShiftFor(date)||shift;let title=hol?hol.name:entries.map(e=>TYPES[e.type]).join(', ');if(!title)title=(effectiveShift.label==='Exceptionnel'?'Horaire exceptionnel':'Semaine '+effectiveShift.label)+' · '+effectiveShift.start+'–'+effectiveShift.end;out+=`<button class="day ${cl.join(' ')}" title="${escapeHtml(title)}" aria-label="${escapeHtml(fmtDate(date))}${title?', '+escapeHtml(title):''}" onclick="handleCalendarDateClick('${date}')">${day}</button>`}out+='</div></div>'}document.getElementById('months').innerHTML=out;renderSelectedDay()}
+function renderCalendar(){document.getElementById('calendarYearLabel').textContent=currentYear;let out='';for(let m=0;m<12;m++){let first=new Date(currentYear,m,1,12),days=new Date(currentYear,m+1,0,12).getDate(),offset=(first.getDay()+6)%7;out+=`<div class="month"><h3>${MONTHS[m]}</h3><div class="weekdays">${DAYS.map(x=>`<span>${x}</span>`).join('')}</div><div class="days">`;for(let i=0;i<offset;i++)out+='<span class="day empty"></span>';for(let day=1;day<=days;day++){let date=iso(new Date(currentYear,m,day,12)),hol=holidayFor(date),entries=dayEntries(date),cl=[],shift=shiftFor(date);if(isWorkday(date)&&!hol&&!entries.some(e=>e.type==='leave'))cl.push(shift.label==='A'?'week-a':'week-b');if(hol)cl.push('holiday');else if(entries.some(e=>e.type==='leave'))cl.push('leave');if(entries.some(e=>e.type==='overtime'))cl.push('overtime');if(entries.some(e=>e.type==='shift'))cl.push('manual');if(entries.some(e=>e.type==='appointment'))cl.push('appointment');if(date===iso(new Date()))cl.push('today');if(date===selectedDate)cl.push('selected');if(multiSelectionEnabled&&multiSelectedDates.has(date))cl.push('multi-selected');let effectiveShift=periodShiftFor(date)||shift;let title=hol?hol.name:entries.map(e=>TYPES[e.type]).join(', ');if(!title)title=(effectiveShift.label==='Exceptionnel'?'Horaire exceptionnel':'Semaine '+effectiveShift.label)+' · '+effectiveShift.start+'–'+effectiveShift.end;out+=`<button class="day ${cl.join(' ')}" data-date="${date}" title="${escapeHtml(title)}" aria-label="${escapeHtml(fmtDate(date))}${title?', '+escapeHtml(title):''}" onclick="handleCalendarDateClick('${date}')">${day}</button>`}out+='</div></div>'}document.getElementById('months').innerHTML=out;renderSelectedDay();refreshCalendarPhotoThumbnails()}
 function handleCalendarDateClick(date){if(multiSelectionEnabled){if(multiSelectedDates.has(date))multiSelectedDates.delete(date);else multiSelectedDates.add(date);selectedDate=date;updateMultiSelectionUI();renderCalendar();return}selectDate(date)}
 function selectDate(date){selectedDate=date;currentYear=dateYear(date);document.getElementById('headerYear').value=String(currentYear);renderCalendar()}
-function renderSelectedDay(){document.getElementById('selectedDateLabel').textContent=fmtDate(selectedDate,{weekday:'long',day:'numeric',month:'long',year:'numeric'});let hol=holidayFor(selectedDate),entries=dayEntries(selectedDate),sh=shiftFor(selectedDate),custom=entries.find(e=>e.type==='shift');let html=`<div class="notice" style="margin-bottom:8px"><strong>${escapeHtml(fmtDate(selectedDate,{weekday:'long',day:'numeric',month:'long',year:'numeric'}))}</strong><br>${hol?'🎉 Jour férié : '+escapeHtml(hol.name):(!isWorkday(selectedDate)?'Jour de repos (week-end)':'Journée de travail prévue')} · Semaine ${sh.label}${isWorkday(selectedDate)?' · '+(custom?custom.start+'–'+custom.end:sh.start+'–'+sh.end):''}</div>`;if(hol)html+=`<div class="day-row"><div><strong>🎉 ${escapeHtml(hol.name)}</strong><div class="small muted">Jour férié légal luxembourgeois${hol.source==='custom'?' personnalisé':''}</div></div><span class="tag holiday">Férié</span></div>`;if(isWorkday(selectedDate)){let s=custom?{start:custom.start,end:custom.end}:(periodShiftFor(selectedDate)||sh);html+=`<div class="day-row"><div><strong>Horaire prévu · semaine ${sh.label}</strong><div class="small muted">${custom?'Horaire exceptionnel':'Alternance automatique'}</div></div><strong>${s.start}–${s.end}</strong></div>`}if(entries.length)entries.forEach(e=>{html+=`<div class="day-row"><div><strong>${escapeHtml(TYPES[e.type]||e.type)}${e.type==='leave'?' · '+fmtNum(e.amount||1)+' j':''}${e.type==='overtime'?' · '+fmtNum(e.hours)+' h':''}${e.type==='appointment'&&e.time?' · '+escapeHtml(e.time):''}</strong><div class="small muted">${escapeHtml(e.note|| (e.type==='overtime'?({recover:'À récupérer',paid:'Payées',done:'Enregistrées'}[e.status]||''):''))}</div></div><button class="btn secondary sm" onclick="openEntry('${e.id}')">Modifier</button></div>`});if(!html)html='<div class="empty-state">Aucun événement enregistré pour cette journée.</div>';html+=`<div class="row" style="margin-top:12px"><button class="btn" onclick="openEntry(null,'leave','${selectedDate}')">＋ Congé</button><button class="btn secondary" onclick="openEntry(null,'overtime','${selectedDate}')">＋ Heures supp.</button><button class="btn ghost" onclick="openEntry(null,'shift','${selectedDate}')">Modifier horaire</button><button class="btn secondary" onclick="openEntry(null,'appointment','${selectedDate}')">＋ Rendez-vous</button></div>`;document.getElementById('selectedDay').innerHTML=html}
+function renderSelectedDay(){document.getElementById('selectedDateLabel').textContent=fmtDate(selectedDate,{weekday:'long',day:'numeric',month:'long',year:'numeric'});let hol=holidayFor(selectedDate),entries=dayEntries(selectedDate),sh=shiftFor(selectedDate),custom=entries.find(e=>e.type==='shift');let html=`<div class="notice" style="margin-bottom:8px"><strong>${escapeHtml(fmtDate(selectedDate,{weekday:'long',day:'numeric',month:'long',year:'numeric'}))}</strong><br>${hol?'🎉 Jour férié : '+escapeHtml(hol.name):(!isWorkday(selectedDate)?'Jour de repos (week-end)':'Journée de travail prévue')} · Semaine ${sh.label}${isWorkday(selectedDate)?' · '+(custom?custom.start+'–'+custom.end:sh.start+'–'+sh.end):''}</div>`;if(hol)html+=`<div class="day-row"><div><strong>🎉 ${escapeHtml(hol.name)}</strong><div class="small muted">Jour férié légal luxembourgeois${hol.source==='custom'?' personnalisé':''}</div></div><span class="tag holiday">Férié</span></div>`;if(isWorkday(selectedDate)){let s=custom?{start:custom.start,end:custom.end}:(periodShiftFor(selectedDate)||sh);html+=`<div class="day-row"><div><strong>Horaire prévu · semaine ${sh.label}</strong><div class="small muted">${custom?'Horaire exceptionnel':'Alternance automatique'}</div></div><strong>${s.start}–${s.end}</strong></div>`}if(entries.length)entries.forEach(e=>{html+=`<div class="day-row"><div><strong>${escapeHtml(TYPES[e.type]||e.type)}${e.type==='leave'?' · '+fmtNum(e.amount||1)+' j':''}${e.type==='overtime'?' · '+fmtNum(e.hours)+' h':''}${e.type==='appointment'&&e.time?' · '+escapeHtml(e.time):''}</strong><div class="small muted">${escapeHtml(e.note|| (e.type==='overtime'?({recover:'À récupérer',paid:'Payées',done:'Enregistrées'}[e.status]||''):''))}</div></div><button class="btn secondary sm" onclick="openEntry('${e.id}')">Modifier</button></div>`});if(!html)html='<div class="empty-state">Aucun événement enregistré pour cette journée.</div>';html+=`<div class="row" style="margin-top:12px"><button class="btn" onclick="openEntry(null,'leave','${selectedDate}')">＋ Congé</button><button class="btn secondary" onclick="openEntry(null,'overtime','${selectedDate}')">＋ Heures supp.</button><button class="btn ghost" onclick="openEntry(null,'shift','${selectedDate}')">Modifier horaire</button><button class="btn secondary" onclick="openEntry(null,'appointment','${selectedDate}')">＋ Rendez-vous</button></div><div class="calendar-photo-tools"><strong>📷 Photo pour cette journée</strong><p class="small muted">Choisis une photo dans la photothèque de ton iPhone. Elle apparaîtra sur ce jour du calendrier. Pour la modifier, choisis simplement une autre photo ; pour la supprimer, utilise le bouton sous la photo.</p><input id="calendarDayPhotoInput" type="file" accept="image/*" aria-label="Choisir une photo depuis la photothèque" onchange="saveCalendarDayPhoto()"><div id="calendarDayPhotoStatus" class="small muted" style="margin-top:6px"></div><div id="calendarDayPhotoPreview"></div></div>`;document.getElementById('selectedDay').innerHTML=html;renderCalendarDayPhoto(selectedDate)}
 
 
 const PHOTO_DB_NAME='conges_horaires_photos_db_v1';
@@ -321,6 +328,60 @@ async function deleteLeavePhoto(id){
 }
 async function downloadLeavePhoto(id){
  try{const db=await openPhotoDB();const p=await new Promise((resolve,reject)=>{const req=db.transaction(PHOTO_STORE,'readonly').objectStore(PHOTO_STORE).get(id);req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)});if(!p)return;const a=document.createElement('a');a.href=p.dataUrl;a.download=(p.title||'feuille-conges').replace(/[^\w\-]+/g,'_')+'.'+((p.mime||'image/jpeg').split('/')[1]||'jpg');document.body.appendChild(a);a.click();a.remove();toast('Photo exportée dans les téléchargements.')}catch(e){toast('Export de la photo impossible.')}
+}
+
+
+async function getCalendarPhotosForDate(date){
+ const db=await openPhotoDB();
+ return await new Promise((resolve,reject)=>{
+  const req=db.transaction(PHOTO_STORE,'readonly').objectStore(PHOTO_STORE).getAll();
+  req.onsuccess=()=>resolve((req.result||[]).filter(p=>p.calendarDate===date).sort((a,b)=>b.createdAt-a.createdAt));
+  req.onerror=()=>reject(req.error||new Error('Lecture photo impossible'));
+ });
+}
+async function renderCalendarDayPhoto(date){
+ const preview=document.getElementById('calendarDayPhotoPreview'),status=document.getElementById('calendarDayPhotoStatus');
+ if(!preview)return;
+ try{
+  const photos=await getCalendarPhotosForDate(date);
+  if(status)status.textContent=photos.length?`${photos.length} photo(s) liée(s) à cette journée.`:'Aucune photo liée à cette journée.';
+  preview.innerHTML=photos.map(p=>`<div style="margin-top:8px"><img class="calendar-photo-preview" src="${p.dataUrl}" alt="Photo du ${escapeHtml(fmtDate(date))}"><div class="row" style="margin-top:6px"><button class="btn secondary sm" type="button" onclick="downloadLeavePhoto('${p.id}')">Exporter</button><button class="btn danger sm" type="button" onclick="deleteCalendarDayPhoto('${p.id}','${date}')">Supprimer la photo</button></div></div>`).join('');
+ }catch(e){if(status)status.textContent='Lecture des photos impossible dans ce navigateur.'}
+}
+async function saveCalendarDayPhoto(){
+ const input=document.getElementById('calendarDayPhotoInput'),file=input&&input.files&&input.files[0];
+ if(!file)return;
+ if(!file.type.startsWith('image/')){toast('Choisis une image depuis la photothèque.');return}
+ try{
+  const dataUrl=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(r.error);r.readAsDataURL(file)});
+  const date=selectedDate;
+  const db=await openPhotoDB();
+  const existing=await new Promise((resolve,reject)=>{const req=db.transaction(PHOTO_STORE,'readonly').objectStore(PHOTO_STORE).getAll();req.onsuccess=()=>resolve((req.result||[]).filter(p=>p.calendarDate===date));req.onerror=()=>reject(req.error)});
+  const item={id:existing.length?existing[0].id:'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),title:'Photo du '+date,date,calendarDate:date,note:'Photo liée au jour de congé',dataUrl,mime:file.type,createdAt:Date.now()};
+  await new Promise((resolve,reject)=>{const tx=db.transaction(PHOTO_STORE,'readwrite');const store=tx.objectStore(PHOTO_STORE);existing.slice(1).forEach(p=>store.delete(p.id));store.put(item);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error||new Error('Écriture impossible'));tx.onabort=()=>reject(tx.error||new Error('Écriture annulée'))});
+  input.value='';await renderCalendarDayPhoto(date);await refreshCalendarPhotoThumbnails();listLeavePhotos();toast(existing.length?'Photo remplacée pour cette journée.':'Photo ajoutée à la journée du calendrier.');
+ }catch(e){toast('Impossible d’enregistrer la photo. Vérifie le stockage disponible.')}
+}
+async function deleteCalendarDayPhoto(id,date){
+ if(!confirm('Retirer cette photo de cette journée ?'))return;
+ try{
+  const db=await openPhotoDB();
+  await new Promise((resolve,reject)=>{const tx=db.transaction(PHOTO_STORE,'readwrite');tx.objectStore(PHOTO_STORE).delete(id);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});
+  await renderCalendarDayPhoto(date);await refreshCalendarPhotoThumbnails();listLeavePhotos();toast('Photo retirée du calendrier.');
+ }catch(e){toast('Impossible de retirer la photo.')}
+}
+async function refreshCalendarPhotoThumbnails(){
+ try{
+  const db=await openPhotoDB();
+  const photos=await new Promise((resolve,reject)=>{const req=db.transaction(PHOTO_STORE,'readonly').objectStore(PHOTO_STORE).getAll();req.onsuccess=()=>resolve(req.result||[]);req.onerror=()=>reject(req.error)});
+  const byDate={};photos.filter(p=>p.calendarDate&&p.dataUrl).forEach(p=>{if(!byDate[p.calendarDate])byDate[p.calendarDate]=p});
+  document.querySelectorAll('.day[data-date]').forEach(btn=>{
+   const p=byDate[btn.dataset.date],old=btn.querySelector('.calendar-photo-thumb'),badge=btn.querySelector('.calendar-photo-number');
+   if(old)old.remove();if(badge)badge.remove();btn.classList.toggle('has-calendar-photo',!!p);
+   if(p){const img=document.createElement('img');img.className='calendar-photo-thumb';img.src=p.dataUrl;img.alt='Photo';btn.prepend(img);
+    const num=document.createElement('span');num.className='calendar-photo-number';num.textContent=btn.dataset.date.split('-')[2].replace(/^0/,'');btn.appendChild(num);}
+  });
+ }catch(e){}
 }
 
 function renderSummary(){
