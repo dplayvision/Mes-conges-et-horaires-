@@ -167,46 +167,6 @@ header{background:linear-gradient(135deg,#ffffff,#f0f5ff)!important;color:#202b3
    <div id="payStatus" class="notice" style="margin-top:12px">Choisis un mois et un document.</div>
   </div>
   <div class="panel"><div class="panel-head"><h2>📁 Fiches enregistrées</h2><select id="payFilterYear" onchange="renderPaySlips()"><option value="all">Toutes les années</option></select></div><div id="payList"><div class="empty-state">Aucune fiche de paie enregistrée.</div></div></div>
-
-  <div class="panel" id="provisionalPayroll">
-   <div class="panel-head"><h2>🧮 Fiche de paie provisoire</h2><span class="tag work">Estimation</span></div>
-   <p class="small muted">Estimation indicative basée sur les paramètres ci-dessous. Elle ne remplace pas la fiche officielle de l’employeur.</p>
-   <div class="form-grid">
-    <div class="field"><label for="ppMonth">Mois à calculer</label><select id="ppMonth"><option value="1">Janvier</option><option value="2">Février</option><option value="3">Mars</option><option value="4">Avril</option><option value="5">Mai</option><option value="6">Juin</option><option value="7">Juillet</option><option value="8">Août</option><option value="9">Septembre</option><option value="10">Octobre</option><option value="11">Novembre</option><option value="12">Décembre</option></select></div>
-    <div class="field"><label for="ppYear">Année</label><input id="ppYear" type="number" min="2020" max="2100" value="2026"></div>
-    <div class="field"><label for="ppRate">Salaire brut horaire (€)</label><input id="ppRate" type="number" min="0" step="0.0001" value="19.4365"></div>
-    <div class="field"><label for="ppBaseHours">Heures normales payées (mois)</label><input id="ppBaseHours" type="number" min="0" step="0.25" value="173.33"></div>
-    <div class="field"><label for="ppOtHours">Heures supplémentaires payées</label><input id="ppOtHours" type="number" min="0" step="0.25" value="0"></div>
-    <div class="field"><label for="ppWorkDays">Jours réellement travaillés</label><input id="ppWorkDays" type="number" min="0" max="31" step="1" value="22"></div>
-    <div class="field"><label for="ppSickDays">Jours de maladie</label><input id="ppSickDays" type="number" min="0" max="31" step="1" value="0"></div>
-    <div class="field"><label for="ppOtherGross">Autres éléments bruts (€)</label><input id="ppOtherGross" type="number" step="0.01" value="0"></div>
-    <div class="field"><label for="ppTax">Retenue d’impôt estimée (€)</label><input id="ppTax" type="number" min="0" step="0.01" value="102.90"></div>
-    <div class="field"><label for="ppCIS">Crédits d’impôt affichés (€)</label><input id="ppCIS" type="number" min="0" step="0.01" value="77.99"></div>
-   </div>
-   <details style="margin-top:14px"><summary style="font-weight:800;cursor:pointer;padding:8px 0">⚙ Paramètres de paie</summary>
-    <div class="form-grid" style="margin-top:10px">
-     <div class="field"><label for="ppKmRate">Indemnité trajet (€/km)</label><input id="ppKmRate" type="number" min="0" step="0.01" value="0.04"></div>
-     <div class="field"><label for="ppKmDay">Kilomètres aller-retour/jour</label><input id="ppKmDay" type="number" min="0" step="1" value="48"></div>
-     <div class="field"><label for="ppAttendance">Prime présence mensuelle (€)</label><input id="ppAttendance" type="number" min="0" step="0.01" value="45"></div>
-     <div class="field"><label for="ppSickPenalty">Perte par jour malade (€)</label><input id="ppSickPenalty" type="number" min="0" step="0.01" value="15"></div>
-     <div class="field"><label for="ppFD">Déduction Code FD (€)</label><input id="ppFD" type="number" min="0" step="0.01" value="49.50"></div>
-     <div class="field"><label for="ppSocial">Cotisations sociales estimées (%)</label><input id="ppSocial" type="number" min="0" max="100" step="0.01" value="12.95"></div>
-     <div class="field"><label for="ppAdvance">Avance / acompte (€)</label><input id="ppAdvance" type="number" min="0" step="0.01" value="0"></div>
-    </div>
-    <p class="footer-note">Règle d’heures supplémentaires configurée : les 2 premières heures supplémentaires de chaque semaine à 140 %, puis les suivantes à 150 %. Pour ce calcul simplifié, saisis séparément le nombre d’heures à 140 % et à 150 % ci-dessous.</p>
-    <div class="form-grid">
-     <div class="field"><label for="ppOt140">Heures supp. à 140 %</label><input id="ppOt140" type="number" min="0" step="0.25" value="0"></div>
-     <div class="field"><label for="ppOt150">Heures supp. à 150 %</label><input id="ppOt150" type="number" min="0" step="0.25" value="0"></div>
-    </div>
-   </details>
-   <div class="notice" style="margin-top:14px">Chèques-repas Edenred : retenue personnelle de <strong>61,60 €</strong> en janvier, avril, juillet et septembre uniquement. Les autres mois : 0 €. La valeur créditée sur la carte (330 € par trimestre selon tes indications) n’est pas ajoutée au salaire net.</div>
-   <div class="row" style="margin-top:14px"><button class="btn" type="button" onclick="calculateProvisionalPayroll()">Calculer la fiche provisoire</button><button class="btn secondary" type="button" onclick="resetProvisionalPayroll()">Réinitialiser</button></div>
-   <div id="ppResults" style="margin-top:14px">
-    <div class="empty-state">Modifie les heures et appuie sur « Calculer la fiche provisoire ».</div>
-   </div>
-   <p class="footer-note">Important : classe fiscale 1a. La retenue d’impôt et les crédits sont saisis manuellement à titre d’estimation, car le calcul exact dépend notamment de la fiche de retenue d’impôt et des règles applicables. Le taux social est une approximation globale ; la base de certaines cotisations peut différer. Les congés, jours fériés et heures rémunérées doivent être inclus dans les heures payées sans double comptage.</p>
-  </div>
-
   <p class="footer-note">Les fiches restent sur cet appareil et ne sont pas envoyées sur GitHub. Pense à conserver une copie des documents importants.</p>
  </section>
  <section id="view-settings" class="view">
@@ -565,26 +525,48 @@ function renderSummary(){
   sel.value=String(currentYear);
  }
  const names=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
- const totals={days:0,leave:0,holiday:0,overtime:0,sick:0,rest:0,work:0};
+ const totals={days:0,leave:0,holiday:0,overtime:0,sick:0,absence:0,appointment:0,work:0,workLeave:0,workHoliday:0,workSick:0,workAbsence:0};
  let rows='';
  for(let m=0;m<12;m++){
   const days=new Date(currentYear,m+1,0).getDate();
-  const sums={days,leave:0,holiday:0,overtime:0,sick:0,rest:0,work:0};
+  const sums={days,leave:0,holiday:0,overtime:0,sick:0,absence:0,appointment:0,work:0,workLeave:0,workHoliday:0,workSick:0,workAbsence:0};
   for(let n=1;n<=days;n++){
    const date=iso(new Date(currentYear,m,n,12)), dow=new Date(date+'T12:00:00').getDay();
    const entries=dayEntries(date), hol=holidayFor(date);
+   const weekday=dow>=1&&dow<=5;
    sums.leave+=entries.filter(e=>e.type==='leave'||e.type==='mel_leave').reduce((a,e)=>a+Number(e.amount||1),0);
-   sums.sick+=entries.filter(e=>e.type==='sickness'||e.type==='absence').reduce((a,e)=>a+Number(e.amount||1),0);
+   sums.sick+=entries.filter(e=>e.type==='sickness').reduce((a,e)=>a+Number(e.amount||1),0);
+   sums.absence+=entries.filter(e=>e.type==='absence').reduce((a,e)=>a+Number(e.amount||1),0);
    sums.overtime+=entries.filter(e=>e.type==='overtime').reduce((a,e)=>a+Number(e.hours||0),0);
-   if(hol)sums.holiday+=1;
-   if(dow===0||dow===6) sums.rest++;
-   else if(!hol&&!entries.some(e=>['leave','mel_leave','sickness','absence'].includes(e.type))) sums.work++;
+   if(hol)sums.holiday++;
+   if(weekday){
+    sums.workLeave+=entries.filter(e=>e.type==='leave'||e.type==='mel_leave').reduce((a,e)=>a+Number(e.amount||1),0);
+    sums.workSick+=entries.filter(e=>e.type==='sickness').reduce((a,e)=>a+Number(e.amount||1),0);
+    sums.workAbsence+=entries.filter(e=>e.type==='absence').reduce((a,e)=>a+Number(e.amount||1),0);
+    if(hol)sums.workHoliday++;
+    if(entries.some(e=>e.type==='appointment'))sums.appointment++;
+    if(!hol&&!entries.some(e=>['sickness','absence'].includes(e.type))){const leaveAmount=entries.filter(e=>e.type==='leave'||e.type==='mel_leave').reduce((a,e)=>a+Number(e.amount||1),0);sums.work+=Math.max(0,1-leaveAmount)}
+   }
   }
   Object.keys(totals).forEach(k=>totals[k]+=sums[k]);
-  rows+=`<tr><td>${names[m]}</td><td class="sum-days">${sums.days}</td><td class="sum-leave">${fmtNum(sums.leave)}${sums.leave?' j':''}</td><td class="sum-holiday">${fmtNum(sums.holiday)}${sums.holiday?' j':''}</td><td class="sum-overtime">${fmtNum(sums.overtime)}${sums.overtime?' h':''}</td><td class="sum-sick">${fmtNum(sums.sick)}${sums.sick?' j':''}</td><td class="sum-rest">${sums.rest}</td><td class="sum-work">${sums.work} j</td></tr>`;
+  const details=[];
+  if(sums.workLeave)details.push(`${fmtNum(sums.workLeave)} congé${sums.workLeave>1?'s':''}`);
+  if(sums.workHoliday)details.push(`${fmtNum(sums.workHoliday)} férié${sums.workHoliday>1?'s':''}`);
+  if(sums.workSick)details.push(`${fmtNum(sums.workSick)} maladie`);
+  if(sums.workAbsence)details.push(`${fmtNum(sums.workAbsence)} absence${sums.workAbsence>1?'s':''}`);
+  if(sums.appointment)details.push(`${fmtNum(sums.appointment)} RDV`);
+  const workCell=`<strong>${sums.work} j</strong>${details.length?`<small class="summary-work-details">+ ${details.map(escapeHtml).join(' · ')}</small>`:''}`;
+  rows+=`<tr><td>${names[m]}</td><td class="sum-days">${sums.days}</td><td class="sum-leave">${fmtNum(sums.leave)}${sums.leave?' j':''}</td><td class="sum-holiday">${fmtNum(sums.holiday)}${sums.holiday?' j':''}</td><td class="sum-overtime">${fmtNum(sums.overtime)}${sums.overtime?' h':''}</td><td class="sum-sick">${fmtNum(sums.sick+sums.absence)}${(sums.sick+sums.absence)?' j':''}</td><td class="sum-work">${workCell}</td></tr>`;
  }
  Object.keys(totals).forEach(k=>{if(k!=='days')totals[k]=Math.round(totals[k]*100)/100});
- document.getElementById('summaryTable').innerHTML=`<table class="summary-table"><thead><tr><th>Mois</th><th>Jours</th><th class="sum-leave">Congé</th><th class="sum-holiday">Férié</th><th class="sum-overtime">Heures supp.</th><th class="sum-sick">Maladie</th><th class="sum-rest">Repos</th><th>Jours travaillés</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td>Total</td><td class="sum-days">${totals.days}</td><td class="sum-leave">${fmtNum(totals.leave)} j</td><td class="sum-holiday">${fmtNum(totals.holiday)} j</td><td class="sum-overtime">${fmtNum(totals.overtime)} h</td><td class="sum-sick">${fmtNum(totals.sick)} j</td><td class="sum-rest">${totals.rest}</td><td>${totals.work} j</td></tr></tfoot></table>`;
+ const totalDetails=[];
+ if(totals.workLeave)totalDetails.push(`${fmtNum(totals.workLeave)} congés`);
+ if(totals.workHoliday)totalDetails.push(`${fmtNum(totals.workHoliday)} fériés`);
+ if(totals.workSick)totalDetails.push(`${fmtNum(totals.workSick)} maladies`);
+ if(totals.workAbsence)totalDetails.push(`${fmtNum(totals.workAbsence)} absences`);
+ if(totals.appointment)totalDetails.push(`${fmtNum(totals.appointment)} RDV`);
+ const totalWorkCell=`<strong>${totals.work} j</strong>${totalDetails.length?`<small class="summary-work-details">+ ${totalDetails.map(escapeHtml).join(' · ')}</small>`:''}`;
+ document.getElementById('summaryTable').innerHTML=`<table class="summary-table"><thead><tr><th>Mois</th><th>Jours</th><th class="sum-leave">Congé</th><th class="sum-holiday">Férié</th><th class="sum-overtime">Heures supp.</th><th class="sum-sick">Maladie / absence</th><th class="sum-work">Jours travaillés</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td>Total</td><td class="sum-days">${totals.days}</td><td class="sum-leave">${fmtNum(totals.leave)} j</td><td class="sum-holiday">${fmtNum(totals.holiday)} j</td><td class="sum-overtime">${fmtNum(totals.overtime)} h</td><td class="sum-sick">${fmtNum(totals.sick+totals.absence)} j</td><td class="sum-work">${totalWorkCell}</td></tr></tfoot></table>`;
 }
 
 async function renderLeave(){let y=Number(data.settings.leaveYear||currentYear),used=leaveUsed(y),bal=Number(data.settings.initialLeave||0)-used;document.getElementById('leaveBalanceBig').textContent=fmtNum(bal)+' j';document.getElementById('leaveUsed').textContent=fmtNum(used)+' j';document.getElementById('leaveEntitlement').textContent=`Droit initial : ${fmtNum(data.settings.initialLeave)} jours · année ${y}`;document.getElementById('leaveProgress').style.width=Math.max(0,Math.min(100,data.settings.initialLeave?used/data.settings.initialLeave*100:0))+'%';let filter=document.getElementById('leaveFilter').value;let list=data.entries.filter(e=>['leave','absence','mel_leave','sickness'].includes(e.type)&&(filter==='all'||(filter==='leave'?['leave','mel_leave'].includes(e.type):e.type===filter))).sort((a,b)=>a.date.localeCompare(b.date));let photos=[];try{const db=await openPhotoDB();photos=await new Promise((resolve,reject)=>{const req=db.transaction(PHOTO_STORE,'readonly').objectStore(PHOTO_STORE).getAll();req.onsuccess=()=>resolve(req.result||[]);req.onerror=()=>reject(req.error)})}catch(e){}document.getElementById('leaveList').innerHTML=list.length?list.map(e=>{const photo=photos.find(p=>(p.calendarDate===e.date||(!p.calendarDate&&p.category==='leave'&&p.date===e.date))&&p.dataUrl);return `<div class="list-item"><div class="main"><strong>${escapeHtml(fmtDate(e.date,{weekday:'long',day:'numeric',month:'long',year:'numeric'}))}</strong><small>${TYPES[e.type]}${e.type==='leave'?' · '+fmtNum(e.amount||1)+' jour(s)':''}${e.note?' · '+escapeHtml(e.note):''}</small>${photo?`<div style="margin-top:8px"><img src="${photo.dataUrl}" alt="Photo du congé du ${escapeHtml(e.date)}" onclick="openCalendarPhoto('${photo.id}')" style="display:block;max-width:100%;max-height:180px;object-fit:contain;border-radius:10px;cursor:zoom-in;border:1px solid var(--line)"><div class="row" style="margin-top:6px"><button class="btn secondary sm" onclick="openCalendarPhoto('${photo.id}')">👁 Voir la photo</button><button class="btn secondary sm" onclick="openEntry('${e.id}')">📷 Modifier la photo</button></div></div>`:''}</div><div class="row"><button class="btn secondary sm" onclick="openEntry('${e.id}')">Modifier</button><button class="btn danger sm" onclick="deleteEntry('${e.id}')">×</button></div></div>`}).join(''):'<div class="empty-state">Aucun congé ou absence encodé pour le moment.</div>'}
@@ -700,39 +682,6 @@ window.addEventListener('error',function(e){const box=document.getElementById('a
 function init(){updateFaceButton();renderYearSelects();renderSettingsForm();document.getElementById('payMonth').value=String(new Date().getMonth()+1);document.getElementById('payYear').value=String(new Date().getFullYear());document.getElementById('periodStart').value=iso(new Date());document.getElementById('periodEnd').value=iso(addDays(iso(new Date()),6));renderAll();listLeavePhotos();document.getElementById('headerYear').value=String(currentYear);document.getElementById('entryDialog').addEventListener('click',e=>{if(e.target.id==='entryDialog')closeEntry()})}
 try{init()}catch(err){const box=document.getElementById("appError");if(box){box.style.display="block";box.textContent="Erreur au démarrage : "+(err.message||err)}else alert("Erreur au démarrage de l’application.")}
 document.addEventListener('DOMContentLoaded',initLeavePhotoDate);
-
-function ppMoney(n){return Number(n||0).toLocaleString('fr-FR',{style:'currency',currency:'EUR'})}
-function ppVal(id){const el=document.getElementById(id);return el?Math.max(0,Number(el.value)||0):0}
-function calculateProvisionalPayroll(){
- const month=Number(document.getElementById('ppMonth').value);
- const rate=ppVal('ppRate'),baseHours=ppVal('ppBaseHours'),ot140=ppVal('ppOt140'),ot150=ppVal('ppOt150');
- const workDays=ppVal('ppWorkDays'),sickDays=ppVal('ppSickDays');
- const baseGross=baseHours*rate, overtimeGross=(ot140*rate*1.4)+(ot150*rate*1.5);
- const otherGross=ppVal('ppOtherGross'),gross=baseGross+overtimeGross+otherGross;
- const travel=workDays*ppVal('ppKmDay')*ppVal('ppKmRate');
- const attendance=Math.max(0,ppVal('ppAttendance')-sickDays*ppVal('ppSickPenalty'));
- const social=gross*ppVal('ppSocial')/100;
- const tax=ppVal('ppTax'),credits=ppVal('ppCIS'),fd=ppVal('ppFD');
- const edenred=[1,4,7,9].includes(month)?61.60:0;
- const net=gross+travel+attendance-social-tax+credits-fd-edenred-ppVal('ppAdvance');
- const rows=[
-  ['Salaire de base',baseGross],['Heures supplémentaires à 140 %',ot140*rate*1.4],
-  ['Heures supplémentaires à 150 %',ot150*rate*1.5],['Autres éléments bruts',otherGross],
-  ['Total brut estimé',gross],['Indemnité trajet ('+workDays+' jours)',travel],
-  ['Prime de présence après maladie',attendance],['Cotisations sociales estimées',-social],
-  ['Retenue d’impôt saisie',-tax],['Crédits d’impôt saisis',credits],['Déduction Code FD',-fd],
-  ['Retenue Edenred',-edenred],['Avance / acompte',-ppVal('ppAdvance')],['NET PROVISOIRE ESTIMÉ',net]
- ];
- document.getElementById('ppResults').innerHTML='<div class="summary-wrap"><table class="summary-table" style="min-width:320px;text-align:left"><tbody>'+
- rows.map((r,i)=>'<tr><td style="text-align:left;'+(i===4||i===13?'font-weight:850;':'')+'">'+r[0]+'</td><td style="text-align:right;white-space:nowrap;'+(i===13?'font-weight:900;font-size:16px;':'')+'">'+ppMoney(r[1])+'</td></tr>').join('')+
- '</tbody></table></div><p class="footer-note">Calcul réalisé pour '+MONTHS[month-1]+' '+(Number(document.getElementById('ppYear').value)||2026)+'. Estimation indicative, non contractuelle.</p>';
-}
-function resetProvisionalPayroll(){
- const defaults={ppMonth:String(new Date().getMonth()+1),ppYear:'2026',ppRate:'19.4365',ppBaseHours:'173.33',ppOtHours:'0',ppWorkDays:'22',ppSickDays:'0',ppOtherGross:'0',ppTax:'102.90',ppCIS:'77.99',ppKmRate:'0.04',ppKmDay:'48',ppAttendance:'45',ppSickPenalty:'15',ppFD:'49.50',ppSocial:'12.95',ppAdvance:'0',ppOt140:'0',ppOt150:'0'};
- Object.entries(defaults).forEach(([id,value])=>{const el=document.getElementById(id);if(el)el.value=value});
- document.getElementById('ppResults').innerHTML='<div class="empty-state">Paramètres réinitialisés. Appuie sur « Calculer la fiche provisoire ».</div>';
-}
-
 </script>
 </body>
 </html>
