@@ -545,7 +545,7 @@ function renderSummary(){
     sums.workAbsence+=entries.filter(e=>e.type==='absence').reduce((a,e)=>a+Number(e.amount||1),0);
     if(hol)sums.workHoliday++;
     if(entries.some(e=>e.type==='appointment'))sums.appointment++;
-    if(!hol&&!entries.some(e=>['leave','mel_leave','sickness','absence'].includes(e.type)))sums.work++;
+    if(!hol&&!entries.some(e=>['sickness','absence'].includes(e.type))){const leaveAmount=entries.filter(e=>e.type==='leave'||e.type==='mel_leave').reduce((a,e)=>a+Number(e.amount||1),0);sums.work+=Math.max(0,1-leaveAmount)}
    }
   }
   Object.keys(totals).forEach(k=>totals[k]+=sums[k]);
