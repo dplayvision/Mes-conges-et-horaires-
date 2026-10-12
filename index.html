@@ -213,7 +213,7 @@ header{background:linear-gradient(135deg,#ffffff,#f0f5ff)!important;color:#202b3
     <div id="ppRaiseList" class="small muted">Aucune évolution enregistrée dans cette session.</div>
    </details>
    <div class="notice" style="margin-top:14px">Chèques-repas Edenred : retenue personnelle de <strong>61,60 €</strong> en janvier, avril, juillet et septembre uniquement. Les autres mois : 0 €. La valeur créditée sur la carte (330 € par trimestre selon tes indications) n’est pas ajoutée au salaire net.</div>
-   <div class="row" style="margin-top:14px"><button class="btn" type="button" onclick="calculateProvisionalPayroll()">Calculer la fiche provisoire</button><button class="btn secondary" type="button" onclick="resetProvisionalPayroll()">Réinitialiser</button></div>
+   <div class="row" style="margin-top:14px"><button id="ppCalculateBtn" class="btn" type="button">Calculer la fiche provisoire</button><button class="btn secondary" type="button" onclick="resetProvisionalPayroll()">Réinitialiser</button></div>
    <div id="ppResults" style="margin-top:14px">
     <div class="empty-state">Modifie les heures et appuie sur « Calculer la fiche provisoire ».</div>
    </div>
@@ -892,6 +892,10 @@ function calculateProvisionalPayroll(skipCalendarSync=false){
   const status=document.getElementById('ppCalendarSyncStatus');if(status)status.textContent='Le calcul a rencontré une erreur. Les détails sont affichés dans la fiche provisoire.';
  }
 }
+// Exposition explicite et liaison du bouton pour garantir le clic, y compris sur Safari/iPhone.
+window.calculateProvisionalPayroll = calculateProvisionalPayroll;
+document.addEventListener('DOMContentLoaded',()=>{const btn=document.getElementById('ppCalculateBtn');if(btn){btn.addEventListener('click',()=>calculateProvisionalPayroll(false));}});
+
 function resetProvisionalPayroll(){
  const defaults={ppMonth:String(new Date().getMonth()+1),ppYear:String(new Date().getFullYear()),ppRate:'19.4365',ppBaseHours:'173.33',ppWorkDays:'22',ppSickDays:'0',ppOtherGross:'0',ppTax:'102.90',ppCIS:'0',ppWeeklyHours:'33',ppFullTimeHours:'40',ppKmRate:'0.04',ppKmDay:'48',ppAttendance:'45',ppSickPenalty:'15',ppFD:'49.50',ppSocial:'12.95',ppAdvance:'0',ppOt140:'0',ppOt150:'0'};
  Object.entries(defaults).forEach(([id,value])=>{const el=document.getElementById(id);if(el)el.value=value});
