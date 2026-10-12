@@ -167,6 +167,54 @@ header{background:linear-gradient(135deg,#ffffff,#f0f5ff)!important;color:#202b3
    <div id="payStatus" class="notice" style="margin-top:12px">Choisis un mois et un document.</div>
   </div>
   <div class="panel"><div class="panel-head"><h2>📁 Fiches enregistrées</h2><select id="payFilterYear" onchange="renderPaySlips()"><option value="all">Toutes les années</option></select></div><div id="payList"><div class="empty-state">Aucune fiche de paie enregistrée.</div></div></div>
+  <div class="panel" id="provisionalPayroll">
+   <div class="panel-head"><h2>🧮 Fiche de paie provisoire</h2><span class="tag work">Estimation</span></div>
+   <p class="small muted">Estimation indicative basée sur les paramètres ci-dessous. Elle ne remplace pas la fiche officielle de l’employeur.</p>
+   <div class="form-grid">
+    <div class="field"><label for="ppMonth">Mois à calculer</label><select id="ppMonth"><option value="1">Janvier</option><option value="2">Février</option><option value="3">Mars</option><option value="4">Avril</option><option value="5">Mai</option><option value="6">Juin</option><option value="7">Juillet</option><option value="8">Août</option><option value="9">Septembre</option><option value="10">Octobre</option><option value="11">Novembre</option><option value="12">Décembre</option></select></div>
+    <div class="field"><label for="ppYear">Année</label><input id="ppYear" type="number" min="2020" max="2100" value="2026"></div>
+    <div class="field"><label for="ppRate">Salaire brut horaire (€)</label><input id="ppRate" type="number" min="0" step="0.0001" value="19.4365"></div>
+    <div class="field"><label for="ppBaseHours">Heures normales payées (mois)</label><input id="ppBaseHours" type="number" min="0" step="0.25" value="173.33"></div>
+        <div class="field"><label for="ppWorkDays">Jours réellement travaillés</label><input id="ppWorkDays" type="number" min="0" max="31" step="1" value="22"></div>
+    <div class="field"><label for="ppSickDays">Jours de maladie</label><input id="ppSickDays" type="number" min="0" max="31" step="1" value="0"></div>
+    <div class="field"><label for="ppOtherGross">Autres éléments bruts (€)</label><input id="ppOtherGross" type="number" step="0.01" value="0"></div>
+    <div class="field"><label for="ppTax">Retenue d’impôt estimée (€)</label><input id="ppTax" type="number" min="0" step="0.01" value="102.90"></div>
+    <div class="field"><label for="ppCIS">Crédits d’impôt affichés (€)</label><input id="ppCIS" type="number" min="0" step="0.01" value="77.99"></div>
+   </div>
+   <details style="margin-top:14px"><summary style="font-weight:800;cursor:pointer;padding:8px 0">⚙ Paramètres de paie</summary>
+    <div class="form-grid" style="margin-top:10px">
+     <div class="field"><label for="ppKmRate">Indemnité trajet (€/km)</label><input id="ppKmRate" type="number" min="0" step="0.01" value="0.04"></div>
+     <div class="field"><label for="ppKmDay">Kilomètres aller-retour/jour</label><input id="ppKmDay" type="number" min="0" step="1" value="48"></div>
+     <div class="field"><label for="ppAttendance">Prime présence mensuelle (€)</label><input id="ppAttendance" type="number" min="0" step="0.01" value="45"></div>
+     <div class="field"><label for="ppSickPenalty">Perte par jour malade (€)</label><input id="ppSickPenalty" type="number" min="0" step="0.01" value="15"></div>
+     <div class="field"><label for="ppFD">Déduction Code FD (€)</label><input id="ppFD" type="number" min="0" step="0.01" value="49.50"></div>
+     <div class="field"><label for="ppSocial">Cotisations sociales estimées (%)</label><input id="ppSocial" type="number" min="0" max="100" step="0.01" value="12.95"></div>
+     <div class="field"><label for="ppAdvance">Avance / acompte (€)</label><input id="ppAdvance" type="number" min="0" step="0.01" value="0"></div>
+    </div>
+    <p class="footer-note">Règle d’heures supplémentaires configurée : les 2 premières heures supplémentaires de chaque semaine à 140 %, puis les suivantes à 150 %. Pour ce calcul simplifié, saisis séparément le nombre d’heures à 140 % et à 150 % ci-dessous.</p>
+    <div class="form-grid">
+     <div class="field"><label for="ppOt140">Heures supp. à 140 %</label><input id="ppOt140" type="number" min="0" step="0.25" value="0"></div>
+     <div class="field"><label for="ppOt150">Heures supp. à 150 %</label><input id="ppOt150" type="number" min="0" step="0.25" value="0"></div>
+    </div>
+   </details>
+   <details style="margin-top:14px"><summary style="font-weight:800;cursor:pointer;padding:8px 0">📈 Évolution du salaire (augmentations / index)</summary>
+    <p class="small muted">Enregistre une modification de salaire avec sa date d’application. Le taux horaire de la fiche provisoire reste celui saisi plus haut : vérifie-le selon la date de la paie.</p>
+    <div class="form-grid">
+     <div class="field"><label for="ppRaiseDate">Date d’application</label><input id="ppRaiseDate" type="date"></div>
+     <div class="field"><label for="ppRaiseRate">Nouveau brut horaire (€)</label><input id="ppRaiseRate" type="number" min="0" step="0.0001" placeholder="Ex. 19.9230"></div>
+     <div class="field full"><label for="ppRaiseNote">Motif (facultatif)</label><input id="ppRaiseNote" maxlength="120" placeholder="Indexation, augmentation…"></div>
+     <div class="field full"><button class="btn secondary" type="button" onclick="savePayrollRaise()">Enregistrer cette évolution</button></div>
+    </div>
+    <div id="ppRaiseList" class="small muted">Aucune évolution enregistrée dans cette session.</div>
+   </details>
+   <div class="notice" style="margin-top:14px">Chèques-repas Edenred : retenue personnelle de <strong>61,60 €</strong> en janvier, avril, juillet et septembre uniquement. Les autres mois : 0 €. La valeur créditée sur la carte (330 € par trimestre selon tes indications) n’est pas ajoutée au salaire net.</div>
+   <div class="row" style="margin-top:14px"><button class="btn" type="button" onclick="calculateProvisionalPayroll()">Calculer la fiche provisoire</button><button class="btn secondary" type="button" onclick="resetProvisionalPayroll()">Réinitialiser</button></div>
+   <div id="ppResults" style="margin-top:14px">
+    <div class="empty-state">Modifie les heures et appuie sur « Calculer la fiche provisoire ».</div>
+   </div>
+   <p class="footer-note">Important : classe fiscale 1a. La retenue d’impôt et les crédits sont saisis manuellement à titre d’estimation, car le calcul exact dépend notamment de la fiche de retenue d’impôt et des règles applicables. Le taux social est une approximation globale ; la base de certaines cotisations peut différer. Les congés, jours fériés et heures rémunérées doivent être inclus dans les heures payées sans double comptage.</p>
+  </div>
+
   <p class="footer-note">Les fiches restent sur cet appareil et ne sont pas envoyées sur GitHub. Pense à conserver une copie des documents importants.</p>
  </section>
  <section id="view-settings" class="view">
@@ -682,6 +730,63 @@ window.addEventListener('error',function(e){const box=document.getElementById('a
 function init(){updateFaceButton();renderYearSelects();renderSettingsForm();document.getElementById('payMonth').value=String(new Date().getMonth()+1);document.getElementById('payYear').value=String(new Date().getFullYear());document.getElementById('periodStart').value=iso(new Date());document.getElementById('periodEnd').value=iso(addDays(iso(new Date()),6));renderAll();listLeavePhotos();document.getElementById('headerYear').value=String(currentYear);document.getElementById('entryDialog').addEventListener('click',e=>{if(e.target.id==='entryDialog')closeEntry()})}
 try{init()}catch(err){const box=document.getElementById("appError");if(box){box.style.display="block";box.textContent="Erreur au démarrage : "+(err.message||err)}else alert("Erreur au démarrage de l’application.")}
 document.addEventListener('DOMContentLoaded',initLeavePhotoDate);
+
+
+function savePayrollRaise(){
+ const date=document.getElementById('ppRaiseDate').value;
+ const rate=Number(document.getElementById('ppRaiseRate').value);
+ const note=document.getElementById('ppRaiseNote').value.trim();
+ if(!date||!Number.isFinite(rate)||rate<=0){toast('Indique une date et un salaire horaire valide.');return}
+ if(!data.settings.payrollRaises)data.settings.payrollRaises=[];
+ data.settings.payrollRaises.push({date,rate,note});
+ data.settings.payrollRaises.sort((a,b)=>a.date.localeCompare(b.date));
+ persist();renderPayrollRaises();toast('Évolution du salaire enregistrée.');
+}
+function renderPayrollRaises(){
+ const el=document.getElementById('ppRaiseList');if(!el)return;
+ const rows=(data.settings.payrollRaises||[]).slice().sort((a,b)=>b.date.localeCompare(a.date));
+ el.innerHTML=rows.length?rows.map((r,i)=>'<div class="list-item"><div class="main"><strong>'+escapeHtml(fmtDate(r.date,{day:'numeric',month:'long',year:'numeric'}))+' · '+fmtNum(r.rate)+' €/h</strong><small>'+escapeHtml(r.note||'Évolution du salaire')+'</small></div><button type="button" class="btn danger sm" onclick="deletePayrollRaise('+i+')">Supprimer</button></div>').join(''):'Aucune évolution enregistrée.';
+}
+function deletePayrollRaise(index){
+ const rows=(data.settings.payrollRaises||[]).slice().sort((a,b)=>a.date.localeCompare(b.date));
+ if(index<0||index>=rows.length)return;
+ const item=rows[rows.length-1-index];
+ data.settings.payrollRaises=(data.settings.payrollRaises||[]).filter(r=>!(r.date===item.date&&r.rate===item.rate&&r.note===item.note));
+ persist();renderPayrollRaises();toast('Évolution supprimée.');
+}
+function ppMoney(n){return Number(n||0).toLocaleString('fr-FR',{style:'currency',currency:'EUR'})}
+function ppVal(id){const el=document.getElementById(id);return el?Math.max(0,Number(el.value)||0):0}
+function calculateProvisionalPayroll(){
+ const month=Number(document.getElementById('ppMonth').value);
+ const rate=ppVal('ppRate'),baseHours=ppVal('ppBaseHours'),ot140=ppVal('ppOt140'),ot150=ppVal('ppOt150');
+ const workDays=ppVal('ppWorkDays'),sickDays=ppVal('ppSickDays');
+ const baseGross=baseHours*rate, overtimeGross=(ot140*rate*1.4)+(ot150*rate*1.5);
+ const otherGross=ppVal('ppOtherGross'),gross=baseGross+overtimeGross+otherGross;
+ const travel=workDays*ppVal('ppKmDay')*ppVal('ppKmRate');
+ const attendance=Math.max(0,ppVal('ppAttendance')-sickDays*ppVal('ppSickPenalty'));
+ const social=gross*ppVal('ppSocial')/100;
+ const tax=ppVal('ppTax'),credits=ppVal('ppCIS'),fd=ppVal('ppFD');
+ const edenred=[1,4,7,9].includes(month)?61.60:0;
+ const net=gross+travel+attendance-social-tax+credits-fd-edenred-ppVal('ppAdvance');
+ const rows=[
+  ['Salaire de base',baseGross],['Heures supplémentaires à 140 %',ot140*rate*1.4],
+  ['Heures supplémentaires à 150 %',ot150*rate*1.5],['Autres éléments bruts',otherGross],
+  ['Total brut estimé',gross],['Indemnité trajet ('+workDays+' jours)',travel],
+  ['Prime de présence après maladie',attendance],['Cotisations sociales estimées',-social],
+  ['Retenue d’impôt saisie',-tax],['Crédits d’impôt saisis',credits],['Déduction Code FD',-fd],
+  ['Retenue Edenred',-edenred],['Avance / acompte',-ppVal('ppAdvance')],['NET PROVISOIRE ESTIMÉ',net]
+ ];
+ document.getElementById('ppResults').innerHTML='<div class="summary-wrap"><table class="summary-table" style="min-width:320px;text-align:left"><tbody>'+
+ rows.map((r,i)=>'<tr><td style="text-align:left;'+(i===4||i===13?'font-weight:850;':'')+'">'+r[0]+'</td><td style="text-align:right;white-space:nowrap;'+(i===13?'font-weight:900;font-size:16px;':'')+'">'+ppMoney(r[1])+'</td></tr>').join('')+
+ '</tbody></table></div><p class="footer-note">Calcul réalisé pour '+MONTHS[month-1]+' '+(Number(document.getElementById('ppYear').value)||2026)+'. Estimation indicative, non contractuelle.</p>';
+}
+function resetProvisionalPayroll(){
+ const defaults={ppMonth:String(new Date().getMonth()+1),ppYear:String(new Date().getFullYear()),ppRate:'19.4365',ppBaseHours:'173.33',ppWorkDays:'22',ppSickDays:'0',ppOtherGross:'0',ppTax:'102.90',ppCIS:'77.99',ppKmRate:'0.04',ppKmDay:'48',ppAttendance:'45',ppSickPenalty:'15',ppFD:'49.50',ppSocial:'12.95',ppAdvance:'0',ppOt140:'0',ppOt150:'0'};
+ Object.entries(defaults).forEach(([id,value])=>{const el=document.getElementById(id);if(el)el.value=value});
+ document.getElementById('ppResults').innerHTML='<div class="empty-state">Paramètres réinitialisés. Appuie sur « Calculer la fiche provisoire ».</div>';
+}
+
+document.addEventListener('DOMContentLoaded',()=>{const d=document.getElementById('ppRaiseDate');if(d&&!d.value)d.value=iso(new Date());renderPayrollRaises();});
 </script>
 </body>
 </html>
