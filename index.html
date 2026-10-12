@@ -641,7 +641,7 @@ function exportSummaryImage(){
  ctx.fillStyle='#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#172033';ctx.font='bold 32px -apple-system,Arial,sans-serif';ctx.fillText(`Synthèse annuelle ${currentYear}`,pad,pad+36);
  const usable=width-pad*2,colWidths=rows[0].map((_,i)=>i===0?130:(i===rows[0].length-1?90:(usable-220)/(rows[0].length-2)));
  let y=pad+titleH;
- rows.forEach((cells,ri)=>{let x=pad;cells.forEach((value,ci)=>{const cw=colWidths[ci]||80;ctx.fillStyle=ri===0?'#e9eef7':(ri===rows.length-1?'#eef2f7':(ri%2?'#ffffff':'#f7f9fc'));ctx.fillRect(x,y,cw,rowH);ctx.strokeStyle='#d6deea';ctx.strokeRect(x,y,cw,rowH);ctx.fillStyle='#172033';ctx.font=(ri===0||ri===rows.length-1?'bold ':'600 ')+(ri===0?16:15)+'px -apple-system,Arial,sans-serif';let txt=String(value||'').replace(/📎/g,'').trim();const max=Math.max(4,Math.floor((cw-12)/8));if(txt.length>max)txt=txt.slice(0,max-1)+'…';ctx.textAlign=ci===0?'left':'center';ctx.textBaseline='middle';ctx.fillText(txt,x+(ci===0?8:cw/2),y+rowH/2,cw-8);x+=cw});y+=rowH});
+ rows.forEach((cells,ri)=>{let x=pad;const sourceRow=table.rows[ri];cells.forEach((value,ci)=>{const cw=colWidths[ci]||80;const sourceCell=sourceRow&&sourceRow.cells[ci];const style=sourceCell?getComputedStyle(sourceCell):null;const bg=style&&style.backgroundColor&&style.backgroundColor!=='rgba(0, 0, 0, 0)'?style.backgroundColor:(ri===0?'#e9eef7':(ri===rows.length-1?'#eef2f7':(ri%2?'#ffffff':'#f7f9fc')));const fg=style&&style.color&&style.color!=='rgba(0, 0, 0, 0)'?style.color:'#172033';ctx.fillStyle=bg;ctx.fillRect(x,y,cw,rowH);ctx.strokeStyle='#d6deea';ctx.strokeRect(x,y,cw,rowH);ctx.fillStyle=fg;ctx.font=(ri===0||ri===rows.length-1?'bold ':'600 ')+(ri===0?16:15)+'px -apple-system,Arial,sans-serif';let txt=String(value||'').replace(/📎/g,'').trim();const max=Math.max(4,Math.floor((cw-12)/8));if(txt.length>max)txt=txt.slice(0,max-1)+'…';ctx.textAlign=ci===0?'left':'center';ctx.textBaseline='middle';ctx.fillText(txt,x+(ci===0?8:cw/2),y+rowH/2,cw-8);x+=cw});y+=rowH});
  try{
   const imageUrl=canvas.toDataURL('image/png');
   let overlay=document.getElementById('summaryImagePreview');
@@ -792,7 +792,7 @@ function deletePayrollRaise(index){
  data.settings.payrollRaises=(data.settings.payrollRaises||[]).filter(r=>!(r.date===item.date&&r.rate===item.rate&&r.note===item.note));
  persist();renderPayrollRaises();toast('Évolution supprimée.');
 }
-let ppWorkDaysManual=false;
+var ppWorkDaysManual=false;
 function ppMoney(n){return Number(n||0).toLocaleString('fr-FR',{style:'currency',currency:'EUR'})}
 function ppVal(id){const el=document.getElementById(id);return el?Math.max(0,Number(el.value)||0):0}
 function resetWorkDaysToCalendar(){ppWorkDaysManual=false;syncProvisionalPayrollFromCalendar();}
@@ -857,30 +857,40 @@ function updateProvisionalCredits(monthlyGross){
  return c;
 }
 function calculateProvisionalPayroll(skipCalendarSync=false){
- if(!skipCalendarSync)syncProvisionalPayrollFromCalendar();
- const month=Number(document.getElementById('ppMonth').value);
- const rate=ppVal('ppRate'),baseHours=ppVal('ppBaseHours'),ot140=ppVal('ppOt140'),ot150=ppVal('ppOt150');
- const workDays=ppVal('ppWorkDays'),sickDays=ppVal('ppSickDays');
- const baseGross=baseHours*rate, overtimeGross=(ot140*rate*1.4)+(ot150*rate*1.5);
- const otherGross=ppVal('ppOtherGross'),gross=baseGross+overtimeGross+otherGross;
- const creditsInfo=updateProvisionalCredits(gross);
- const travel=workDays*ppVal('ppKmDay')*ppVal('ppKmRate');
- const attendance=Math.max(0,ppVal('ppAttendance')-sickDays*ppVal('ppSickPenalty'));
- const social=gross*ppVal('ppSocial')/100;
- const tax=ppVal('ppTax'),credits=creditsInfo.total,fd=ppVal('ppFD');
- const edenred=[1,4,7,9].includes(month)?61.60:0;
- const net=gross+travel+attendance-social-tax+credits-fd-edenred-ppVal('ppAdvance');
- const rows=[
-  ['Salaire de base',baseGross],['Heures supplémentaires à 140 %',ot140*rate*1.4],
-  ['Heures supplémentaires à 150 %',ot150*rate*1.5],['Autres éléments bruts',otherGross],
-  ['Total brut estimé',gross],['Indemnité trajet ('+workDays+' jours)',travel],
-  ['Prime de présence après maladie',attendance],['Cotisations sociales estimées',-social],
-  ['Retenue d’impôt saisie',-tax],['CIS estimé',creditsInfo.cis],['CI-CO₂ estimé',creditsInfo.co2],['CISSM estimé',creditsInfo.cissm],['Déduction Code FD',-fd],
-  ['Retenue Edenred',-edenred],['Avance / acompte',-ppVal('ppAdvance')],['NET PROVISOIRE ESTIMÉ',net]
- ];
- document.getElementById('ppResults').innerHTML='<div class="summary-wrap"><table class="summary-table" style="min-width:320px;text-align:left"><tbody>'+
- rows.map((r,i)=>'<tr><td style="text-align:left;'+(i===4||i===15?'font-weight:850;':'')+'">'+r[0]+'</td><td style="text-align:right;white-space:nowrap;'+(i===15?'font-weight:900;font-size:16px;':'')+'">'+ppMoney(r[1])+'</td></tr>').join('')+
- '</tbody></table></div><p class="footer-note">Calcul réalisé pour '+MONTHS[month-1]+' '+(Number(document.getElementById('ppYear').value)||2026)+'. CIS et CI-CO₂ selon le barème 2026 projeté sur 12 mois ; CISSM proratisé selon les heures hebdomadaires indiquées. Estimation indicative, non contractuelle.</p>';
+ const results=document.getElementById('ppResults');
+ try{
+  if(!skipCalendarSync){try{syncProvisionalPayrollFromCalendar()}catch(syncError){console.warn('Synchronisation calendrier indisponible, calcul avec les valeurs affichées.',syncError)}}
+  const monthEl=document.getElementById('ppMonth'),yearEl=document.getElementById('ppYear');
+  const month=monthEl?(Number(monthEl.value)||new Date().getMonth()+1):new Date().getMonth()+1;
+  const year=yearEl?(Number(yearEl.value)||new Date().getFullYear()):new Date().getFullYear();
+  const rate=ppVal('ppRate'),baseHours=ppVal('ppBaseHours'),ot140=ppVal('ppOt140'),ot150=ppVal('ppOt150');
+  const workDays=ppVal('ppWorkDays'),sickDays=ppVal('ppSickDays');
+  const baseGross=baseHours*rate, overtimeGross=(ot140*rate*1.4)+(ot150*rate*1.5);
+  const otherGross=ppVal('ppOtherGross'),gross=baseGross+overtimeGross+otherGross;
+  const creditsInfo=updateProvisionalCredits(gross);
+  const travel=workDays*ppVal('ppKmDay')*ppVal('ppKmRate');
+  const attendance=Math.max(0,ppVal('ppAttendance')-sickDays*ppVal('ppSickPenalty'));
+  const social=gross*ppVal('ppSocial')/100;
+  const tax=ppVal('ppTax'),credits=creditsInfo.total,fd=ppVal('ppFD');
+  const edenred=[1,4,7,9].includes(month)?61.60:0;
+  const net=gross+travel+attendance-social-tax+credits-fd-edenred-ppVal('ppAdvance');
+  const rows=[
+   ['Salaire de base',baseGross],['Heures supplémentaires à 140 %',ot140*rate*1.4],
+   ['Heures supplémentaires à 150 %',ot150*rate*1.5],['Autres éléments bruts',otherGross],
+   ['Total brut estimé',gross],['Indemnité trajet ('+workDays+' jours)',travel],
+   ['Prime de présence après maladie',attendance],['Cotisations sociales estimées',-social],
+   ['Retenue d’impôt saisie',-tax],['CIS estimé',creditsInfo.cis],['CI-CO₂ estimé',creditsInfo.co2],['CISSM estimé',creditsInfo.cissm],['Déduction Code FD',-fd],
+   ['Retenue Edenred',-edenred],['Avance / acompte',-ppVal('ppAdvance')],['NET PROVISOIRE ESTIMÉ',net]
+  ];
+  if(!results)throw new Error('Zone de résultat ppResults introuvable.');
+  results.innerHTML='<div class="summary-wrap"><table class="summary-table" style="min-width:320px;text-align:left"><tbody>'+
+   rows.map((r,i)=>'<tr><td style="text-align:left;'+(i===4||i===15?'font-weight:850;':'')+'">'+r[0]+'</td><td style="text-align:right;white-space:nowrap;'+(i===15?'font-weight:900;font-size:16px;':'')+'">'+ppMoney(r[1])+'</td></tr>').join('')+
+   '</tbody></table></div><p class="footer-note">Calcul réalisé pour '+MONTHS[month-1]+' '+year+'. CIS et CI-CO₂ selon le barème 2026 projeté sur 12 mois ; CISSM proratisé selon les heures hebdomadaires indiquées. Estimation indicative, non contractuelle.</p>';
+ }catch(err){
+  console.error('Erreur calcul fiche provisoire:',err);
+  if(results)results.innerHTML='<div class="notice danger">Le calcul a rencontré une erreur : '+String(err&&err.message?err.message:err).replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))+'. Vérifie les champs puis réessaie.</div>';
+  const status=document.getElementById('ppCalendarSyncStatus');if(status)status.textContent='Le calcul a rencontré une erreur. Les détails sont affichés dans la fiche provisoire.';
+ }
 }
 function resetProvisionalPayroll(){
  const defaults={ppMonth:String(new Date().getMonth()+1),ppYear:String(new Date().getFullYear()),ppRate:'19.4365',ppBaseHours:'173.33',ppWorkDays:'22',ppSickDays:'0',ppOtherGross:'0',ppTax:'102.90',ppCIS:'0',ppWeeklyHours:'33',ppFullTimeHours:'40',ppKmRate:'0.04',ppKmDay:'48',ppAttendance:'45',ppSickPenalty:'15',ppFD:'49.50',ppSocial:'12.95',ppAdvance:'0',ppOt140:'0',ppOt150:'0'};
