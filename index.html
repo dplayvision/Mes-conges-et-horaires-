@@ -180,7 +180,7 @@ header{background:linear-gradient(135deg,#ffffff,#f0f5ff)!important;color:#202b3
         <div class="field"><label for="ppWorkDays">Jours réellement travaillés</label><input id="ppWorkDays" type="number" min="0" max="31" step="0.5" value="22"><button class="btn secondary" type="button" style="margin-top:6px;padding:8px 10px" onclick="resetWorkDaysToCalendar()">↻ Reprendre les jours du calendrier</button><small class="muted">Tu peux modifier le nombre manuellement. Le bouton remet le calcul automatique.</small></div>
     <div class="field"><label for="ppSickDays">Jours de maladie</label><input id="ppSickDays" type="number" min="0" max="31" step="0.5" value="0" readonly></div>
     <div class="field"><label for="ppOtherGross">Autres éléments bruts (€)</label><input id="ppOtherGross" type="number" step="0.01" value="0"></div>
-    <div class="field"><label for="ppTax">Retenue d’impôt estimée (€)</label><input id="ppTax" type="number" min="0" step="0.01" value="102.90"></div>
+    <div class="field"><label for="ppTax">Retenue d’impôt estimée — classe 1a (€)</label><input id="ppTax" type="number" min="0" step="0.01" value="0" readonly><small class="muted">Calcul indicatif automatique, basé sur le revenu annuel projeté et la déduction FD.</small></div>
     <div class="field"><label for="ppCIS">Total crédits d’impôt estimés (€)</label><input id="ppCIS" type="number" min="0" step="0.01" value="0" readonly></div>
     <div class="field full"><div id="ppCreditBreakdown" class="notice" style="margin:0">Les crédits CIS, CI-CO₂ et CISSM seront estimés automatiquement à partir du brut.</div></div>
    </div>
@@ -860,6 +860,26 @@ function updateProvisionalCredits(monthlyGross){
  if(box)box.innerHTML='<strong>Estimation des crédits (barème 2026)</strong><br>CIS : '+ppMoney(c.cis)+' / mois<br>CI-CO₂ : '+ppMoney(c.co2)+' / mois<br>CISSM : '+ppMoney(c.cissm)+' / mois<br><strong>Total estimé : '+ppMoney(c.total)+'</strong><br><small>Brut mensuel estimé : '+ppMoney(monthlyGross)+' · brut annuel projeté : '+ppMoney(c.annual)+' · brut mensuel équivalent temps plein pour le CISSM : '+ppMoney(c.fullTimeGross)+' · contrat : '+weekly+' h / '+full+' h</small>';
  return c;
 }
+// Estimation indicative classe 1a : interpolation des repères publiés pour 2025.
+// La retenue réelle est calculée par l'employeur selon le barème officiel mensuel et la fiche fiscale.
+function estimateLuxTaxClass1a(monthlyGross, socialRate, monthlyFD){
+ const annualTaxable=Math.max(0,(monthlyGross*(1-(socialRate/100))-monthlyFD)*12);
+ const points=[[0,0],[30000,402],[45000,3563],[60000,9462],[85000,19894],[110000,30327],[150000,47366],[200000,69426],[250000,91936]];
+ let annualTax=0;
+ if(annualTaxable<=points[0][0]) annualTax=0;
+ else if(annualTaxable>=points[points.length-1][0]){
+  const a=points[points.length-2],b=points[points.length-1];
+  annualTax=b[1]+(annualTaxable-b[0])*(b[1]-a[1])/(b[0]-a[0]);
+ }else{
+  for(let i=1;i<points.length;i++){
+   if(annualTaxable<=points[i][0]){
+    const a=points[i-1],b=points[i];
+    annualTax=a[1]+(annualTaxable-a[0])*(b[1]-a[1])/(b[0]-a[0]);break;
+   }
+  }
+ }
+ return {monthly:Math.max(0,annualTax/12),annualTaxable,annualTax};
+}
 function calculateProvisionalPayroll(skipCalendarSync=false){
  const results=document.getElementById('ppResults');
  try{
@@ -875,7 +895,10 @@ function calculateProvisionalPayroll(skipCalendarSync=false){
   const travel=workDays*ppVal('ppKmDay')*ppVal('ppKmRate');
   const attendance=Math.max(0,ppVal('ppAttendance')-sickDays*ppVal('ppSickPenalty'));
   const social=gross*ppVal('ppSocial')/100;
-  const tax=ppVal('ppTax'),credits=creditsInfo.total,fd=ppVal('ppFD');
+  const taxInfo=estimateLuxTaxClass1a(gross,ppVal('ppSocial'),ppVal('ppFD'));
+  const tax=Math.round(taxInfo.monthly*100)/100;
+  const taxInput=document.getElementById('ppTax');if(taxInput)taxInput.value=tax.toFixed(2);
+  const credits=creditsInfo.total,fd=ppVal('ppFD');
   const edenred=[1,4,7,9].includes(month)?61.60:0;
   const net=gross+travel+attendance-social-tax+credits-fd-edenred-ppVal('ppAdvance');
   const rows=[
@@ -883,13 +906,13 @@ function calculateProvisionalPayroll(skipCalendarSync=false){
    ['Heures supplémentaires à 150 %',ot150*rate*1.5],['Autres éléments bruts',otherGross],
    ['Total brut estimé',gross],['Indemnité trajet ('+workDays+' jours)',travel],
    ['Prime de présence après maladie',attendance],['Cotisations sociales estimées',-social],
-   ['Retenue d’impôt saisie',-tax],['CIS estimé',creditsInfo.cis],['CI-CO₂ estimé',creditsInfo.co2],['CISSM estimé',creditsInfo.cissm],['Déduction Code FD',-fd],
+   ['Retenue d’impôt estimée (classe 1a)',-tax],['CIS estimé',creditsInfo.cis],['CI-CO₂ estimé',creditsInfo.co2],['CISSM estimé',creditsInfo.cissm],['Déduction Code FD',-fd],
    ['Retenue Edenred',-edenred],['Avance / acompte',-ppVal('ppAdvance')],['NET PROVISOIRE ESTIMÉ',net]
   ];
   if(!results)throw new Error('Zone de résultat ppResults introuvable.');
   results.innerHTML='<div class="summary-wrap"><table class="summary-table" style="min-width:320px;text-align:left"><tbody>'+
    rows.map((r,i)=>'<tr><td style="text-align:left;'+(i===4||i===15?'font-weight:850;':'')+'">'+r[0]+'</td><td style="text-align:right;white-space:nowrap;'+(i===15?'font-weight:900;font-size:16px;':'')+'">'+ppMoney(r[1])+'</td></tr>').join('')+
-   '</tbody></table></div><p class="footer-note">Calcul réalisé pour '+MONTHS[month-1]+' '+year+'. CIS et CI-CO₂ selon le barème 2026 projeté sur 12 mois ; CISSM proratisé selon les heures hebdomadaires indiquées. Estimation indicative, non contractuelle.</p>';
+   '</tbody></table></div><p class="footer-note">Calcul réalisé pour '+MONTHS[month-1]+' '+year+'. Impôt classe 1a estimé par interpolation de repères annuels publiés (revenu imposable projeté après cotisations estimées et FD) ; CIS et CI-CO₂ selon le barème 2026 ; CISSM proratisé selon les heures du contrat. Estimation simplifiée, non équivalente au barème mensuel officiel et à confirmer sur la fiche de salaire.</p>';
  }catch(err){
   console.error('Erreur calcul fiche provisoire:',err);
   if(results)results.innerHTML='<div class="notice danger">Le calcul a rencontré une erreur : '+String(err&&err.message?err.message:err).replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))+'. Vérifie les champs puis réessaie.</div>';
@@ -901,14 +924,14 @@ window.calculateProvisionalPayroll = calculateProvisionalPayroll;
 document.addEventListener('DOMContentLoaded',()=>{const btn=document.getElementById('ppCalculateBtn');if(btn&&!btn.dataset.calcBound){btn.dataset.calcBound='1';btn.addEventListener('click',()=>{try{calculateProvisionalPayroll(false)}catch(e){const out=document.getElementById('ppResults');if(out)out.innerHTML='<div class="notice danger">Erreur de calcul : '+String(e&&e.message?e.message:e)+'</div>';}});} });
 
 function resetProvisionalPayroll(){
- const defaults={ppMonth:String(new Date().getMonth()+1),ppYear:String(new Date().getFullYear()),ppRate:'19.4365',ppBaseHours:'173.33',ppWorkDays:'22',ppSickDays:'0',ppOtherGross:'0',ppTax:'102.90',ppCIS:'0',ppWeeklyHours:'33',ppFullTimeHours:'40',ppKmRate:'0.04',ppKmDay:'48',ppAttendance:'45',ppSickPenalty:'15',ppFD:'49.50',ppSocial:'12.95',ppAdvance:'0',ppOt140:'0',ppOt150:'0'};
+ const defaults={ppMonth:String(new Date().getMonth()+1),ppYear:String(new Date().getFullYear()),ppRate:'19.4365',ppBaseHours:'173.33',ppWorkDays:'22',ppSickDays:'0',ppOtherGross:'0',ppTax:'0',ppCIS:'0',ppWeeklyHours:'33',ppFullTimeHours:'40',ppKmRate:'0.04',ppKmDay:'48',ppAttendance:'45',ppSickPenalty:'15',ppFD:'49.50',ppSocial:'12.95',ppAdvance:'0',ppOt140:'0',ppOt150:'0'};
  Object.entries(defaults).forEach(([id,value])=>{const el=document.getElementById(id);if(el)el.value=value});
  document.getElementById('ppResults').innerHTML='<div class="empty-state">Paramètres réinitialisés.</div>';
  syncProvisionalPayrollFromCalendar();
 }
 
 
-document.addEventListener('DOMContentLoaded',()=>{const d=document.getElementById('ppRaiseDate');if(d&&!d.value)d.value=iso(new Date());const m=document.getElementById('ppMonth'),y=document.getElementById('ppYear');if(m)m.value=String(new Date().getMonth()+1);if(y)y.value=String(new Date().getFullYear());renderPayrollRaises();syncProvisionalPayrollFromCalendar();const refreshAll=()=>{const g=ppVal('ppBaseHours')*ppVal('ppRate')+ppVal('ppOt140')*ppVal('ppRate')*1.4+ppVal('ppOt150')*ppVal('ppRate')*1.5+ppVal('ppOtherGross');updateProvisionalCredits(g);calculateProvisionalPayroll(true)};['ppRate','ppOtherGross','ppTax','ppKmRate','ppKmDay','ppAttendance','ppSickPenalty','ppFD','ppSocial','ppWeeklyHours','ppFullTimeHours','ppAdvance'].forEach(id=>{const e=document.getElementById(id);if(e){e.addEventListener('input',refreshAll);e.addEventListener('change',refreshAll)}});const workDaysInput=document.getElementById('ppWorkDays');if(workDaysInput){const updateManualDays=()=>{ppWorkDaysManual=true;const days=Math.max(0,Number(workDaysInput.value)||0);const base=ppCalendarScheduledDays>0?ppCalendarBaseHours*(days/ppCalendarScheduledDays):0;const hoursInput=document.getElementById('ppBaseHours');if(hoursInput)hoursInput.value=(Math.round(base*100)/100).toString();refreshAll()};workDaysInput.addEventListener('input',updateManualDays);workDaysInput.addEventListener('change',updateManualDays)}['ppMonth','ppYear'].forEach(id=>{const e=document.getElementById(id);if(e)e.addEventListener('change',()=>{ppWorkDaysManual=false;syncProvisionalPayrollFromCalendar()})});refreshAll();});
+document.addEventListener('DOMContentLoaded',()=>{const d=document.getElementById('ppRaiseDate');if(d&&!d.value)d.value=iso(new Date());const m=document.getElementById('ppMonth'),y=document.getElementById('ppYear');if(m)m.value=String(new Date().getMonth()+1);if(y)y.value=String(new Date().getFullYear());renderPayrollRaises();syncProvisionalPayrollFromCalendar();const refreshAll=()=>{const g=ppVal('ppBaseHours')*ppVal('ppRate')+ppVal('ppOt140')*ppVal('ppRate')*1.4+ppVal('ppOt150')*ppVal('ppRate')*1.5+ppVal('ppOtherGross');updateProvisionalCredits(g);calculateProvisionalPayroll(true)};['ppRate','ppOtherGross','ppKmRate','ppKmDay','ppAttendance','ppSickPenalty','ppFD','ppSocial','ppWeeklyHours','ppFullTimeHours','ppAdvance'].forEach(id=>{const e=document.getElementById(id);if(e){e.addEventListener('input',refreshAll);e.addEventListener('change',refreshAll)}});const workDaysInput=document.getElementById('ppWorkDays');if(workDaysInput){const updateManualDays=()=>{ppWorkDaysManual=true;const days=Math.max(0,Number(workDaysInput.value)||0);const base=ppCalendarScheduledDays>0?ppCalendarBaseHours*(days/ppCalendarScheduledDays):0;const hoursInput=document.getElementById('ppBaseHours');if(hoursInput)hoursInput.value=(Math.round(base*100)/100).toString();refreshAll()};workDaysInput.addEventListener('input',updateManualDays);workDaysInput.addEventListener('change',updateManualDays)}['ppMonth','ppYear'].forEach(id=>{const e=document.getElementById(id);if(e)e.addEventListener('change',()=>{ppWorkDaysManual=false;syncProvisionalPayrollFromCalendar()})});refreshAll();});
 </script>
 </body>
 </html>
