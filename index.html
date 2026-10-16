@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f3f6fb">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-touch-fullscreen" content="yes">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Congés & Horaires</title>
@@ -70,6 +76,32 @@ header{background:linear-gradient(135deg,#ffffff,#f0f5ff)!important;color:#202b3
 .leave-date-btn:disabled{opacity:.45}
 .leave-multi-summary{font-size:12px;line-height:1.5;color:#475569;margin-top:9px}
 @media(max-width:380px){.leave-multi-box{padding:9px}.leave-date-btn{font-size:11px}}
+
+/* Présentation plus claire de la seule section Configuration des horaires */
+#configHoursPanel .form-grid{grid-template-columns:minmax(0,1fr);gap:14px}
+#configHoursPanel .field{width:100%;min-width:0;padding:10px 12px;border:1px solid #e3e8f0;border-radius:14px;background:#fbfcff}
+#configHoursPanel .field label{font-size:13px;line-height:1.35}
+#configHoursPanel .field input,#configHoursPanel .field select{width:100%;min-width:0}
+#configHoursPanel .field:has(#weekCEnabled){background:#f2f7ff;border-color:#d5e3fb}
+#configHoursPanel .field:has(#weekCEnabled) .switchrow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+#configHoursPanel .field.full{padding:0;border:0;background:transparent}
+
+/* Compatibilité mobile multi-marques : améliorations de présentation uniquement */
+@supports not (padding: env(safe-area-inset-bottom)) { body{padding-bottom:86px} .nav{padding-bottom:8px} }
+@supports not selector(:has(*)) { #configHoursPanel .field{min-width:0} }
+button, input, select, textarea { touch-action: manipulation; }
+input, select, textarea { max-width:100%; }
+img, canvas, video, iframe { max-width:100%; }
+@media(max-width:480px){
+  .summary-wrap,.months,.panel,.form-grid,.stats{min-width:0;max-width:100%;}
+  .summary-wrap{overflow-x:auto;overscroll-behavior-x:contain;}
+  .form-grid{grid-template-columns:minmax(0,1fr);}
+  .form-grid .full{grid-column:1/-1;}
+  .nav button{min-width:0;overflow-wrap:anywhere;}
+  button{min-height:40px;}
+}
+@media(hover:none){button:hover{filter:none}}
+
 </style>
 </head>
 <body>
@@ -247,7 +279,7 @@ header{background:linear-gradient(135deg,#ffffff,#f0f5ff)!important;color:#202b3
    <div class="field"><label for="colorSickness">Maladie</label><input id="colorSickness" type="color" value="#ffd9dc" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
    <div class="field"><label for="colorToday">Aujourd’hui (contour)</label><input id="colorToday" type="color" value="#356df3" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
    </div><button class="btn secondary sm" type="button" onclick="resetCalendarColors()" style="margin-top:12px">Restaurer les couleurs par défaut</button></div>
-  <div class="panel">
+  <div class="panel" id="configHoursPanel">
    <div class="panel-head"><h2>Configuration des horaires</h2></div>
    <div class="notice">Par défaut, les semaines alternent du lundi au vendredi : semaine A de 6 h à 14 h, puis semaine B de 8 h à 16 h. Tu peux activer une semaine C et définir ses heures. La semaine A de référence commence le lundi 5 octobre 2026.</div>
    <div class="form-grid" style="margin-top:14px">
@@ -519,7 +551,16 @@ async function renderPaySlips(){
  }catch(e){list.innerHTML='<div class="empty-state">Impossible de lire les fiches enregistrées.</div>'}
 }
 async function getPaySlip(id){return (await getAllPhotoRecords()).find(p=>p.id===id&&p.category==='pay')}
-async function openPaySlip(id){try{const p=await getPaySlip(id);if(!p)return;const win=window.open();if(!win){toast('Autorise les fenêtres surgissantes pour afficher le document.');return}if((p.mime||'').includes('pdf')||(p.fileName||'').toLowerCase().endsWith('.pdf')){win.document.write(`<title>${escapeHtml(p.title||'Fiche de paie')}</title><iframe src="${p.dataUrl}" style="border:0;width:100%;height:100vh" title="Fiche de paie"></iframe>`)}else{win.document.write(`<title>${escapeHtml(p.title||'Fiche de paie')}</title><meta name="viewport" content="width=device-width,initial-scale=1"><body style="margin:0;background:#222;display:grid;place-items:center"><img src="${p.dataUrl}" style="max-width:100%;max-height:100vh;object-fit:contain"></body>`)}win.document.close()}catch(e){toast('Impossible d’ouvrir ce document.')}}
+async function openPaySlip(id){try{const p=await getPaySlip(id);if(!p)return;const win=window.open();if(!win){toast('Autorise les fenêtres surgissantes pour afficher le document.');return}if((p.mime||'').includes('pdf')||(p.fileName||'').toLowerCase().endsWith('.pdf')){win.document.write(`<title>${escapeHtml(p.title||'Fiche de paie')}</title><iframe src="${p.dataUrl}" style="border:0;width:100%;height:100vh" title="Fiche de paie"></iframe>`)}else{win.document.write(`<title>${escapeHtml(p.title||'Fiche de paie')}</title><meta name="viewport" content="width=device-width,initial-scale=1"><body style="margin:0;background:#222;display:grid;place-items:center"><img src="${p.dataUrl}" style="max-width:100%;max-height:100vh;object-fit:contain">
+<script>
+// Installation et cache hors ligne sur hébergement HTTPS/localhost. N'interfère pas avec les fonctions existantes.
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('./service-worker.js').catch(function (err) { console.info('Mode web sans installation hors ligne :', err); });
+  });
+}
+</script>
+</body>`)}win.document.close()}catch(e){toast('Impossible d’ouvrir ce document.')}}
 async function editPaySlip(id){try{const p=await getPaySlip(id);if(!p)return;const title=prompt('Titre de la fiche :',p.title||'');if(title===null)return;const note=prompt('Note (facultatif) :',p.note||'');if(note===null)return;const db=await openPhotoDB();p.title=title.trim()||`Fiche de paie ${PAY_MONTHS[(p.payMonth||1)-1]} ${p.payYear}`;p.note=note.trim();await new Promise((resolve,reject)=>{const tx=db.transaction(PHOTO_STORE,'readwrite');tx.objectStore(PHOTO_STORE).put(p);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});renderPaySlips();toast('Fiche modifiée.')}catch(e){toast('Impossible de modifier cette fiche.')}}
 async function exportPaySlip(id){try{const p=await getPaySlip(id);if(!p)return;const a=document.createElement('a');a.href=p.dataUrl;a.download=(p.fileName||`${(p.title||'fiche-paie').replace(/[^\w-]+/g,'_')}.${(p.mime||'image/jpeg').includes('pdf')?'pdf':((p.mime||'image/jpeg').split('/')[1]||'jpg')}`);document.body.appendChild(a);a.click();a.remove()}catch(e){toast('Export impossible.')}}
 async function deletePaySlip(id){if(!confirm('Supprimer cette fiche de paie ?'))return;try{const db=await openPhotoDB();await new Promise((resolve,reject)=>{const tx=db.transaction(PHOTO_STORE,'readwrite');tx.objectStore(PHOTO_STORE).delete(id);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});renderPaySlips();toast('Fiche supprimée.')}catch(e){toast('Suppression impossible.')}}
