@@ -121,7 +121,7 @@ img, canvas, video, iframe { max-width:100%; }
  </div>
 </div>
 <header>
- <div class="top"><div><h1>Congés & Horaires</h1><p>Ton planning, tes congés, tes heures — au même endroit.</p></div><div class="row" style="justify-content:flex-end;gap:6px"><select class="year-pill" id="profileSelect" aria-label="Choisir le profil" onchange="switchProfile(this.value)"><option value="moi">Moi</option></select><select class="year-pill" id="headerYear" aria-label="Année"></select></div></div>
+ <div class="top"><div><h1>Congés & Horaires</h1><p>Ton planning, tes congés, tes heures — au même endroit.</p></div></div>
 </header>
 <main class="wrap">
  <div id="appError" class="notice warn" style="display:none;margin-bottom:12px" role="alert"></div>
@@ -130,7 +130,7 @@ img, canvas, video, iframe { max-width:100%; }
    <div class="stat" data-card-id="balance"><div class="label">Congés disponibles</div><div class="value" id="statBalance">27 j</div><div class="sub" id="statLeaveSub">sur 27 jours au départ</div></div>
    <div class="stat" data-card-id="overtime"><div class="label">Heures supplémentaires</div><div class="value" id="statOvertime">0 h</div><div class="sub">Total enregistré</div></div>
    <div class="stat" data-card-id="holiday"><div class="label">Prochain jour férié</div><div class="value" style="font-size:18px" id="statHoliday">—</div><div class="sub" id="statHolidaySub">Luxembourg</div></div>
-   <div class="stat" data-card-id="shift"><div class="label">Prochain horaire</div><div class="value" id="statShift">6 h–14 h</div><div class="sub" id="statShiftSub">Semaine A</div></div>
+   <div class="stat" data-card-id="shift"><div class="label">Prochain horaire</div><div class="value" id="statShift">6 h–14 h</div><div class="row" style="margin-top:10px;gap:6px"><select class="year-pill" id="profileSelect" aria-label="Choisir le profil" onchange="switchProfile(this.value)"><option value="moi">Moi</option></select><select class="year-pill" id="headerYear" aria-label="Année"></select></div><div class="sub" id="statShiftSub">Semaine A</div></div>
    <div class="stat" data-card-id="carryover"><div class="label">Solde année précédente</div><div class="value" id="statCarryover">0 j</div><div class="sub" id="statCarryoverSub">Report de congés</div></div>
   </div>
   <div class="panel"><div class="panel-head"><h2>À venir</h2><button class="btn secondary sm" onclick="go('calendar')">Voir le calendrier</button></div><div id="upcoming"></div></div>
@@ -310,6 +310,7 @@ img, canvas, video, iframe { max-width:100%; }
   <div class="panel"><div class="panel-head"><h2>Congés</h2></div><div class="form-grid"><div class="field"><label for="initialLeave">Solde initial (jours)</label><input id="initialLeave" type="number" min="0" max="365" step="0.5" value="27"></div><div class="field"><label for="leaveYear">Année du solde</label><select id="leaveYear"></select></div><div class="field full"><button class="btn" onclick="saveLeaveSettings()">Enregistrer le solde</button></div></div></div>
   <div class="panel"><div class="panel-head"><h2>Jours fériés du Luxembourg</h2><span class="tag holiday">Luxembourg</span></div><p class="small muted">Les 11 jours fériés légaux du Luxembourg sont calculés automatiquement pour chaque année affichée, y compris les années futures. Les dates mobiles (Pâques, Ascension et Pentecôte) sont recalculées chaque année. Les congés compensatoires et jours propres à ton entreprise peuvent être ajoutés manuellement.</p><div id="holidaySettingsList"></div><div class="row" style="margin-top:12px"><button class="btn secondary" onclick="addHoliday()">＋ Ajouter un jour férié</button><button class="btn ghost" onclick="resetHolidays()">Restaurer les jours fériés intégrés</button></div></div>
 
+  <div class="panel" id="profileNameSettings"><div class="panel-head"><h2>👤 Nom du profil</h2></div><p class="small muted">Modifie le nom du profil actuellement sélectionné. Le calendrier et ses données ne changent pas.</p><div class="form-grid"><div class="field full"><label for="profileNameInput">Nom affiché</label><input id="profileNameInput" maxlength="40" placeholder="Ex. Moi, Julie, Enfant…"></div><div class="field full"><button class="btn" type="button" onclick="renameActiveProfile()">Enregistrer le nom</button></div></div></div>
   <div class="panel"><div class="panel-head"><h2>🔐 Sécurité de l’application</h2></div><div class="notice">Le code protège l’ouverture de l’application sur cet appareil. Pour une protection plus forte des données, il faut un serveur sécurisé. Face ID est proposé si ton iPhone et ton navigateur prennent en charge les clés d’accès.</div>
    <div class="form-grid" style="margin-top:12px"><div class="field"><label for="newPin">Nouveau mot de passe / code</label><input id="newPin" type="password" autocomplete="new-password" minlength="4" maxlength="32" placeholder="4 caractères minimum"></div><div class="field"><label for="confirmPin">Confirmer</label><input id="confirmPin" type="password" autocomplete="new-password" minlength="4" maxlength="32" placeholder="Confirmer le code"></div><div class="field full"><button type="button" class="btn" onclick="changePin()">Enregistrer le mot de passe</button></div><div class="field full"><button type="button" class="btn secondary" id="setupFaceId" onclick="setupFaceID()">Configurer Face ID</button></div><div class="field full"><button type="button" class="btn ghost" onclick="lockApp()">Verrouiller maintenant</button></div></div>
    <div class="footer-note">Le mot de passe et l’activation Face ID sont enregistrés dans le stockage local de ce navigateur. Ne les considère pas comme une sécurité serveur.</div>
@@ -376,8 +377,20 @@ function loadProfiles(){
 let profiles=loadProfiles();
 let activeProfileId=(()=>{try{const saved=localStorage.getItem(ACTIVE_PROFILE_KEY);return profiles.some(p=>p.id===saved)?saved:'moi'}catch(e){return 'moi'}})();
 function saveProfiles(){try{localStorage.setItem(PROFILE_KEY,JSON.stringify(profiles));return true}catch(e){toast('Impossible d’enregistrer la liste des profils.');return false}}
-function renderProfileSelect(){const sel=document.getElementById('profileSelect');if(!sel)return;sel.innerHTML=profiles.map(p=>`<option value="${escapeHtml(p.id)}">${escapeHtml(p.name)}</option>`).join('');sel.value=activeProfileId}
+function renderProfileSelect(){const sel=document.getElementById('profileSelect');if(sel){sel.innerHTML=profiles.map(p=>`<option value="${escapeHtml(p.id)}">${escapeHtml(p.name)}</option>`).join('');sel.value=activeProfileId}const nameInput=document.getElementById('profileNameInput');if(nameInput)nameInput.value=profileName()}
 function profileName(id=activeProfileId){return profiles.find(p=>p.id===id)?.name||'Profil'}
+function renameActiveProfile(){
+ const input=document.getElementById('profileNameInput');
+ if(!input)return;
+ const name=input.value.trim();
+ if(!name){toast('Entre un nom pour ce profil.');return}
+ if(name.length>40){toast('Le nom doit contenir au maximum 40 caractères.');return}
+ if(profiles.some(p=>p.id!==activeProfileId&&p.name.toLocaleLowerCase('fr')===name.toLocaleLowerCase('fr'))){toast('Ce nom est déjà utilisé par un autre profil.');return}
+ const profile=profiles.find(p=>p.id===activeProfileId);if(!profile)return;
+ const oldName=profile.name;profile.name=name;
+ if(!saveProfiles()){profile.name=oldName;return}
+ renderProfileSelect();input.value=name;toast('Nom du profil modifié en « '+name+' ».');
+}
 function addProfile(){
  const raw=prompt('Quel nom veux-tu donner à ce profil ?');
  if(raw===null)return;
