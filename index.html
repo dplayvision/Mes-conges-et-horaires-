@@ -102,6 +102,15 @@ img, canvas, video, iframe { max-width:100%; }
 }
 @media(hover:none){button:hover{filter:none}}
 
+
+/* Jour J : contour fluorescent très visible, sans changer la couleur de fond */
+.day.today {
+  outline: 3px solid #ff00ff !important;
+  outline-offset: -3px;
+  box-shadow: inset 0 0 0 2px #00ffff, 0 0 0 2px #ff00ff !important;
+  position: relative;
+  z-index: 2;
+}
 </style>
 </head>
 <body>
@@ -552,6 +561,14 @@ async function renderPaySlips(){
 }
 async function getPaySlip(id){return (await getAllPhotoRecords()).find(p=>p.id===id&&p.category==='pay')}
 async function openPaySlip(id){try{const p=await getPaySlip(id);if(!p)return;const win=window.open();if(!win){toast('Autorise les fenêtres surgissantes pour afficher le document.');return}if((p.mime||'').includes('pdf')||(p.fileName||'').toLowerCase().endsWith('.pdf')){win.document.write(`<title>${escapeHtml(p.title||'Fiche de paie')}</title><iframe src="${p.dataUrl}" style="border:0;width:100%;height:100vh" title="Fiche de paie"></iframe>`)}else{win.document.write(`<title>${escapeHtml(p.title||'Fiche de paie')}</title><meta name="viewport" content="width=device-width,initial-scale=1"><body style="margin:0;background:#222;display:grid;place-items:center"><img src="${p.dataUrl}" style="max-width:100%;max-height:100vh;object-fit:contain">
+<script>
+// Installation et cache hors ligne sur hébergement HTTPS/localhost. N'interfère pas avec les fonctions existantes.
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('./service-worker.js').catch(function (err) { console.info('Mode web sans installation hors ligne :', err); });
+  });
+}
+</script>
 </body>`)}win.document.close()}catch(e){toast('Impossible d’ouvrir ce document.')}}
 async function editPaySlip(id){try{const p=await getPaySlip(id);if(!p)return;const title=prompt('Titre de la fiche :',p.title||'');if(title===null)return;const note=prompt('Note (facultatif) :',p.note||'');if(note===null)return;const db=await openPhotoDB();p.title=title.trim()||`Fiche de paie ${PAY_MONTHS[(p.payMonth||1)-1]} ${p.payYear}`;p.note=note.trim();await new Promise((resolve,reject)=>{const tx=db.transaction(PHOTO_STORE,'readwrite');tx.objectStore(PHOTO_STORE).put(p);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});renderPaySlips();toast('Fiche modifiée.')}catch(e){toast('Impossible de modifier cette fiche.')}}
 async function exportPaySlip(id){try{const p=await getPaySlip(id);if(!p)return;const a=document.createElement('a');a.href=p.dataUrl;a.download=(p.fileName||`${(p.title||'fiche-paie').replace(/[^\w-]+/g,'_')}.${(p.mime||'image/jpeg').includes('pdf')?'pdf':((p.mime||'image/jpeg').split('/')[1]||'jpg')}`);document.body.appendChild(a);a.click();a.remove()}catch(e){toast('Export impossible.')}}
@@ -986,16 +1003,6 @@ function resetProvisionalPayroll(){
 
 
 document.addEventListener('DOMContentLoaded',()=>{const d=document.getElementById('ppRaiseDate');if(d&&!d.value)d.value=iso(new Date());const m=document.getElementById('ppMonth'),y=document.getElementById('ppYear');if(m)m.value=String(new Date().getMonth()+1);if(y)y.value=String(new Date().getFullYear());renderPayrollRaises();syncProvisionalPayrollFromCalendar();const refreshAll=()=>{const g=ppVal('ppBaseHours')*ppVal('ppRate')+ppVal('ppOt140')*ppVal('ppRate')*1.4+ppVal('ppOt150')*ppVal('ppRate')*1.5+ppVal('ppOtherGross');updateProvisionalCredits(g);calculateProvisionalPayroll(true)};['ppRate','ppOtherGross','ppKmRate','ppKmDay','ppAttendance','ppSickPenalty','ppFD','ppSocial','ppWeeklyHours','ppFullTimeHours','ppAdvance'].forEach(id=>{const e=document.getElementById(id);if(e){e.addEventListener('input',refreshAll);e.addEventListener('change',refreshAll)}});const workDaysInput=document.getElementById('ppWorkDays');if(workDaysInput){const updateManualDays=()=>{ppWorkDaysManual=true;const days=Math.max(0,Number(workDaysInput.value)||0);const base=ppCalendarScheduledDays>0?ppCalendarBaseHours*(days/ppCalendarScheduledDays):0;const hoursInput=document.getElementById('ppBaseHours');if(hoursInput)hoursInput.value=(Math.round(base*100)/100).toString();refreshAll()};workDaysInput.addEventListener('input',updateManualDays);workDaysInput.addEventListener('change',updateManualDays)}['ppMonth','ppYear'].forEach(id=>{const e=document.getElementById(id);if(e)e.addEventListener('change',()=>{ppWorkDaysManual=false;syncProvisionalPayrollFromCalendar()})});refreshAll();});
-</script>
-<script>
-// Enregistrement du service worker pour l’installation mobile, hors du script principal.
-if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
-  window.addEventListener('load', function () {
-    navigator.serviceWorker.register('./service-worker.js').catch(function (err) {
-      console.info('Service worker non disponible :', err);
-    });
-  }, { once: true });
-}
 </script>
 </body>
 </html>
