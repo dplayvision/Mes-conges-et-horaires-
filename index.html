@@ -121,12 +121,12 @@ img, canvas, video, iframe { max-width:100%; }
  </div>
 </div>
 <header>
- <div class="top"><div><h1>Congés & Horaires</h1><p>Ton planning, tes congés, tes heures — au même endroit.</p></div><div class="row" style="justify-content:flex-end;gap:6px"><select class="year-pill" id="profileSelect" aria-label="Choisir le calendrier" onchange="switchProfile(this.value)"><option value="moi">Mon calendrier</option><option value="copine">Calendrier de ma copine</option></select><select class="year-pill" id="headerYear" aria-label="Année"></select></div></div>
+ <div class="top"><div><h1>Congés & Horaires</h1><p>Ton planning, tes congés, tes heures — au même endroit.</p></div><div class="row" style="justify-content:flex-end;gap:6px"><select class="year-pill" id="profileSelect" aria-label="Choisir le profil" onchange="switchProfile(this.value)"><option value="moi">Moi</option></select><select class="year-pill" id="headerYear" aria-label="Année"></select></div></div>
 </header>
 <main class="wrap">
  <div id="appError" class="notice warn" style="display:none;margin-bottom:12px" role="alert"></div>
  <section id="view-home" class="view active">
-  <div class="home-tools"><button class="btn secondary sm" id="homeCustomizeBtn" type="button" onclick="toggleHomeOrganizer()">⚙ Organiser l’accueil</button></div><div class="panel home-organizer hidden" id="homeOrganizer"><div class="panel-head"><h2>Personnaliser l’accueil</h2><button class="btn ghost sm" type="button" onclick="toggleHomeOrganizer(false)">Fermer</button></div><p class="small muted">Déplace les cartes avec les flèches et coche celles que tu veux afficher.</p><div id="homeOrganizerList"></div><button class="btn secondary sm" type="button" onclick="resetHomeCards()" style="margin-top:12px">Réinitialiser l’accueil</button></div><div class="stats" id="homeStats">
+  <div class="home-tools"><button class="btn secondary sm" id="homeCustomizeBtn" type="button" onclick="toggleHomeOrganizer()">⚙ Organiser l’accueil</button></div><div style="margin-top:8px"><button class="btn secondary sm" id="addProfileHomeBtn" type="button" onclick="addProfile()">＋ Ajouter un profil</button></div><div class="panel home-organizer hidden" id="homeOrganizer"><div class="panel-head"><h2>Personnaliser l’accueil</h2><button class="btn ghost sm" type="button" onclick="toggleHomeOrganizer(false)">Fermer</button></div><p class="small muted">Déplace les cartes avec les flèches et coche celles que tu veux afficher.</p><div id="homeOrganizerList"></div><button class="btn secondary sm" type="button" onclick="resetHomeCards()" style="margin-top:12px">Réinitialiser l’accueil</button></div><div class="stats" id="homeStats">
    <div class="stat" data-card-id="balance"><div class="label">Congés disponibles</div><div class="value" id="statBalance">27 j</div><div class="sub" id="statLeaveSub">sur 27 jours au départ</div></div>
    <div class="stat" data-card-id="overtime"><div class="label">Heures supplémentaires</div><div class="value" id="statOvertime">0 h</div><div class="sub">Total enregistré</div></div>
    <div class="stat" data-card-id="holiday"><div class="label">Prochain jour férié</div><div class="value" style="font-size:18px" id="statHoliday">—</div><div class="sub" id="statHolidaySub">Luxembourg</div></div>
@@ -363,8 +363,36 @@ img, canvas, video, iframe { max-width:100%; }
 "use strict";
 const STORAGE_KEY='conges_horaires_lux_v1';
 const PROFILE_KEY='conges_horaires_profiles_v1';
-let activeProfileId=(()=>{try{return localStorage.getItem('conges_horaires_active_profile_v1')==='copine'?'copine':'moi'}catch(e){return 'moi'}})();
-function profileStorageKey(){return STORAGE_KEY+'_'+activeProfileId;}
+const ACTIVE_PROFILE_KEY='conges_horaires_active_profile_v1';
+function loadProfiles(){
+ try{
+  const raw=localStorage.getItem(PROFILE_KEY);
+  if(raw){const list=JSON.parse(raw);if(Array.isArray(list)&&list.some(p=>p&&p.id==='moi'))return list.filter(p=>p&&typeof p.id==='string'&&typeof p.name==='string')}
+ }catch(e){}
+ const list=[{id:'moi',name:'Moi'},{id:'copine',name:'Profil 2'}];
+ try{localStorage.setItem(PROFILE_KEY,JSON.stringify(list))}catch(e){}
+ return list;
+}
+let profiles=loadProfiles();
+let activeProfileId=(()=>{try{const saved=localStorage.getItem(ACTIVE_PROFILE_KEY);return profiles.some(p=>p.id===saved)?saved:'moi'}catch(e){return 'moi'}})();
+function saveProfiles(){try{localStorage.setItem(PROFILE_KEY,JSON.stringify(profiles));return true}catch(e){toast('Impossible d’enregistrer la liste des profils.');return false}}
+function renderProfileSelect(){const sel=document.getElementById('profileSelect');if(!sel)return;sel.innerHTML=profiles.map(p=>`<option value="${escapeHtml(p.id)}">${escapeHtml(p.name)}</option>`).join('');sel.value=activeProfileId}
+function profileName(id=activeProfileId){return profiles.find(p=>p.id===id)?.name||'Profil'}
+function addProfile(){
+ const raw=prompt('Quel nom veux-tu donner à ce profil ?');
+ if(raw===null)return;
+ const name=raw.trim();
+ if(!name){toast('Entre un nom pour le profil.');return}
+ if(name.length>40){toast('Le nom doit contenir au maximum 40 caractères.');return}
+ if(profiles.some(p=>p.name.toLocaleLowerCase('fr')===name.toLocaleLowerCase('fr'))){toast('Ce nom de profil existe déjà.');return}
+ const id='profil_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7);
+ profiles.push({id,name});
+ if(!saveProfiles()){profiles=profiles.filter(p=>p.id!==id);return}
+ renderProfileSelect();
+ switchProfile(id);
+ toast('Profil « '+name+' » ajouté.');
+}
+function profileStorageKey(){return activeProfileId==='moi'?STORAGE_KEY:STORAGE_KEY+'_'+activeProfileId;}
 const MONTHS=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 const DAYS=['L','M','M','J','V','S','D'];
 const TYPES={leave:'Congé',absence:'Absence / maladie',overtime:'Heures supplémentaires',shift:'Horaire exceptionnel',holiday:'Jour férié personnalisé',appointment:'Rendez-vous',mel_leave:'Congé Mel',sickness:'Maladie'};
@@ -376,7 +404,7 @@ function defaultData(){let holidays={};[2026,2027].forEach(y=>holidays[y]=luxHol
 let data=loadData(), currentYear=2026, selectedDate=iso(new Date()), selectedEntryDate=null;
 function loadData(){try{let key=profileStorageKey(),raw=localStorage.getItem(key);if(!raw&&activeProfileId==='moi'){raw=localStorage.getItem(STORAGE_KEY);if(raw){/* Migration transparente : les données existantes deviennent le profil Moi. */try{localStorage.setItem(key,raw)}catch(e){}}}if(raw){let x=JSON.parse(raw);if(x&&x.settings&&Array.isArray(x.entries)){let merged={...defaultData(),...x,settings:{...defaultData().settings,...x.settings}};if(!merged.settings.leaveEntitlements||typeof merged.settings.leaveEntitlements!=='object'||Array.isArray(merged.settings.leaveEntitlements)){merged.settings.leaveEntitlements={};merged.settings.leaveEntitlements[String(Number(merged.settings.leaveYear)||2026)]=Number(merged.settings.initialLeave??27)}else{merged.settings.leaveEntitlements={...merged.settings.leaveEntitlements};let legacyYear=String(Number(merged.settings.leaveYear)||2026);if(!Object.prototype.hasOwnProperty.call(merged.settings.leaveEntitlements,legacyYear))merged.settings.leaveEntitlements[legacyYear]=Number(merged.settings.initialLeave??27)}return merged}}}catch(e){}let fresh=defaultData();fresh.settings.leaveEntitlements={'2026':27};return fresh}
 function persist(){try{localStorage.setItem(profileStorageKey(),JSON.stringify(data));return true}catch(e){toast('Sauvegarde impossible : espace de stockage insuffisant. Exporte tes données.');return false}}
-function switchProfile(profileId){if(profileId!=='moi'&&profileId!=='copine')return;if(profileId===activeProfileId)return;if(!persist())return;activeProfileId=profileId;try{localStorage.setItem('conges_horaires_active_profile_v1',activeProfileId)}catch(e){}data=loadData();selectedDate=iso(new Date());selectedEntryDate=null;multiSelectionEnabled=false;multiSelectedDates.clear();leavePhotoDb=null;const sel=document.getElementById('profileSelect');if(sel)sel.value=activeProfileId;renderYearSelects();renderSettingsForm();renderAll();listLeavePhotos();document.getElementById('headerYear').value=String(currentYear);renderPayrollRaises();syncProvisionalPayrollFromCalendar();toast(activeProfileId==='moi'?'Ton calendrier est affiché.':'Le calendrier de ta copine est affiché.')}
+function switchProfile(profileId){if(!profiles.some(p=>p.id===profileId))return;if(profileId===activeProfileId)return;if(!persist())return;activeProfileId=profileId;try{localStorage.setItem(ACTIVE_PROFILE_KEY,activeProfileId)}catch(e){}data=loadData();selectedDate=iso(new Date());selectedEntryDate=null;multiSelectionEnabled=false;multiSelectedDates.clear();leavePhotoDb=null;renderProfileSelect();renderYearSelects();renderSettingsForm();renderAll();listLeavePhotos();document.getElementById('headerYear').value=String(currentYear);renderPayrollRaises();syncProvisionalPayrollFromCalendar();toast('Calendrier « '+profileName()+' » affiché.')}
 function toast(msg){let t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.remove('show'),2600)}
 function fmtDate(s,opts={weekday:'short',day:'numeric',month:'short',year:undefined}){if(!s)return'';return new Date(s+'T12:00:00').toLocaleDateString('fr-FR',opts)}
 function fmtNum(n){return Number(n||0).toLocaleString('fr-FR',{maximumFractionDigits:2})}
@@ -840,7 +868,7 @@ document.getElementById('faceIdUnlock').addEventListener('click',unlockWithFaceI
 function updateFaceButton(){try{document.getElementById('faceIdUnlock').style.display=localStorage.getItem(FACE_KEY)?'block':'none'}catch(e){}}
 function changePin(){let a=document.getElementById('newPin').value,b=document.getElementById('confirmPin').value;if(a.length<4){toast('Choisis un mot de passe d’au moins 4 caractères.');return}if(a!==b){toast('Les deux mots de passe ne correspondent pas.');return}try{localStorage.setItem(PIN_KEY,a);document.getElementById('newPin').value='';document.getElementById('confirmPin').value='';toast('Mot de passe modifié.')}catch(e){toast('Impossible d’enregistrer le mot de passe sur cet appareil.')}}
 window.addEventListener('error',function(e){const box=document.getElementById('appError');if(box){box.style.display='block';box.textContent='Une erreur JavaScript empêche certaines fonctions de marcher : '+(e.message||'erreur inconnue')}});
-function init(){configureLockScreen();updateFaceButton();const profileSelect=document.getElementById('profileSelect');if(profileSelect)profileSelect.value=activeProfileId;renderYearSelects();renderSettingsForm();document.getElementById('payMonth').value=String(new Date().getMonth()+1);document.getElementById('payYear').value=String(new Date().getFullYear());document.getElementById('periodStart').value=iso(new Date());document.getElementById('periodEnd').value=iso(addDays(iso(new Date()),6));renderAll();listLeavePhotos();document.getElementById('headerYear').value=String(currentYear);document.getElementById('entryDialog').addEventListener('click',e=>{if(e.target.id==='entryDialog')closeEntry()})}
+function init(){configureLockScreen();updateFaceButton();renderProfileSelect();renderYearSelects();renderSettingsForm();document.getElementById('payMonth').value=String(new Date().getMonth()+1);document.getElementById('payYear').value=String(new Date().getFullYear());document.getElementById('periodStart').value=iso(new Date());document.getElementById('periodEnd').value=iso(addDays(iso(new Date()),6));renderAll();listLeavePhotos();document.getElementById('headerYear').value=String(currentYear);document.getElementById('entryDialog').addEventListener('click',e=>{if(e.target.id==='entryDialog')closeEntry()})}
 try{init()}catch(err){const box=document.getElementById("appError");if(box){box.style.display="block";box.textContent="Erreur au démarrage : "+(err.message||err)}else alert("Erreur au démarrage de l’application.")}
 document.addEventListener('DOMContentLoaded',initLeavePhotoDate);
 
