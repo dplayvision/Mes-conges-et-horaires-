@@ -16,7 +16,7 @@
 <meta name="description" content="Planning, congés, heures supplémentaires et fiches de paie">
 <style>
 :root{--week-a-bg:#DCEBFF;--week-b-bg:#F3DFFF;--week-c-bg:#DDF4F5;--leave-bg:#d8f7e8;--holiday-bg:#ffe1e1;--overtime-bg:#fff0d8;--manual-bg:#e8efff;--appointment-bg:#e9e5ff;--sickness-bg:#ffd9dc;--today-color:#356df3;--bg:#f3f6fb;--card:#fff;--ink:#172033;--muted:#6b7280;--line:#e5eaf2;--navy:#101827;--blue:#356df3;--green:#15966a;--red:#d64545;--orange:#dc8618;--purple:#805ad5;--week-a-bg:#DCEBFF;--week-b-bg:#F3DFFF;--week-c-bg:#DDF4F5;--leave-bg:#d8f7e8;--holiday-bg:#ffe1e1;--overtime-bg:#fff0d8;--manual-bg:#e8efff;--appointment-bg:#e9e5ff;--today-outline:#356df3;--shadow:0 8px 28px rgba(25,42,70,.07)}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;padding-bottom:calc(86px + env(safe-area-inset-bottom))}button,input,select,textarea{font:inherit}button{cursor:pointer}header{background:linear-gradient(135deg,#ffffff,#eaf2ff);color:#172033;padding:24px 18px 22px;border-radius:0 0 26px 26px;border-bottom:1px solid #dce6f5}header .top{display:flex;align-items:center;justify-content:space-between;gap:12px}header h1{font-size:24px;line-height:1.15;margin:0;font-weight:800;letter-spacing:-.5px}header p{margin:8px 0 0;color:#63718a;font-size:13px}.year-pill{border:1px solid #d5e1f3;background:#ffffff;color:#24416e;border-radius:12px;padding:9px 12px;font-weight:800}.wrap{max-width:980px;margin:auto;padding:16px}.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:-4px}.stat{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px;box-shadow:var(--shadow);min-width:0}.stat .label{font-size:12px;color:var(--muted);font-weight:650}.stat .value{font-size:26px;font-weight:850;letter-spacing:-.7px;margin-top:6px}.stat .sub{font-size:11px;color:var(--muted);margin-top:3px}.panel{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin-top:14px;box-shadow:var(--shadow)}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}.panel h2{font-size:17px;margin:0;letter-spacing:-.2px}.muted{color:var(--muted)}.small{font-size:12px}.btn{border:0;border-radius:12px;padding:11px 14px;font-weight:750;background:var(--blue);color:white}.btn.secondary{background:#edf2ff;color:#244fc5}.btn.dark{background:#202c42;color:white}.btn.ghost{background:#f3f5f9;color:#344054}.btn.danger{background:#fff0f0;color:#b52e2e}.btn.sm{padding:8px 10px;font-size:12px}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.field{display:flex;flex-direction:column;gap:6px;min-width:0}.field label{font-size:12px;color:#596579;font-weight:750}.field input,.field select,.field textarea{width:100%;border:1px solid #d9e0eb;border-radius:12px;background:#fff;color:var(--ink);padding:12px;min-height:44px;outline:none}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px #356df31a}.field input[type="color"]{width:100%;height:54px;min-height:54px;padding:5px;border:2px solid #d9e0eb;border-radius:12px;background:#fff;cursor:pointer;touch-action:manipulation}.field input[type="color"]::-webkit-color-swatch-wrapper{padding:2px}.field input[type="color"]::-webkit-color-swatch{border:1px solid #0002;border-radius:7px}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.form-grid .full{grid-column:1/-1}.nav{position:fixed;z-index:20;bottom:0;left:0;right:0;padding:8px 8px calc(8px + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;background:#ffffffed;backdrop-filter:blur(18px);border-top:1px solid #dfe5ef}.nav button{border:0;background:transparent;color:#758096;border-radius:12px;padding:8px 1px 6px;font-size:9px;font-weight:750;display:flex;flex-direction:column;align-items:center;gap:4px}.nav button span{font-size:19px;line-height:1}.nav button.active{color:var(--blue);background:#edf2ff}.view{display:none}.view.active{display:block}.calendar-tools{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}.calendar-tools select{border:1px solid var(--line);border-radius:10px;padding:9px;background:#fff;font-weight:750}.months{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.month{border:1px solid var(--line);border-radius:15px;padding:10px 8px;background:#fff;min-width:0}.month h3{font-size:13px;margin:0 0 9px;text-align:center}.weekdays,.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px}.weekdays span{text-align:center;font-size:9px;color:#929bad;padding-bottom:5px;font-weight:700}.day{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;border:0;border-radius:6px;background:transparent;color:#344054;font-size:10px;position:relative;padding:0;min-width:0}.day.empty{pointer-events:none}.day.today{outline:6px solid #000;outline-offset:1px;font-weight:900}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;padding-bottom:calc(86px + env(safe-area-inset-bottom))}button,input,select,textarea{font:inherit}button{cursor:pointer}header{background:linear-gradient(135deg,#ffffff,#eaf2ff);color:#172033;padding:24px 18px 22px;border-radius:0 0 26px 26px;border-bottom:1px solid #dce6f5}header .top{display:flex;align-items:center;justify-content:space-between;gap:12px}header h1{font-size:24px;line-height:1.15;margin:0;font-weight:800;letter-spacing:-.5px}header p{margin:8px 0 0;color:#63718a;font-size:13px}.year-pill{border:1px solid #d5e1f3;background:#ffffff;color:#24416e;border-radius:12px;padding:9px 12px;font-weight:800}.wrap{max-width:980px;margin:auto;padding:16px}.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:-4px}.stat{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px;box-shadow:var(--shadow);min-width:0}.stat .label{font-size:12px;color:var(--muted);font-weight:650}.stat .value{font-size:26px;font-weight:850;letter-spacing:-.7px;margin-top:6px}.stat .sub{font-size:11px;color:var(--muted);margin-top:3px}.panel{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin-top:14px;box-shadow:var(--shadow)}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}.panel h2{font-size:17px;margin:0;letter-spacing:-.2px}.muted{color:var(--muted)}.small{font-size:12px}.btn{border:0;border-radius:12px;padding:11px 14px;font-weight:750;background:var(--blue);color:white}.btn.secondary{background:#edf2ff;color:#244fc5}.btn.dark{background:#202c42;color:white}.btn.ghost{background:#f3f5f9;color:#344054}.btn.danger{background:#fff0f0;color:#b52e2e}.btn.sm{padding:8px 10px;font-size:12px}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.field{display:flex;flex-direction:column;gap:6px;min-width:0}.field label{font-size:12px;color:#596579;font-weight:750}.field input,.field select,.field textarea{width:100%;border:1px solid #d9e0eb;border-radius:12px;background:#fff;color:var(--ink);padding:12px;min-height:44px;outline:none}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px #356df31a}.field input[type="color"]{width:100%;height:54px;min-height:54px;padding:5px;border:2px solid #d9e0eb;border-radius:12px;background:#fff;cursor:pointer;touch-action:manipulation}.field input[type="color"]::-webkit-color-swatch-wrapper{padding:2px}.field input[type="color"]::-webkit-color-swatch{border:1px solid #0002;border-radius:7px}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.form-grid .full{grid-column:1/-1}.nav{position:fixed;z-index:20;bottom:0;left:0;right:0;padding:8px 8px calc(8px + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;background:#ffffffed;backdrop-filter:blur(18px);border-top:1px solid #dfe5ef}.nav button{border:0;background:transparent;color:#758096;border-radius:12px;padding:8px 1px 6px;font-size:9px;font-weight:750;display:flex;flex-direction:column;align-items:center;gap:4px}.nav button span{font-size:19px;line-height:1}.nav button.active{color:var(--blue);background:#edf2ff}.view{display:none}.view.active{display:block}.calendar-tools{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}.calendar-tools select{border:1px solid var(--line);border-radius:10px;padding:9px;background:#fff;font-weight:750}.months{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.month{border:1px solid var(--line);border-radius:15px;padding:10px 8px;background:#fff;min-width:0}.month h3{font-size:13px;margin:0 0 9px;text-align:center}.weekdays,.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px}.weekdays span{text-align:center;font-size:9px;color:#929bad;padding-bottom:5px;font-weight:700}.day{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;border:0;border-radius:6px;background:transparent;color:#344054;font-size:10px;position:relative;padding:0;min-width:0}.day.empty{pointer-events:none}.day.today{outline:4px double var(--today-color);outline-offset:1px;font-weight:900}
 /* Couleurs des semaines A et B */
 .day.week-a{background:var(--week-a-bg);color:#1557B0;font-weight:850}
 .day.week-b{background:var(--week-b-bg);color:#7625A5;font-weight:850}
@@ -102,6 +102,20 @@ img, canvas, video, iframe { max-width:100%; }
 }
 @media(hover:none){button:hover{filter:none}}
 
+
+/* Outil de recadrage tactile des photos */
+.crop-photo-modal{position:fixed;inset:0;z-index:100100;background:rgba(20,32,50,.72);display:flex;align-items:center;justify-content:center;padding:12px;}
+.crop-photo-card{width:min(760px,100%);max-height:96vh;overflow:auto;background:#fff;color:#202b3c;border-radius:18px;padding:14px;box-shadow:0 20px 70px #0006;}
+.crop-photo-stage-wrap{display:flex;align-items:center;justify-content:center;overflow:hidden;background:#eef2f7;border-radius:12px;padding:8px;min-height:160px;touch-action:none;}
+.crop-photo-stage{position:relative;display:inline-block;line-height:0;max-width:100%;touch-action:none;user-select:none;-webkit-user-select:none;}
+.crop-photo-stage img{display:block;width:auto;height:auto;max-width:min(82vw,700px);max-height:55vh;object-fit:contain;pointer-events:none;user-select:none;-webkit-user-drag:none;}
+.crop-photo-selection{position:absolute;border:2px solid #fff;box-shadow:0 0 0 9999px rgba(12,22,38,.48);box-sizing:border-box;touch-action:none;cursor:move;}
+.crop-photo-selection:after{content:"";position:absolute;inset:33.333%;border:1px solid #ffffffa8;pointer-events:none;}
+.crop-handle{position:absolute;width:22px;height:22px;border:2px solid #fff;background:#356df3;border-radius:6px;box-shadow:0 1px 5px #0005;touch-action:none;}
+.crop-handle.nw{left:-9px;top:-9px;cursor:nw-resize}.crop-handle.ne{right:-9px;top:-9px;cursor:ne-resize}.crop-handle.sw{left:-9px;bottom:-9px;cursor:sw-resize}.crop-handle.se{right:-9px;bottom:-9px;cursor:se-resize}
+.crop-photo-hint{font-size:12px;color:#687386;line-height:1.45;margin:10px 0}
+@media(max-width:420px){.crop-photo-card{padding:10px}.crop-photo-stage img{max-width:82vw;max-height:50vh}.crop-handle{width:24px;height:24px}}
+
 </style>
 </head>
 <body>
@@ -109,28 +123,27 @@ img, canvas, video, iframe { max-width:100%; }
  <div class="lock-card">
   <div class="lock-logo">🔒</div>
   <h2 id="lockTitle">Congés &amp; Horaires</h2>
-  <p id="lockIntro">Entre ton code pour accéder à ton planning.</p>
+  <p>Entre ton code pour accéder à ton planning.</p>
   <form id="unlockForm">
-   <input id="unlockPin" type="password" autocomplete="current-password" maxlength="32" placeholder="Mot de passe" aria-label="Mot de passe" required>
-   <input id="firstPinConfirm" type="password" autocomplete="new-password" minlength="4" maxlength="32" placeholder="Confirme ton mot de passe" aria-label="Confirme ton mot de passe" style="display:none;margin-top:10px">
-   <button class="btn" id="unlockSubmit" type="submit">Déverrouiller</button>
+   <input id="unlockPin" type="password" inputmode="numeric" autocomplete="current-password" maxlength="32" placeholder="Mot de passe" aria-label="Mot de passe" required>
+   <button class="btn" type="submit">Déverrouiller</button>
   </form>
   <button class="btn secondary" id="faceIdUnlock" type="button" style="display:none"> Déverrouiller avec Face ID</button>
   <div id="lockError" class="lock-error" aria-live="polite"></div>
-  <p class="lock-note" id="lockNote">Mot de passe enregistré sur cet appareil. Face ID nécessite Safari/HTTPS et un appareil compatible.</p>
+  <p class="lock-note">Code initial : 1157. Tu pourras le modifier dans Réglages. Face ID nécessite Safari/HTTPS et un appareil compatible.</p>
  </div>
 </div>
 <header>
- <div class="top"><div><h1>Congés & Horaires</h1><p>Ton planning, tes congés, tes heures — au même endroit.</p></div></div>
+ <div class="top"><div><h1>Congés & Horaires</h1><p>Ton planning, tes congés, tes heures — au même endroit.</p></div><select class="year-pill" id="headerYear" aria-label="Année"></select></div>
 </header>
 <main class="wrap">
  <div id="appError" class="notice warn" style="display:none;margin-bottom:12px" role="alert"></div>
  <section id="view-home" class="view active">
-  <div class="home-tools"><button class="btn secondary sm" id="homeCustomizeBtn" type="button" onclick="toggleHomeOrganizer()">⚙ Organiser l’accueil</button></div><div style="margin-top:8px"><button class="btn secondary sm" id="addProfileHomeBtn" type="button" onclick="addProfile()">＋ Ajouter un profil</button></div><div class="panel home-organizer hidden" id="homeOrganizer"><div class="panel-head"><h2>Personnaliser l’accueil</h2><button class="btn ghost sm" type="button" onclick="toggleHomeOrganizer(false)">Fermer</button></div><p class="small muted">Déplace les cartes avec les flèches et coche celles que tu veux afficher.</p><div id="homeOrganizerList"></div><button class="btn secondary sm" type="button" onclick="resetHomeCards()" style="margin-top:12px">Réinitialiser l’accueil</button></div><div class="stats" id="homeStats">
+  <div class="home-tools"><button class="btn secondary sm" id="homeCustomizeBtn" type="button" onclick="toggleHomeOrganizer()">⚙ Organiser l’accueil</button></div><div class="panel home-organizer hidden" id="homeOrganizer"><div class="panel-head"><h2>Personnaliser l’accueil</h2><button class="btn ghost sm" type="button" onclick="toggleHomeOrganizer(false)">Fermer</button></div><p class="small muted">Déplace les cartes avec les flèches et coche celles que tu veux afficher.</p><div id="homeOrganizerList"></div><button class="btn secondary sm" type="button" onclick="resetHomeCards()" style="margin-top:12px">Réinitialiser l’accueil</button></div><div class="stats" id="homeStats">
    <div class="stat" data-card-id="balance"><div class="label">Congés disponibles</div><div class="value" id="statBalance">27 j</div><div class="sub" id="statLeaveSub">sur 27 jours au départ</div></div>
    <div class="stat" data-card-id="overtime"><div class="label">Heures supplémentaires</div><div class="value" id="statOvertime">0 h</div><div class="sub">Total enregistré</div></div>
    <div class="stat" data-card-id="holiday"><div class="label">Prochain jour férié</div><div class="value" style="font-size:18px" id="statHoliday">—</div><div class="sub" id="statHolidaySub">Luxembourg</div></div>
-   <div class="stat" data-card-id="shift"><div class="label">Prochain horaire</div><div class="value" id="statShift">6 h–14 h</div><div class="row" style="margin-top:10px;gap:6px"><select class="year-pill" id="profileSelect" aria-label="Choisir le profil" onchange="switchProfile(this.value)"><option value="moi">Moi</option></select><select class="year-pill" id="headerYear" aria-label="Année"></select></div><div class="sub" id="statShiftSub">Semaine A</div></div>
+   <div class="stat" data-card-id="shift"><div class="label">Prochain horaire</div><div class="value" id="statShift">6 h–14 h</div><div class="sub" id="statShiftSub">Semaine A</div></div>
    <div class="stat" data-card-id="carryover"><div class="label">Solde année précédente</div><div class="value" id="statCarryover">0 j</div><div class="sub" id="statCarryoverSub">Report de congés</div></div>
   </div>
   <div class="panel"><div class="panel-head"><h2>À venir</h2><button class="btn secondary sm" onclick="go('calendar')">Voir le calendrier</button></div><div id="upcoming"></div></div>
@@ -308,9 +321,8 @@ img, canvas, video, iframe { max-width:100%; }
   </div>
 
   <div class="panel"><div class="panel-head"><h2>Congés</h2></div><div class="form-grid"><div class="field"><label for="initialLeave">Solde initial (jours)</label><input id="initialLeave" type="number" min="0" max="365" step="0.5" value="27"></div><div class="field"><label for="leaveYear">Année du solde</label><select id="leaveYear"></select></div><div class="field full"><button class="btn" onclick="saveLeaveSettings()">Enregistrer le solde</button></div></div></div>
-  <div class="panel"><div class="panel-head"><h2>Jours fériés du pays</h2><span class="tag holiday">Par profil</span></div><p class="small muted">Choisis le pays de ce profil. Le choix est enregistré séparément pour chaque profil. Le calcul automatique est actuellement disponible pour la Belgique, la France métropolitaine, l’Allemagne (jours nationaux), le Luxembourg et les Pays-Bas. Pour les autres pays européens, tu peux ajouter les jours fériés manuellement afin d’éviter d’afficher des dates légales inexactes.</p><div class="field" style="margin:12px 0"><label for="holidayCountry">Pays</label><select id="holidayCountry" onchange="saveHolidayCountry()"></select></div><div id="holidaySettingsList"></div><div class="row" style="margin-top:12px"><button class="btn secondary" onclick="addHoliday()">＋ Ajouter un jour férié</button><button class="btn ghost" onclick="resetHolidays()">Restaurer les jours fériés intégrés</button></div></div>
+  <div class="panel"><div class="panel-head"><h2>Jours fériés du Luxembourg</h2><span class="tag holiday">Luxembourg</span></div><p class="small muted">Les 11 jours fériés légaux du Luxembourg sont calculés automatiquement pour chaque année affichée, y compris les années futures. Les dates mobiles (Pâques, Ascension et Pentecôte) sont recalculées chaque année. Les congés compensatoires et jours propres à ton entreprise peuvent être ajoutés manuellement.</p><div id="holidaySettingsList"></div><div class="row" style="margin-top:12px"><button class="btn secondary" onclick="addHoliday()">＋ Ajouter un jour férié</button><button class="btn ghost" onclick="resetHolidays()">Restaurer les jours fériés intégrés</button></div></div>
 
-  <div class="panel" id="profileNameSettings"><div class="panel-head"><h2>👤 Nom du profil</h2></div><p class="small muted">Modifie le nom du profil actuellement sélectionné. Le calendrier et ses données ne changent pas.</p><div class="form-grid"><div class="field full"><label for="profileNameInput">Nom affiché</label><input id="profileNameInput" maxlength="40" placeholder="Ex. Moi, Julie, Enfant…"></div><div class="field full"><button class="btn" type="button" onclick="renameActiveProfile()">Enregistrer le nom</button></div><div class="field full"><button class="btn danger" type="button" onclick="deleteActiveProfile()">🗑️ Supprimer ce profil</button><small class="muted">Le profil « Moi » ne peut pas être supprimé. La suppression d’un autre profil efface son calendrier et ses réglages enregistrés sur cet appareil.</small></div></div></div>
   <div class="panel"><div class="panel-head"><h2>🔐 Sécurité de l’application</h2></div><div class="notice">Le code protège l’ouverture de l’application sur cet appareil. Pour une protection plus forte des données, il faut un serveur sécurisé. Face ID est proposé si ton iPhone et ton navigateur prennent en charge les clés d’accès.</div>
    <div class="form-grid" style="margin-top:12px"><div class="field"><label for="newPin">Nouveau mot de passe / code</label><input id="newPin" type="password" autocomplete="new-password" minlength="4" maxlength="32" placeholder="4 caractères minimum"></div><div class="field"><label for="confirmPin">Confirmer</label><input id="confirmPin" type="password" autocomplete="new-password" minlength="4" maxlength="32" placeholder="Confirmer le code"></div><div class="field full"><button type="button" class="btn" onclick="changePin()">Enregistrer le mot de passe</button></div><div class="field full"><button type="button" class="btn secondary" id="setupFaceId" onclick="setupFaceID()">Configurer Face ID</button></div><div class="field full"><button type="button" class="btn ghost" onclick="lockApp()">Verrouiller maintenant</button></div></div>
    <div class="footer-note">Le mot de passe et l’activation Face ID sont enregistrés dans le stockage local de ce navigateur. Ne les considère pas comme une sécurité serveur.</div>
@@ -330,13 +342,13 @@ img, canvas, video, iframe { max-width:100%; }
   </div>
 
   <div class="panel"><div class="panel-head"><h2>💾 Sauvegarde, importation et exportation</h2></div>
-   <div class="notice good">Les données sont enregistrées automatiquement sur cet appareil. La sauvegarde complète rassemble dans un seul fichier JSON tous les profils, leurs calendriers et réglages, ainsi que les photos de congés et les fiches de paie (images et PDF). Tu peux importer ce même fichier pour tout restaurer.</div>
+   <div class="notice good">Les données sont enregistrées automatiquement sur cet appareil. Pour éviter de les perdre, exporte régulièrement une sauvegarde JSON. Tu peux ensuite importer ce fichier pour restaurer tes congés, horaires, rendez-vous, heures supplémentaires, jours fériés personnalisés et réglages.</div>
    <div class="row" style="margin-top:14px">
     <button class="btn" type="button" onclick="exportBackup()">⬇ Exporter / sauvegarder</button>
     <button class="btn secondary" type="button" onclick="document.getElementById('importFile').click()">⬆ Importer / restaurer</button>
     <input type="file" id="importFile" accept=".json,application/json" class="hidden" onchange="importBackup(event)">
    </div>
-   <p class="footer-note">Le fichier peut être volumineux si tu as beaucoup de photos ou de fiches PDF. Garde-le dans Fichiers ou sur un ordinateur. L’import d’une sauvegarde complète remplace les profils, leurs données et leurs documents actuels. Le mot de passe et Face ID restent propres à l’appareil et ne sont pas inclus dans le fichier.</p>
+   <p class="footer-note">L’export crée un fichier JSON que tu peux garder dans Fichiers sur ton iPhone ou sur ton ordinateur. L’import remplace les données actuelles : exporte une sauvegarde avant de restaurer un ancien fichier.</p>
   </div>
  </section>
 </main>
@@ -363,87 +375,23 @@ img, canvas, video, iframe { max-width:100%; }
 <script>
 "use strict";
 const STORAGE_KEY='conges_horaires_lux_v1';
-const PROFILE_KEY='conges_horaires_profiles_v1';
-const ACTIVE_PROFILE_KEY='conges_horaires_active_profile_v1';
-function loadProfiles(){
- try{
-  const raw=localStorage.getItem(PROFILE_KEY);
-  if(raw){const list=JSON.parse(raw);if(Array.isArray(list)&&list.some(p=>p&&p.id==='moi'))return list.filter(p=>p&&typeof p.id==='string'&&typeof p.name==='string')}
- }catch(e){}
- const list=[{id:'moi',name:'Moi'},{id:'copine',name:'Profil 2'}];
- try{localStorage.setItem(PROFILE_KEY,JSON.stringify(list))}catch(e){}
- return list;
-}
-let profiles=loadProfiles();
-let activeProfileId=(()=>{try{const saved=localStorage.getItem(ACTIVE_PROFILE_KEY);return profiles.some(p=>p.id===saved)?saved:'moi'}catch(e){return 'moi'}})();
-function saveProfiles(){try{localStorage.setItem(PROFILE_KEY,JSON.stringify(profiles));return true}catch(e){toast('Impossible d’enregistrer la liste des profils.');return false}}
-function renderProfileSelect(){const sel=document.getElementById('profileSelect');if(sel){sel.innerHTML=profiles.map(p=>`<option value="${escapeHtml(p.id)}">${escapeHtml(p.name)}</option>`).join('');sel.value=activeProfileId}const nameInput=document.getElementById('profileNameInput');if(nameInput)nameInput.value=profileName()}
-function profileName(id=activeProfileId){return profiles.find(p=>p.id===id)?.name||'Profil'}
-function renameActiveProfile(){
- const input=document.getElementById('profileNameInput');
- if(!input)return;
- const name=input.value.trim();
- if(!name){toast('Entre un nom pour ce profil.');return}
- if(name.length>40){toast('Le nom doit contenir au maximum 40 caractères.');return}
- if(profiles.some(p=>p.id!==activeProfileId&&p.name.toLocaleLowerCase('fr')===name.toLocaleLowerCase('fr'))){toast('Ce nom est déjà utilisé par un autre profil.');return}
- const profile=profiles.find(p=>p.id===activeProfileId);if(!profile)return;
- const oldName=profile.name;profile.name=name;
- if(!saveProfiles()){profile.name=oldName;return}
- renderProfileSelect();input.value=name;toast('Nom du profil modifié en « '+name+' ».');
-}
-function deleteActiveProfile(){
- if(activeProfileId==='moi'){toast('Le profil principal « Moi » ne peut pas être supprimé.');return}
- const profile=profiles.find(p=>p.id===activeProfileId);if(!profile)return;
- if(!confirm('Supprimer le profil « '+profile.name+' » ? Son calendrier, ses congés, ses horaires et ses réglages enregistrés sur cet appareil seront effacés. Cette action est irréversible.'))return;
- if(!persist())return;
- const deletedId=activeProfileId;
- try{localStorage.removeItem(STORAGE_KEY+'_'+deletedId)}catch(e){}
- profiles=profiles.filter(p=>p.id!==deletedId);
- if(!saveProfiles()){profiles.push(profile);return}
- activeProfileId='moi';
- try{localStorage.setItem(ACTIVE_PROFILE_KEY,'moi')}catch(e){}
- data=loadData();selectedDate=iso(new Date());selectedEntryDate=null;multiSelectionEnabled=false;multiSelectedDates.clear();leavePhotoDb=null;
- renderProfileSelect();renderYearSelects();renderSettingsForm();renderAll();listLeavePhotos();document.getElementById('headerYear').value=String(currentYear);renderPayrollRaises();syncProvisionalPayrollFromCalendar();
- toast('Profil « '+profile.name+' » supprimé.');
-}
-function addProfile(){
- const raw=prompt('Quel nom veux-tu donner à ce profil ?');
- if(raw===null)return;
- const name=raw.trim();
- if(!name){toast('Entre un nom pour le profil.');return}
- if(name.length>40){toast('Le nom doit contenir au maximum 40 caractères.');return}
- if(profiles.some(p=>p.name.toLocaleLowerCase('fr')===name.toLocaleLowerCase('fr'))){toast('Ce nom de profil existe déjà.');return}
- const id='profil_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7);
- profiles.push({id,name});
- if(!saveProfiles()){profiles=profiles.filter(p=>p.id!==id);return}
- renderProfileSelect();
- switchProfile(id);
- toast('Profil « '+name+' » ajouté.');
-}
-function profileStorageKey(){return activeProfileId==='moi'?STORAGE_KEY:STORAGE_KEY+'_'+activeProfileId;}
 const MONTHS=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 const DAYS=['L','M','M','J','V','S','D'];
 const TYPES={leave:'Congé',absence:'Absence / maladie',overtime:'Heures supplémentaires',shift:'Horaire exceptionnel',holiday:'Jour férié personnalisé',appointment:'Rendez-vous',mel_leave:'Congé Mel',sickness:'Maladie'};
 function easterSunday(year){let a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),month=Math.floor((h+l-7*m+114)/31),day=((h+l-7*m+114)%31)+1;return new Date(year,month-1,day)}
 function iso(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 function addDays(date,n){let d=new Date(date+'T12:00:00');d.setDate(d.getDate()+n);return d}
-const EUROPE_COUNTRIES=[['AL','Albanie'],['AD','Andorre'],['AM','Arménie'],['AZ','Azerbaïdjan'],['AT','Autriche'],['BY','Biélorussie'],['BE','Belgique'],['BA','Bosnie-Herzégovine'],['BG','Bulgarie'],['CY','Chypre'],['HR','Croatie'],['DK','Danemark'],['ES','Espagne'],['EE','Estonie'],['FI','Finlande'],['FR','France métropolitaine'],['GE','Géorgie'],['GR','Grèce'],['HU','Hongrie'],['IE','Irlande'],['IS','Islande'],['IT','Italie'],['XK','Kosovo'],['LV','Lettonie'],['LI','Liechtenstein'],['LT','Lituanie'],['LU','Luxembourg'],['MK','Macédoine du Nord'],['MT','Malte'],['MD','Moldavie'],['MC','Monaco'],['ME','Monténégro'],['NO','Norvège'],['NL','Pays-Bas'],['PL','Pologne'],['PT','Portugal'],['CZ','Tchéquie'],['RO','Roumanie'],['GB','Royaume-Uni'],['RU','Russie (partie européenne)'],['SM','Saint-Marin'],['RS','Serbie'],['SK','Slovaquie'],['SI','Slovénie'],['SE','Suède'],['CH','Suisse'],['TR','Turquie'],['UA','Ukraine'],['VA','Vatican'],['KZ','Kazakhstan (partie européenne)'],['DE','Allemagne']];
-function initHolidayCountry(){let el=document.getElementById('holidayCountry');if(!el)return;el.innerHTML=EUROPE_COUNTRIES.slice().sort((a,b)=>a[1].localeCompare(b[1],'fr')).map(([code,name])=>`<option value="${code}">${name}</option>`).join('');el.value=data.settings.holidayCountry||'LU'}
-function saveHolidayCountry(){let el=document.getElementById('holidayCountry');if(!el)return;data.settings.holidayCountry=el.value;persist();renderAll();toast('Pays des jours fériés enregistré pour ce profil.')}
-function easterRelated(year){let easter=easterSunday(year),monday=new Date(easter),ascension=new Date(easter),whitMonday=new Date(easter);monday.setDate(easter.getDate()+1);ascension.setDate(easter.getDate()+39);whitMonday.setDate(easter.getDate()+50);return {easter, easterMonday:iso(monday),ascension:iso(ascension),whitMonday:iso(whitMonday)}}
-function luxHolidays(year){let e=easterRelated(year);return [{date:`${year}-01-01`,name:"Nouvel An"},{date:e.easterMonday,name:"Lundi de Pâques"},{date:`${year}-05-01`,name:"Fête du Travail"},{date:`${year}-05-09`,name:"Journée de l’Europe"},{date:e.ascension,name:"Ascension"},{date:e.whitMonday,name:"Lundi de Pentecôte"},{date:`${year}-06-23`,name:"Fête nationale"},{date:`${year}-08-15`,name:"Assomption"},{date:`${year}-11-01`,name:"Toussaint"},{date:`${year}-12-25`,name:"Noël"},{date:`${year}-12-26`,name:"Saint-Étienne"}]}
-function countryHolidays(year){let c=data.settings.holidayCountry||'LU',e=easterRelated(year),fixed=(items)=>items.map(([md,name])=>({date:`${year}-${md}`,name}));if(c==='LU')return luxHolidays(year);if(c==='BE')return [...fixed([['01-01','Nouvel An'],['05-01','Fête du Travail'],['07-21','Fête nationale belge'],['08-15','Assomption'],['11-01','Toussaint'],['11-11','Armistice'],['12-25','Noël']]),{date:e.easterMonday,name:'Lundi de Pâques'},{date:e.ascension,name:'Ascension'},{date:e.whitMonday,name:'Lundi de Pentecôte'}];if(c==='FR')return [...fixed([['01-01','Jour de l’An'],['05-01','Fête du Travail'],['05-08','Victoire 1945'],['07-14','Fête nationale'],['08-15','Assomption'],['11-01','Toussaint'],['11-11','Armistice'],['12-25','Noël']]),{date:e.easterMonday,name:'Lundi de Pâques'},{date:e.ascension,name:'Ascension'},{date:e.whitMonday,name:'Lundi de Pentecôte'}];if(c==='DE')return [...fixed([['01-01','Nouvel An'],['05-01','Fête du Travail'],['10-03','Journée de l’unité allemande'],['12-25','Noël'],['12-26','Deuxième jour de Noël']]),{date:iso(new Date(e.easter.getTime()-2*86400000)),name:'Vendredi saint'},{date:e.easterMonday,name:'Lundi de Pâques'},{date:e.ascension,name:'Ascension'},{date:e.whitMonday,name:'Lundi de Pentecôte'}].map(h=>h);if(c==='NL'){let kings=new Date(year,3,27);if(kings.getDay()===0)kings.setDate(26);return [...fixed([['01-01','Nouvel An'],['04-27','Jour du Roi'],['05-05','Jour de la Libération (jour férié national)'],['12-25','Noël'],['12-26','Deuxième jour de Noël']]).filter(h=>h.date!==`${year}-04-27`),{date:iso(kings),name:'Jour du Roi'},{date:e.easterMonday,name:'Lundi de Pâques'},{date:e.ascension,name:'Ascension'},{date:e.whitMonday,name:'Lundi de Pentecôte'}]}return []}
+function luxHolidays(year){let easter=easterSunday(year), easterMonday=new Date(easter);easterMonday.setDate(easter.getDate()+1);let ascension=new Date(easter);ascension.setDate(easter.getDate()+39);let whitMonday=new Date(easter);whitMonday.setDate(easter.getDate()+50);return [{date:`${year}-01-01`,name:"Nouvel An"},{date:iso(easterMonday),name:"Lundi de Pâques"},{date:`${year}-05-01`,name:"Fête du Travail"},{date:`${year}-05-09`,name:"Journée de l’Europe"},{date:iso(ascension),name:"Ascension"},{date:iso(whitMonday),name:"Lundi de Pentecôte"},{date:`${year}-06-23`,name:"Fête nationale"},{date:`${year}-08-15`,name:"Assomption"},{date:`${year}-11-01`,name:"Toussaint"},{date:`${year}-12-25`,name:"Noël"},{date:`${year}-12-26`,name:"Saint-Étienne"}]}
 function defaultData(){let holidays={};[2026,2027].forEach(y=>holidays[y]=luxHolidays(y));return {version:1,settings:{anchorDate:'2026-10-05',weekStart:'A',weekCEnabled:false,shiftAStart:'06:00',shiftAEnd:'14:00',shiftBStart:'08:00',shiftBEnd:'16:00',shiftCStart:'08:00',shiftCEnd:'16:30',weeklyHours:40,initialLeave:27,leaveYear:2026,calendarColors:{weekA:'#DCEBFF',weekB:'#F3DFFF',weekC:'#DDF4F5',leave:'#d8f7e8',holiday:'#ffe1e1',overtime:'#fff0d8',manual:'#e8efff',appointment:'#e9e5ff',sickness:'#ffd9dc',today:'#356df3'}},entries:[],holidays,customHolidays:[]}}
 let data=loadData(), currentYear=2026, selectedDate=iso(new Date()), selectedEntryDate=null;
-function loadData(){try{let key=profileStorageKey(),raw=localStorage.getItem(key);if(!raw&&activeProfileId==='moi'){raw=localStorage.getItem(STORAGE_KEY);if(raw){/* Migration transparente : les données existantes deviennent le profil Moi. */try{localStorage.setItem(key,raw)}catch(e){}}}if(raw){let x=JSON.parse(raw);if(x&&x.settings&&Array.isArray(x.entries)){let merged={...defaultData(),...x,settings:{...defaultData().settings,...x.settings}};if(!merged.settings.leaveEntitlements||typeof merged.settings.leaveEntitlements!=='object'||Array.isArray(merged.settings.leaveEntitlements)){merged.settings.leaveEntitlements={};merged.settings.leaveEntitlements[String(Number(merged.settings.leaveYear)||2026)]=Number(merged.settings.initialLeave??27)}else{merged.settings.leaveEntitlements={...merged.settings.leaveEntitlements};let legacyYear=String(Number(merged.settings.leaveYear)||2026);if(!Object.prototype.hasOwnProperty.call(merged.settings.leaveEntitlements,legacyYear))merged.settings.leaveEntitlements[legacyYear]=Number(merged.settings.initialLeave??27)}return merged}}}catch(e){}let fresh=defaultData();fresh.settings.leaveEntitlements={'2026':27};return fresh}
-function persist(){try{localStorage.setItem(profileStorageKey(),JSON.stringify(data));return true}catch(e){toast('Sauvegarde impossible : espace de stockage insuffisant. Exporte tes données.');return false}}
-function switchProfile(profileId){if(!profiles.some(p=>p.id===profileId))return;if(profileId===activeProfileId)return;if(!persist())return;activeProfileId=profileId;try{localStorage.setItem(ACTIVE_PROFILE_KEY,activeProfileId)}catch(e){}data=loadData();selectedDate=iso(new Date());selectedEntryDate=null;multiSelectionEnabled=false;multiSelectedDates.clear();leavePhotoDb=null;renderProfileSelect();renderYearSelects();renderSettingsForm();renderAll();listLeavePhotos();document.getElementById('headerYear').value=String(currentYear);renderPayrollRaises();syncProvisionalPayrollFromCalendar();toast('Calendrier « '+profileName()+' » affiché.')}
+function loadData(){try{let raw=localStorage.getItem(STORAGE_KEY);if(raw){let x=JSON.parse(raw);if(x&&x.settings&&Array.isArray(x.entries)){let merged={...defaultData(),...x,settings:{...defaultData().settings,...x.settings}};if(!merged.settings.leaveEntitlements||typeof merged.settings.leaveEntitlements!=='object'||Array.isArray(merged.settings.leaveEntitlements)){merged.settings.leaveEntitlements={};merged.settings.leaveEntitlements[String(Number(merged.settings.leaveYear)||2026)]=Number(merged.settings.initialLeave??27)}else{merged.settings.leaveEntitlements={...merged.settings.leaveEntitlements};let legacyYear=String(Number(merged.settings.leaveYear)||2026);if(!Object.prototype.hasOwnProperty.call(merged.settings.leaveEntitlements,legacyYear))merged.settings.leaveEntitlements[legacyYear]=Number(merged.settings.initialLeave??27)}return merged}}}catch(e){}let fresh=defaultData();fresh.settings.leaveEntitlements={'2026':27};return fresh}
+function persist(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(data));return true}catch(e){toast('Sauvegarde impossible : espace de stockage insuffisant. Exporte tes données.');return false}}
 function toast(msg){let t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.remove('show'),2600)}
 function fmtDate(s,opts={weekday:'short',day:'numeric',month:'short',year:undefined}){if(!s)return'';return new Date(s+'T12:00:00').toLocaleDateString('fr-FR',opts)}
 function fmtNum(n){return Number(n||0).toLocaleString('fr-FR',{maximumFractionDigits:2})}
 function dateYear(s){return Number((s||'').slice(0,4))}
 function entryFor(date){return data.entries.filter(e=>e.date===date)}
-function allHolidays(year){let base=countryHolidays(year).map(h=>({...h,source:'official'}));return base.concat((data.customHolidays||[]).filter(h=>dateYear(h.date)===year).map(h=>({...h,source:'custom'})))}
+function allHolidays(year){let base=luxHolidays(year).map(h=>({...h,source:'official'}));return base.concat((data.customHolidays||[]).filter(h=>dateYear(h.date)===year).map(h=>({...h,source:'custom'})))}
 function holidayFor(date){return allHolidays(dateYear(date)).find(h=>h.date===date)}
 function isWorkday(date){let d=new Date(date+'T12:00:00').getDay();return d>=1&&d<=5}
 function shiftFor(date){let s=data.settings;let d=new Date(date+'T12:00:00'),anchor=new Date((s.anchorDate||'2026-10-05')+'T12:00:00');let day=d.getDay(),offset=(day+6)%7;d.setDate(d.getDate()-offset);anchor.setDate(anchor.getDate()-((anchor.getDay()+6)%7));let weeks=Math.floor((d-anchor)/604800000);let cycle=s.weekCEnabled?3:2;let startOffset=s.weekStart==='B'?1:(s.weekCEnabled&&s.weekStart==='C'?2:0);let idx=((weeks+startOffset)%cycle+cycle)%cycle;let label=cycle===3?['A','B','C'][idx]:(idx===0?'A':'B');let prefix=label==='A'?'shiftA':label==='B'?'shiftB':'shiftC';return {label,start:s[prefix+'Start']||(label==='C'?'08:00':label==='A'?'06:00':'08:00'),end:s[prefix+'End']||(label==='C'?'16:30':label==='A'?'14:00':'16:00')}}
@@ -513,13 +461,12 @@ function renderSelectedDay(){document.getElementById('selectedDateLabel').textCo
 
 
 const PHOTO_DB_NAME='conges_horaires_photos_db_v1';
-function profilePhotoDbName(){return activeProfileId==='moi'?PHOTO_DB_NAME:PHOTO_DB_NAME+'_'+activeProfileId;}
 const PHOTO_STORE='leavePhotos';
 let leavePhotoDb=null;
 function openPhotoDB(){
  return new Promise((resolve,reject)=>{
   if(!('indexedDB' in window)){reject(new Error('IndexedDB indisponible'));return}
-  const req=indexedDB.open(profilePhotoDbName(),1);
+  const req=indexedDB.open(PHOTO_DB_NAME,1);
   req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains(PHOTO_STORE))db.createObjectStore(PHOTO_STORE,{keyPath:'id'})};
   req.onsuccess=()=>{leavePhotoDb=req.result;resolve(leavePhotoDb)};
   req.onerror=()=>reject(req.error||new Error('Ouverture IndexedDB impossible'));
@@ -548,6 +495,37 @@ function renderLeavePhotos(items){
  list.innerHTML=items.map(p=>`<div class="list-item"><div class="main"><strong>${escapeHtml(p.title||'Feuille de congés')}</strong><small>${escapeHtml(fmtDate(p.calendarDate||p.date,{day:'numeric',month:'short',year:'numeric'}))}${p.note?' · '+escapeHtml(p.note):''}${p.calendarDate?' · 📅 Liée au calendrier':''}</small><div style="margin-top:8px"><img src="${p.dataUrl}" alt="${escapeHtml(p.title||'Photo de congés')}" style="display:block;max-width:100%;max-height:220px;object-fit:contain;border:1px solid var(--line);border-radius:10px;cursor:zoom-in" onclick="openCalendarPhoto('${p.id}')"></div></div><div class="row">${p.calendarDate?`<button class="btn secondary sm" onclick="openCalendarPhoto('${p.id}')">👁 Ouvrir</button>`:''}<button class="btn secondary sm" onclick="editLeavePhoto('${p.id}')">✏️ Modifier</button><button class="btn secondary sm" onclick="downloadLeavePhoto('${p.id}')">Exporter</button><button class="btn danger sm" onclick="deleteLeavePhoto('${p.id}')">Supprimer</button></div></div>`).join('');
 }
 
+/* Ouvre un cadre tactile pour recadrer l'image avant sa sauvegarde. Retourne un data URL ou null si annulé. */
+function cropImageFile(file){
+ return new Promise((resolve,reject)=>{
+  const reader=new FileReader();reader.onerror=()=>reject(reader.error||new Error('Lecture de la photo impossible'));
+  reader.onload=()=>{
+   const img=new Image();img.onerror=()=>reject(new Error('Image illisible'));
+   img.onload=()=>{
+    const modal=document.createElement('div');modal.className='crop-photo-modal';modal.innerHTML=`<div class="crop-photo-card" role="dialog" aria-modal="true" aria-label="Recadrer la photo"><div class="row" style="justify-content:space-between;align-items:center"><strong style="font-size:17px">✂️ Recadrer la photo</strong><button type="button" class="btn ghost sm" data-crop-cancel>✕ Fermer</button></div><p class="crop-photo-hint">Déplace le cadre avec ton doigt. Tire un des quatre coins bleus pour agrandir ou réduire la zone, puis valide.</p><div class="crop-photo-stage-wrap"><div class="crop-photo-stage"><img alt="Photo à recadrer"><div class="crop-photo-selection"><i class="crop-handle nw" data-handle="nw"></i><i class="crop-handle ne" data-handle="ne"></i><i class="crop-handle sw" data-handle="sw"></i><i class="crop-handle se" data-handle="se"></i></div></div></div><div class="row" style="justify-content:flex-end;margin-top:12px"><button type="button" class="btn ghost" data-crop-cancel>Annuler</button><button type="button" class="btn" data-crop-confirm>Utiliser cette zone</button></div></div>`;
+    document.body.appendChild(modal);const image=modal.querySelector('img'),stage=modal.querySelector('.crop-photo-stage'),box=modal.querySelector('.crop-photo-selection');
+    const finish=value=>{modal.remove();resolve(value)};
+    modal.querySelectorAll('[data-crop-cancel]').forEach(b=>b.onclick=()=>finish(null));modal.addEventListener('click',e=>{if(e.target===modal)finish(null)});
+    image.onload=()=>{
+     const W=image.getBoundingClientRect().width,H=image.getBoundingClientRect().height;let r={x:W*.08,y:H*.08,w:W*.84,h:H*.84};
+     const min=36;function paint(){box.style.left=r.x+'px';box.style.top=r.y+'px';box.style.width=r.w+'px';box.style.height=r.h+'px'}paint();
+     let drag=null;
+     function down(e){e.preventDefault();e.stopPropagation();const handle=e.target.closest('[data-handle]');drag={mode:handle?handle.dataset.handle:'move',sx:e.clientX,sy:e.clientY,start:{...r}};try{e.target.setPointerCapture(e.pointerId)}catch(_){} }
+     box.addEventListener('pointerdown',down);
+     box.addEventListener('pointermove',e=>{if(!drag)return;e.preventDefault();const dx=e.clientX-drag.sx,dy=e.clientY-drag.sy,st=drag.start;let x=st.x,y=st.y,w=st.w,h=st.h;
+      if(drag.mode==='move'){x=Math.max(0,Math.min(W-w,st.x+dx));y=Math.max(0,Math.min(H-h,st.y+dy))}
+      else {if(drag.mode.includes('e'))w=Math.max(min,Math.min(W-st.x,st.w+dx));if(drag.mode.includes('s'))h=Math.max(min,Math.min(H-st.y,st.h+dy));if(drag.mode.includes('w')){x=Math.max(0,Math.min(st.x+st.w-min,st.x+dx));w=st.w+(st.x-x)}if(drag.mode.includes('n')){y=Math.max(0,Math.min(st.y+st.h-min,st.y+dy));h=st.h+(st.y-y)} }
+      r={x,y,w:Math.min(w,W-x),h:Math.min(h,H-y)};paint();});
+     box.addEventListener('pointerup',()=>drag=null);box.addEventListener('pointercancel',()=>drag=null);
+     modal.querySelector('[data-crop-confirm]').onclick=()=>{try{const scaleX=img.naturalWidth/W,scaleY=img.naturalHeight/H;const sx=Math.round(r.x*scaleX),sy=Math.round(r.y*scaleY),sw=Math.max(1,Math.round(r.w*scaleX)),sh=Math.max(1,Math.round(r.h*scaleY));const canvas=document.createElement('canvas');canvas.width=sw;canvas.height=sh;canvas.getContext('2d').drawImage(img,sx,sy,sw,sh,0,0,sw,sh);finish(canvas.toDataURL(file.type==='image/png'?'image/png':'image/jpeg',.94));}catch(err){modal.remove();reject(err)}};
+    };
+    // Les dimensions de l’image doivent être calculées après insertion dans la fenêtre.
+    image.src=reader.result;
+   };img.src=reader.result;
+  };reader.readAsDataURL(file);
+ });
+}
+
 function initLeavePhotoDate(){const el=document.getElementById('leavePhotoDate');if(el&&!el.value)el.value=(typeof selectedDate!=='undefined'&&selectedDate)||iso(new Date());}
 async function saveLeavePhoto(){
  const input=document.getElementById('leavePhotoInput'),file=input.files&&input.files[0];
@@ -558,8 +536,8 @@ async function saveLeavePhoto(){
  if(!file.type.startsWith('image/')){toast('Choisis un fichier image.');return}
  const status=document.getElementById('leavePhotoStatus');
  try{
-  const dataUrl=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(r.error);r.readAsDataURL(file)});
-  const item={id:'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),category:'leave',title:document.getElementById('leavePhotoTitle').value.trim()||file.name,date:calendarDate,calendarDate,note:document.getElementById('leavePhotoNote').value.trim(),dataUrl,mime:file.type,createdAt:Date.now()};
+  const dataUrl=await cropImageFile(file);if(!dataUrl)return;
+  const item={id:'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),category:'leave',title:document.getElementById('leavePhotoTitle').value.trim()||file.name,date:calendarDate,calendarDate,note:document.getElementById('leavePhotoNote').value.trim(),dataUrl,mime:dataUrl.slice(5,dataUrl.indexOf(';')),createdAt:Date.now()};
   await new Promise((resolve,reject)=>openPhotoDB().then(db=>{const tx=db.transaction(PHOTO_STORE,'readwrite');tx.objectStore(PHOTO_STORE).put(item);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error)}).catch(reject));
   input.value='';document.getElementById('leavePhotoTitle').value='';document.getElementById('leavePhotoNote').value='';
   status.textContent='Photo enregistrée et liée au '+fmtDate(calendarDate)+'. Le jour du calendrier affichera 📷 ; touche cette date pour ouvrir la photo.';
@@ -605,7 +583,7 @@ async function savePaySlip(){
  if(!(file.type.startsWith('image/')||file.type==='application/pdf'||file.name.toLowerCase().endsWith('.pdf'))){toast('Format non pris en charge : choisis une image ou un PDF.');return}
  const month=Number(document.getElementById('payMonth').value),year=Number(document.getElementById('payYear').value);if(!month||year<2000||year>2100){toast('Vérifie le mois et l’année.');return}
  const status=document.getElementById('payStatus');
- try{const dataUrl=await readFileAsDataURL(file);const db=await openPhotoDB();const all=await getAllPhotoRecords();const old=all.find(p=>p.category==='pay'&&p.payMonth===month&&p.payYear===year);const item={id:old?old.id:'pay'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),category:'pay',payMonth:month,payYear:year,title:document.getElementById('payTitle').value.trim()||`Fiche de paie ${PAY_MONTHS[month-1]} ${year}`,note:document.getElementById('payNote').value.trim(),date:`${year}-${String(month).padStart(2,'0')}-01`,dataUrl,mime:file.type|| (file.name.toLowerCase().endsWith('.pdf')?'application/pdf':'image/jpeg'),fileName:file.name,createdAt:Date.now()};
+ try{const dataUrl=file.type.startsWith('image/')?await cropImageFile(file):await readFileAsDataURL(file);if(!dataUrl)return;const db=await openPhotoDB();const all=await getAllPhotoRecords();const old=all.find(p=>p.category==='pay'&&p.payMonth===month&&p.payYear===year);const item={id:old?old.id:'pay'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),category:'pay',payMonth:month,payYear:year,title:document.getElementById('payTitle').value.trim()||`Fiche de paie ${PAY_MONTHS[month-1]} ${year}`,note:document.getElementById('payNote').value.trim(),date:`${year}-${String(month).padStart(2,'0')}-01`,dataUrl,mime:dataUrl.startsWith('data:')?dataUrl.slice(5,dataUrl.indexOf(';')):(file.type||'application/pdf'),fileName:file.name,createdAt:Date.now()};
  await new Promise((resolve,reject)=>{const tx=db.transaction(PHOTO_STORE,'readwrite');tx.objectStore(PHOTO_STORE).put(item);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error||new Error('Écriture impossible'));tx.onabort=()=>reject(tx.error||new Error('Écriture annulée'))});
  document.getElementById('payFile').value='';document.getElementById('payTitle').value='';document.getElementById('payNote').value='';status.textContent=`Fiche de ${PAY_MONTHS[month-1]} ${year} enregistrée${old?' et remplacée pour ce mois':''}.`;await renderPaySlips();toast(old?'Fiche de paie remplacée.':'Fiche de paie enregistrée.');
  }catch(e){status.textContent='Impossible d’enregistrer la fiche. Le document est peut-être trop volumineux ou le stockage indisponible.';toast('Enregistrement de la fiche impossible.')}
@@ -646,11 +624,11 @@ async function saveCalendarDayPhoto(){
  if(!file)return;
  if(!file.type.startsWith('image/')){toast('Choisis une image depuis la photothèque.');return}
  try{
-  const dataUrl=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(r.error);r.readAsDataURL(file)});
+  const dataUrl=await cropImageFile(file);if(!dataUrl){input.value='';return}
   const date=(document.getElementById('entryType')&&document.getElementById('entryType').value==='leave'&&document.getElementById('entryDate').value)||selectedDate;
   const db=await openPhotoDB();
   const existing=await new Promise((resolve,reject)=>{const req=db.transaction(PHOTO_STORE,'readonly').objectStore(PHOTO_STORE).getAll();req.onsuccess=()=>resolve((req.result||[]).filter(p=>p.calendarDate===date));req.onerror=()=>reject(req.error)});
-  const item={id:existing.length?existing[0].id:'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),title:'Photo du '+date,date,calendarDate:date,note:'Photo liée au jour de congé',dataUrl,mime:file.type,createdAt:Date.now()};
+  const item={id:existing.length?existing[0].id:'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),title:'Photo du '+date,date,calendarDate:date,note:'Photo liée au jour de congé',dataUrl,mime:dataUrl.slice(5,dataUrl.indexOf(';')),createdAt:Date.now()};
   await new Promise((resolve,reject)=>{const tx=db.transaction(PHOTO_STORE,'readwrite');const store=tx.objectStore(PHOTO_STORE);existing.slice(1).forEach(p=>store.delete(p.id));store.put(item);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error||new Error('Écriture impossible'));tx.onabort=()=>reject(tx.error||new Error('Écriture annulée'))});
   input.value='';await renderCalendarDayPhoto(date);await refreshCalendarPhotoThumbnails();listLeavePhotos();toast(existing.length?'Photo remplacée pour cette journée.':'Photo ajoutée à la journée du calendrier.');
  }catch(e){toast('Impossible d’enregistrer la photo. Vérifie le stockage disponible.')}
@@ -780,7 +758,7 @@ function exportSummaryImage(){
 async function renderLeave(){let y=currentYear,used=leaveUsed(y),carry=leaveCarryover(y),carryUsed=Math.min(carry,leaveUsedThrough(y,y+'-03-31')),carryLeft=leaveCarryoverRemaining(y),baseUsed=Math.max(0,used-carryUsed),bal=leaveBalanceForYear(y);document.getElementById('leaveBalanceBig').textContent=fmtNum(bal)+' j';document.getElementById('leaveUsed').textContent=fmtNum(used)+' j';document.getElementById('leaveEntitlement').textContent=`Droit annuel : ${fmtNum(leaveBaseEntitlement(y))} jours · année ${y}`;document.getElementById('leaveProgress').style.width=Math.max(0,Math.min(100,leaveBaseEntitlement(y)?baseUsed/leaveBaseEntitlement(y)*100:0))+'%';const carryNotice=document.getElementById('leaveCarryoverNotice');if(carryNotice){const today=iso(new Date()),active=today<y+'-04-01';carryNotice.className='notice'+(carryLeft>0&&active?' good':'');carryNotice.textContent=carry>0?(active?`Report de ${y-1} : ${fmtNum(carryLeft)} j encore disponibles jusqu’au 31 mars ${y}.`:`Report de ${y-1} : le délai d’utilisation jusqu’au 31 mars ${y} est terminé.`):`Aucun report disponible depuis ${y-1}. Les congés non utilisés de ${y} pourront être reportés sur ${y+1}, jusqu’au 31 mars ${y+1}.`; }let filter=document.getElementById('leaveFilter').value;let list=data.entries.filter(e=>['leave','absence','mel_leave','sickness'].includes(e.type)&&(filter==='all'||(filter==='leave'?['leave','mel_leave'].includes(e.type):e.type===filter))).sort((a,b)=>a.date.localeCompare(b.date));let photos=[];try{const db=await openPhotoDB();photos=await new Promise((resolve,reject)=>{const req=db.transaction(PHOTO_STORE,'readonly').objectStore(PHOTO_STORE).getAll();req.onsuccess=()=>resolve(req.result||[]);req.onerror=()=>reject(req.error)})}catch(e){}document.getElementById('leaveList').innerHTML=list.length?list.map(e=>{const photo=photos.find(p=>(p.calendarDate===e.date||(!p.calendarDate&&p.category==='leave'&&p.date===e.date))&&p.dataUrl);return `<div class="list-item"><div class="main"><strong>${escapeHtml(fmtDate(e.date,{weekday:'long',day:'numeric',month:'long',year:'numeric'}))}</strong><small>${TYPES[e.type]}${e.type==='leave'?' · '+fmtNum(e.amount||1)+' jour(s)':''}${e.note?' · '+escapeHtml(e.note):''}</small>${photo?`<div style="margin-top:8px"><img src="${photo.dataUrl}" alt="Photo du congé du ${escapeHtml(e.date)}" onclick="openCalendarPhoto('${photo.id}')" style="display:block;max-width:100%;max-height:180px;object-fit:contain;border-radius:10px;cursor:zoom-in;border:1px solid var(--line)"><div class="row" style="margin-top:6px"><button class="btn secondary sm" onclick="openCalendarPhoto('${photo.id}')">👁 Voir la photo</button><button class="btn secondary sm" onclick="openEntry('${e.id}')">📷 Modifier la photo</button></div></div>`:''}</div><div class="row"><button class="btn secondary sm" onclick="openEntry('${e.id}')">Modifier</button><button class="btn danger sm" onclick="deleteEntry('${e.id}')">×</button></div></div>`}).join(''):'<div class="empty-state">Aucun congé ou absence encodé pour le moment.</div>'}
 
 function renderHours(){document.getElementById('hoursTotal').textContent=fmtNum(overtimeTotal())+' h';document.getElementById('hoursRecover').textContent=fmtNum(overtimeTotal(null,'recover'))+' h';document.getElementById('hoursPaid').textContent=fmtNum(overtimeTotal(null,'paid'))+' h';document.getElementById('hoursYear').textContent=fmtNum(overtimeTotal(currentYear))+' h';let f=document.getElementById('hoursFilter').value;let list=data.entries.filter(e=>e.type==='overtime'&&(f==='all'||dateYear(e.date)===currentYear)).sort((a,b)=>b.date.localeCompare(a.date));document.getElementById('hoursList').innerHTML=list.length?list.map(e=>`<div class="list-item"><div class="main"><strong>${escapeHtml(fmtDate(e.date,{weekday:'short',day:'numeric',month:'long',year:'numeric'}))} · ${fmtNum(e.hours)} h</strong><small>${escapeHtml(({recover:'À récupérer',paid:'Payées',done:'Enregistrées'}[e.status]||'Enregistrées'))}${e.note?' · '+escapeHtml(e.note):''}</small></div><div class="row"><button class="btn secondary sm" onclick="openEntry('${e.id}')">Modifier</button><button class="btn danger sm" onclick="deleteEntry('${e.id}')">×</button></div></div>`).join(''):'<div class="empty-state">Aucune heure supplémentaire enregistrée.</div>'}
-function renderHolidaySettings(){let hs=allHolidays(currentYear).sort((a,b)=>a.date.localeCompare(b.date));let list=document.getElementById('holidaySettingsList');if(!hs.length){list.innerHTML='<div class="notice">Le calcul automatique des jours fériés n’est pas encore configuré pour ce pays. Ajoute les dates officielles de ton choix avec le bouton ci-dessous.</div>';return}list.innerHTML=hs.map(h=>`<div class="list-item"><div class="main"><strong>${escapeHtml(fmtDate(h.date,{weekday:'short',day:'numeric',month:'long',year:'numeric'}))}</strong><small>${escapeHtml(h.name)}${h.source==='custom'?' · personnalisé':''}</small></div>${h.source==='custom'?`<button class="btn danger sm" onclick="removeHoliday('${h.date}','${escapeHtml(h.name)}')">Supprimer</button>`:'<span class="tag holiday">Intégré</span>'}</div>`).join('')}
+function renderHolidaySettings(){let hs=allHolidays(currentYear).sort((a,b)=>a.date.localeCompare(b.date));document.getElementById('holidaySettingsList').innerHTML=hs.map(h=>`<div class="list-item"><div class="main"><strong>${escapeHtml(fmtDate(h.date,{weekday:'short',day:'numeric',month:'long',year:'numeric'}))}</strong><small>${escapeHtml(h.name)}${h.source==='custom'?' · personnalisé':''}</small></div>${h.source==='custom'?`<button class="btn danger sm" onclick="removeHoliday('${h.date}','${escapeHtml(h.name)}')">Supprimer</button>`:'<span class="tag holiday">Intégré</span>'}</div>`).join('')}
 function applyCalendarColors(){let c={weekA:'#DCEBFF',weekB:'#F3DFFF',weekC:'#DDF4F5',leave:'#d8f7e8',holiday:'#ffe1e1',overtime:'#fff0d8',manual:'#e8efff',appointment:'#e9e5ff',sickness:'#ffd9dc',today:'#356df3',...(data.settings.calendarColors||{})};let root=document.documentElement;for(let [key,css] of Object.entries({'weekA':'--week-a-bg','weekB':'--week-b-bg','weekC':'--week-c-bg','leave':'--leave-bg','holiday':'--holiday-bg','overtime':'--overtime-bg','manual':'--manual-bg','appointment':'--appointment-bg','sickness':'--sickness-bg','today':'--today-color'}))root.style.setProperty(css,c[key]);for(let [id,key] of [['colorWeekA','weekA'],['colorWeekB','weekB'],['colorWeekC','weekC'],['colorLeave','leave'],['colorHoliday','holiday'],['colorOvertime','overtime'],['colorManual','manual'],['colorAppointment','appointment'],['colorSickness','sickness'],['colorToday','today']]){let el=document.getElementById(id);if(el)el.value=c[key];let lid=({colorWeekA:'calendarLegendA',colorWeekB:'calendarLegendB',colorWeekC:'calendarLegendC',colorLeave:'calendarLegendLeave',colorHoliday:'calendarLegendHoliday',colorOvertime:'calendarLegendOvertime',colorManual:'calendarLegendManual',colorAppointment:'calendarLegendAppointment',colorToday:null})[id];let legend=lid&&document.getElementById(lid);if(legend)legend.style.background=c[key];if(id==='colorToday'){let todayDot=document.getElementById('calendarLegendToday');if(todayDot)todayDot.style.borderColor=c[key]}}}
 function saveCalendarColors(){let map={colorWeekA:'weekA',colorWeekB:'weekB',colorWeekC:'weekC',colorLeave:'leave',colorHoliday:'holiday',colorOvertime:'overtime',colorManual:'manual',colorAppointment:'appointment',colorSickness:'sickness',colorToday:'today'};data.settings.calendarColors=data.settings.calendarColors||{};for(let [id,key] of Object.entries(map)){let el=document.getElementById(id);if(el)data.settings.calendarColors[key]=el.value}persist();applyCalendarColors();renderCalendar();toast('Couleurs du calendrier enregistrées.')}
 function resetCalendarColors(){data.settings.calendarColors={weekA:'#DCEBFF',weekB:'#F3DFFF',weekC:'#DDF4F5',leave:'#d8f7e8',holiday:'#ffe1e1',overtime:'#fff0d8',manual:'#e8efff',appointment:'#e9e5ff',sickness:'#ffd9dc',today:'#356df3'};persist();applyCalendarColors();renderCalendar();toast('Couleurs par défaut restaurées.')}
@@ -841,94 +819,8 @@ function saveLeaveSettings(){let n=Number(document.getElementById('initialLeave'
 function addHoliday(){let date=prompt('Date du jour férié (AAAA-MM-JJ)');if(!date||!/^\d{4}-\d{2}-\d{2}$/.test(date)){if(date)toast('Format de date invalide.');return}let name=prompt('Nom du jour férié');if(!name)return;if(!data.customHolidays)data.customHolidays=[];data.customHolidays.push({date,name});persist();currentYear=dateYear(date);document.getElementById('headerYear').value=String(currentYear);renderAll();toast('Jour férié ajouté.')}
 function removeHoliday(date,name){if(!confirm('Supprimer ce jour férié personnalisé ?'))return;data.customHolidays=data.customHolidays.filter(h=>!(h.date===date&&h.name===name));persist();renderAll();toast('Jour férié supprimé.')}
 function resetHolidays(){if(!confirm('Restaurer les 11 jours fériés légaux calculés automatiquement pour toutes les années ? Les jours fériés personnalisés seront conservés.'))return;data.holidays={};persist();renderAll();toast('Jours fériés légaux recalculés pour toutes les années.')}
-function backupPhotoDbName(profileId){return profileId==='moi'?PHOTO_DB_NAME:PHOTO_DB_NAME+'_'+profileId}
-function readBackupPhotoDb(profileId){
- return new Promise((resolve,reject)=>{
-  if(!('indexedDB' in window)){reject(new Error('IndexedDB indisponible'));return}
-  const req=indexedDB.open(backupPhotoDbName(profileId),1);
-  req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains(PHOTO_STORE))db.createObjectStore(PHOTO_STORE,{keyPath:'id'})};
-  req.onerror=()=>reject(req.error||new Error('Ouverture de la base photo impossible'));
-  req.onsuccess=()=>{const db=req.result;if(!db.objectStoreNames.contains(PHOTO_STORE)){db.close();resolve([]);return}
-   const tx=db.transaction(PHOTO_STORE,'readonly'),get=tx.objectStore(PHOTO_STORE).getAll();
-   get.onsuccess=()=>{const items=get.result||[];db.close();resolve(items)};
-   get.onerror=()=>{const err=get.error||new Error('Lecture des photos impossible');db.close();reject(err)};
-  };
- });
-}
-function writeBackupPhotoDb(profileId,items){
- return new Promise((resolve,reject)=>{
-  if(!('indexedDB' in window)){reject(new Error('IndexedDB indisponible'));return}
-  const req=indexedDB.open(backupPhotoDbName(profileId),1);
-  req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains(PHOTO_STORE))db.createObjectStore(PHOTO_STORE,{keyPath:'id'})};
-  req.onerror=()=>reject(req.error||new Error('Ouverture de la base photo impossible'));
-  req.onsuccess=()=>{const db=req.result;let tx;
-   try{tx=db.transaction(PHOTO_STORE,'readwrite');const store=tx.objectStore(PHOTO_STORE);store.clear();(Array.isArray(items)?items:[]).forEach(item=>store.put(item))}
-   catch(e){db.close();reject(e);return}
-   tx.oncomplete=()=>{db.close();resolve()};
-   tx.onerror=()=>{const err=tx.error||new Error('Restauration des photos impossible');db.close();reject(err)};
-   tx.onabort=()=>{const err=tx.error||new Error('Restauration des photos annulée');db.close();reject(err)};
-  };
- });
-}
-function exportBackup(){
- (async()=>{
-  try{
-   if(!persist())throw new Error('Enregistrement du profil actif impossible');
-   const profileCopies=[];
-   for(const profile of profiles){
-    let raw=localStorage.getItem(profile.id==='moi'?STORAGE_KEY:STORAGE_KEY+'_'+profile.id);
-    if(!raw&&profile.id==='moi')raw=localStorage.getItem(STORAGE_KEY);
-    let profileData=defaultData();
-    if(raw){const parsed=JSON.parse(raw);if(parsed&&parsed.settings&&Array.isArray(parsed.entries))profileData={...defaultData(),...parsed,settings:{...defaultData().settings,...parsed.settings}}}
-    const photos=await readBackupPhotoDb(profile.id);
-    profileCopies.push({id:profile.id,name:profile.name,data:profileData,photos});
-   }
-   const backup={format:'conges-horaires-backup',backupVersion:2,exportedAt:new Date().toISOString(),activeProfileId,profiles:profileCopies};
-   const blob=new Blob([JSON.stringify(backup)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');
-   a.href=url;a.download=`sauvegarde-complete-conges-horaires-${iso(new Date())}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
-   const photoCount=profileCopies.reduce((n,p)=>n+p.photos.length,0);
-   toast(`Sauvegarde complète exportée : ${profiles.length} profil(s), ${photoCount} document(s)/photo(s).`);
-  }catch(e){console.error('Export sauvegarde complète impossible:',e);toast('Sauvegarde impossible. Vérifie le stockage et réessaie.');}
- })();
-}
-function importBackup(ev){
- const file=ev.target.files?.[0];if(!file)return;
- const reader=new FileReader();
- reader.onload=()=>{
-  (async()=>{
-   try{
-    const x=JSON.parse(reader.result);
-    if(!x)throw new Error('Fichier vide');
-    if(x.format==='conges-horaires-backup'&&x.backupVersion===2&&Array.isArray(x.profiles)&&x.profiles.length){
-     if(!x.profiles.some(p=>p&&p.id==='moi'&&p.data&&p.data.settings&&Array.isArray(p.data.entries)))throw new Error('Profil principal manquant');
-     if(!x.profiles.every(p=>p&&typeof p.id==='string'&&typeof p.name==='string'&&p.data&&p.data.settings&&Array.isArray(p.data.entries)&&Array.isArray(p.photos)))throw new Error('Sauvegarde incomplète');
-     if(!confirm('Restaurer la sauvegarde complète remplacera les profils, calendriers, réglages, photos de congés et fiches de paie présents sur cet appareil. Fais une sauvegarde actuelle avant de continuer.'))return;
-     const restoredProfiles=x.profiles.map(p=>({id:p.id,name:p.name}));
-     // Le mot de passe et Face ID de cet appareil sont conservés séparément.
-     for(const p of x.profiles){const key=p.id==='moi'?STORAGE_KEY:STORAGE_KEY+'_'+p.id;localStorage.setItem(key,JSON.stringify(p.data));}
-     profiles=restoredProfiles;
-     saveProfiles();
-     activeProfileId=profiles.some(p=>p.id===x.activeProfileId)?x.activeProfileId:'moi';
-     localStorage.setItem(ACTIVE_PROFILE_KEY,activeProfileId);
-     for(const p of x.profiles)await writeBackupPhotoDb(p.id,p.photos);
-     data=loadData();selectedDate=iso(new Date());selectedEntryDate=null;multiSelectionEnabled=false;multiSelectedDates.clear();leavePhotoDb=null;
-     renderProfileSelect();renderYearSelects();renderSettingsForm();renderAll();await listLeavePhotos();await renderPaySlips();renderPayrollRaises();syncProvisionalPayrollFromCalendar();
-     document.getElementById('headerYear').value=String(currentYear);
-     toast(`Sauvegarde complète restaurée : ${profiles.length} profil(s).`);
-    }else{
-     // Compatibilité avec les anciennes sauvegardes qui ne contiennent qu'un calendrier.
-     if(!x.settings||!Array.isArray(x.entries))throw new Error('Ancienne sauvegarde invalide');
-     if(!confirm('Cette ancienne sauvegarde ne contient qu’un calendrier et pas les profils ni les photos. Restaurer uniquement ce calendrier dans le profil actuellement sélectionné ?'))return;
-     data={...defaultData(),...x,settings:{...defaultData().settings,...x.settings},entries:x.entries,holidays:x.holidays||defaultData().holidays,customHolidays:x.customHolidays||[]};
-     persist();renderSettingsForm();renderAll();
-     toast('Ancienne sauvegarde restaurée dans le profil actif. Les autres profils et photos n’étaient pas dans ce fichier.');
-    }
-   }catch(e){console.error('Import sauvegarde impossible:',e);toast('Fichier invalide ou restauration incomplète. Les données n’ont peut-être été restaurées qu’en partie.');}
-   finally{ev.target.value=''}
-  })();
- };
- reader.readAsText(file);
-}
+function exportBackup(){try{persist();let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`sauvegarde-conges-horaires-${iso(new Date())}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Sauvegarde exportée. Garde le fichier JSON dans Fichiers.')}catch(e){toast('Impossible de créer la sauvegarde. Réessaie.')}}
+function importBackup(ev){let file=ev.target.files?.[0];if(!file)return;let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(!x||!x.settings||!Array.isArray(x.entries))throw new Error('invalid');if(!confirm('Restaurer cette sauvegarde remplacera les données actuelles. Continuer ?'))return;data={...defaultData(),...x,settings:{...defaultData().settings,...x.settings},entries:x.entries,holidays:x.holidays||defaultData().holidays,customHolidays:x.customHolidays||[]};persist();renderSettingsForm();renderAll();toast('Sauvegarde restaurée.')}catch(e){toast('Fichier de sauvegarde invalide.')}finally{ev.target.value=''}};r.readAsText(file)}
 function exportCalendarCSV(){let rows=[['Date','Jour','Type','Détail','Début','Fin','Heures supp.','Statut','Note']];let start=new Date(currentYear,0,1,12),end=new Date(currentYear+1,0,1,12);for(let d=new Date(start);d<end;d.setDate(d.getDate()+1)){let date=iso(d),hol=holidayFor(date),entries=dayEntries(date);if(hol)rows.push([date,fmtDate(date,{weekday:'long'}),'Jour férié',hol.name,'','','','','']);if(isWorkday(date)){let e=entries.find(x=>x.type==='shift'),s=e?{start:e.start,end:e.end}:shiftFor(date);rows.push([date,fmtDate(date,{weekday:'long'}),e?'Horaire exceptionnel':'Horaire prévu',`Semaine ${shiftFor(date).label}`,s.start,s.end,'','',''])}entries.forEach(e=>rows.push([date,fmtDate(date,{weekday:'long'}),TYPES[e.type],e.type==='leave'?`${e.amount} jour(s)`:e.type==='overtime'?`${e.hours} h`:'',e.start||(e.type==='appointment'?e.time||'':''),e.end||'',e.hours||'',e.status||'',e.note||'']))}let csv='\ufeff'+rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';')).join('\r\n'),blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`calendrier-conges-${currentYear}.csv`;a.click();URL.revokeObjectURL(url);toast('Calendrier CSV exporté.')}
 function resetAll(){if(!confirm('Cela effacera toutes les entrées et réglages enregistrés sur cet appareil. As-tu exporté une sauvegarde ?'))return;data=defaultData();persist();currentYear=2026;selectedDate=iso(new Date());renderSettingsForm();renderYearSelects();renderAll();toast('Application réinitialisée.')}
 
@@ -956,38 +848,24 @@ function periodShiftFor(date){
  return p?{start:p.begin,end:p.finish,label:'Exceptionnel'}:null;
 }
 
-function renderSettingsForm(){let s=data.settings;initHolidayCountry();for(let [id,key] of [['anchorDate','anchorDate'],['weekStart','weekStart'],['shiftAStart','shiftAStart'],['shiftAEnd','shiftAEnd'],['shiftBStart','shiftBStart'],['shiftBEnd','shiftBEnd'],['shiftCStart','shiftCStart'],['shiftCEnd','shiftCEnd'],['weeklyHours','weeklyHours'],['leaveYear','leaveYear']]){let el=document.getElementById(id);if(el)el.value=s[key]??''}const leaveInput=document.getElementById('initialLeave');if(leaveInput)leaveInput.value=String(leaveBaseEntitlement(Number(document.getElementById('leaveYear')?.value||s.leaveYear||2026)));const wc=document.getElementById('weekCEnabled');if(wc)wc.checked=!!s.weekCEnabled;const ws=document.getElementById('weekStart');if(ws&&!s.weekCEnabled&&ws.value==='C')ws.value='A'}
+function renderSettingsForm(){let s=data.settings;for(let [id,key] of [['anchorDate','anchorDate'],['weekStart','weekStart'],['shiftAStart','shiftAStart'],['shiftAEnd','shiftAEnd'],['shiftBStart','shiftBStart'],['shiftBEnd','shiftBEnd'],['shiftCStart','shiftCStart'],['shiftCEnd','shiftCEnd'],['weeklyHours','weeklyHours'],['leaveYear','leaveYear']]){let el=document.getElementById(id);if(el)el.value=s[key]??''}const leaveInput=document.getElementById('initialLeave');if(leaveInput)leaveInput.value=String(leaveBaseEntitlement(Number(document.getElementById('leaveYear')?.value||s.leaveYear||2026)));const wc=document.getElementById('weekCEnabled');if(wc)wc.checked=!!s.weekCEnabled;const ws=document.getElementById('weekStart');if(ws&&!s.weekCEnabled&&ws.value==='C')ws.value='A'}
 function escapeHtml(str){return String(str??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 const PIN_KEY='conges_horaires_pin_v1';
 const FACE_KEY='conges_horaires_face_credential_v1';
-function getPin(){try{return localStorage.getItem(PIN_KEY)}catch(e){return null}}
-function configureLockScreen(){
- const pin=getPin(),intro=document.getElementById('lockIntro'),confirm=document.getElementById('firstPinConfirm'),submit=document.getElementById('unlockSubmit'),note=document.getElementById('lockNote'),face=document.getElementById('faceIdUnlock'),input=document.getElementById('unlockPin');
- const firstUse=!pin;
- intro.textContent=firstUse?'Première utilisation : choisis le mot de passe de cette personne.':'Entre ton mot de passe pour accéder à ton planning.';
- confirm.style.display=firstUse?'block':'none';confirm.required=firstUse;
- input.autocomplete=firstUse?'new-password':'current-password';input.placeholder=firstUse?'Choisis un mot de passe (4 caractères minimum)':'Mot de passe';input.minLength=firstUse?4:0;
- submit.textContent=firstUse?'Créer mon mot de passe':'Déverrouiller';
- note.textContent=firstUse?'Ce mot de passe sera utilisé uniquement sur ce téléphone. Chaque téléphone garde ses propres données.':'Mot de passe enregistré sur cet appareil. Face ID nécessite Safari/HTTPS et un appareil compatible.';
- if(face&&firstUse)face.style.display='none';
-}
+function getPin(){try{return localStorage.getItem(PIN_KEY)||'1157'}catch(e){return '1157'}}
 function b64url(bytes){let s='';for(const b of new Uint8Array(bytes))s+=String.fromCharCode(b);return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
 function fromB64url(s){s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';let raw=atob(s),out=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)out[i]=raw.charCodeAt(i);return out}
 function randomBytes(n=32){let a=new Uint8Array(n);crypto.getRandomValues(a);return a}
-function lockApp(){configureLockScreen();document.getElementById('lockScreen').style.display='flex';document.getElementById('unlockPin').value='';document.getElementById('firstPinConfirm').value='';document.getElementById('lockError').textContent='';document.getElementById('unlockPin').focus()}
+function lockApp(){document.getElementById('lockScreen').style.display='flex';document.getElementById('unlockPin').value='';document.getElementById('lockError').textContent='';document.getElementById('unlockPin').focus()}
 function unlockApp(){document.getElementById('lockScreen').style.display='none';document.getElementById('lockError').textContent=''}
-document.getElementById('unlockForm').addEventListener('submit',function(ev){
- ev.preventDefault();const entered=document.getElementById('unlockPin').value,confirm=document.getElementById('firstPinConfirm'),saved=getPin(),error=document.getElementById('lockError');
- if(!saved){if(entered.length<4){error.textContent='Choisis un mot de passe d’au moins 4 caractères.';return}if(entered!==confirm.value){error.textContent='Les deux mots de passe ne correspondent pas.';confirm.select();return}try{localStorage.setItem(PIN_KEY,entered);configureLockScreen();unlockApp()}catch(e){error.textContent='Impossible d’enregistrer le mot de passe sur cet appareil.'}return}
- if(entered===saved){unlockApp()}else{error.textContent='Mot de passe incorrect.';document.getElementById('unlockPin').select()}
-});
+document.getElementById('unlockForm').addEventListener('submit',function(ev){ev.preventDefault();if(document.getElementById('unlockPin').value===getPin()){unlockApp()}else{document.getElementById('lockError').textContent='Mot de passe incorrect.';document.getElementById('unlockPin').select()}});
 async function setupFaceID(){const msg=document.getElementById('lockError');if(!window.isSecureContext||!navigator.credentials||!window.PublicKeyCredential){toast('Face ID / clé d’accès n’est pas pris en charge ici. Ouvre le site HTTPS dans Safari sur ton iPhone.');return}try{const host=location.hostname;const cred=await navigator.credentials.create({publicKey:{challenge:randomBytes(),rp:{name:'Congés & Horaires',id:host},user:{id:randomBytes(16),name:'utilisateur',displayName:'Utilisateur Congés & Horaires'},pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{authenticatorAttachment:'platform',residentKey:'preferred',userVerification:'required'},timeout:60000,attestation:'none'}});if(!cred)throw new Error('Annulé');localStorage.setItem(FACE_KEY,b64url(cred.rawId));document.getElementById('faceIdUnlock').style.display='block';toast('Face ID / clé d’accès configuré sur cet appareil.')}catch(e){toast('Configuration Face ID impossible ou annulée. Vérifie que le site est en HTTPS et réessaie dans Safari.')}}
 async function unlockWithFaceID(){try{const saved=localStorage.getItem(FACE_KEY);if(!saved){toast('Configure d’abord Face ID dans Réglages.');return}const assertion=await navigator.credentials.get({publicKey:{challenge:randomBytes(),rpId:location.hostname,allowCredentials:[{type:'public-key',id:fromB64url(saved)}],userVerification:'required',timeout:60000}});if(assertion&&b64url(assertion.rawId)===saved)unlockApp();else document.getElementById('lockError').textContent='Face ID n’a pas confirmé l’accès.'}catch(e){document.getElementById('lockError').textContent='Face ID annulé ou indisponible. Utilise ton mot de passe.'}}
 document.getElementById('faceIdUnlock').addEventListener('click',unlockWithFaceID);
 function updateFaceButton(){try{document.getElementById('faceIdUnlock').style.display=localStorage.getItem(FACE_KEY)?'block':'none'}catch(e){}}
 function changePin(){let a=document.getElementById('newPin').value,b=document.getElementById('confirmPin').value;if(a.length<4){toast('Choisis un mot de passe d’au moins 4 caractères.');return}if(a!==b){toast('Les deux mots de passe ne correspondent pas.');return}try{localStorage.setItem(PIN_KEY,a);document.getElementById('newPin').value='';document.getElementById('confirmPin').value='';toast('Mot de passe modifié.')}catch(e){toast('Impossible d’enregistrer le mot de passe sur cet appareil.')}}
 window.addEventListener('error',function(e){const box=document.getElementById('appError');if(box){box.style.display='block';box.textContent='Une erreur JavaScript empêche certaines fonctions de marcher : '+(e.message||'erreur inconnue')}});
-function init(){configureLockScreen();updateFaceButton();renderProfileSelect();renderYearSelects();renderSettingsForm();document.getElementById('payMonth').value=String(new Date().getMonth()+1);document.getElementById('payYear').value=String(new Date().getFullYear());document.getElementById('periodStart').value=iso(new Date());document.getElementById('periodEnd').value=iso(addDays(iso(new Date()),6));renderAll();listLeavePhotos();document.getElementById('headerYear').value=String(currentYear);document.getElementById('entryDialog').addEventListener('click',e=>{if(e.target.id==='entryDialog')closeEntry()})}
+function init(){updateFaceButton();renderYearSelects();renderSettingsForm();document.getElementById('payMonth').value=String(new Date().getMonth()+1);document.getElementById('payYear').value=String(new Date().getFullYear());document.getElementById('periodStart').value=iso(new Date());document.getElementById('periodEnd').value=iso(addDays(iso(new Date()),6));renderAll();listLeavePhotos();document.getElementById('headerYear').value=String(currentYear);document.getElementById('entryDialog').addEventListener('click',e=>{if(e.target.id==='entryDialog')closeEntry()})}
 try{init()}catch(err){const box=document.getElementById("appError");if(box){box.style.display="block";box.textContent="Erreur au démarrage : "+(err.message||err)}else alert("Erreur au démarrage de l’application.")}
 document.addEventListener('DOMContentLoaded',initLeavePhotoDate);
 
@@ -1163,6 +1041,3 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
     });
   }, { once: true });
 }
-</script>
-</body>
-</html>
