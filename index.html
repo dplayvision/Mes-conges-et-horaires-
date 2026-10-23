@@ -1081,7 +1081,7 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
   appId:"1:1085958529684:web:99e5514798cf0b8f098a81"
  };
  const status=document.getElementById('cloudSyncStatus'), button=document.getElementById('cloudSyncButton');
- let syncing=false, previous='';
+ let syncing=false, signingIn=false, previous='';
  function say(t){if(status)status.textContent=t;}
  const keyOf=x=>x&&x.id!=null?'id:'+x.id:x&&x.date?[x.date,x.type||'',x.start||'',x.end||'',x.note||'',x.title||''].join('|'):'json:'+JSON.stringify(x);
  function merge(local,cloud){
@@ -1114,13 +1114,42 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
  try{
    if(!firebase.apps.length)firebase.initializeApp(cfg);
    const auth=firebase.auth();
+   // Garder la session Google sur cet appareil, comme dans Mes paiements.
+   auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(e=>console.warn('Persistance Google',e));
    auth.onAuthStateChanged(user=>{
-     if(user){say('Connecté : '+(user.email||'compte Google'));button.textContent='Synchroniser maintenant';syncNow(user);}
-     else{say('Non connecté');button.textContent='Connecter avec Google';}
+     if(user){
+       say('Google connecté — synchronisation en cours…');
+       button.textContent='Synchroniser maintenant';
+       syncNow(user);
+     } else {
+       say('Non connecté — appuie sur Connecter avec Google pour activer la synchronisation.');
+       button.textContent='Connecter avec Google';
+     }
    });
    button.addEventListener('click',async()=>{
-     try{if(auth.currentUser){await syncNow(auth.currentUser);return;}await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());}
-     catch(e){console.error(e);say((e.code==='auth/popup-blocked'||e.code==='auth/operation-not-supported-in-this-environment')?'Ouvre l’application dans Safari puis réessaie.':'Connexion impossible : '+(e.message||'réessaie'));}
+     // Évite deux fenêtres Google si le bouton est touché plusieurs fois.
+     if(signingIn)return;
+     if(auth.currentUser){await syncNow(auth.currentUser);return;}
+     signingIn=true;
+     button.disabled=true;
+     try{
+       await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+       await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+     }catch(e){
+       console.error('Connexion Google Congés & Horaires',e);
+       if(e.code==='auth/cancelled-popup-request'){
+         say('Une autre fenêtre Google est déjà ouverte. Ferme-la puis réessaie une seule fois.');
+       }else if(e.code==='auth/popup-blocked'||e.code==='auth/operation-not-supported-in-this-environment'){
+         say('La fenêtre Google est bloquée. Ouvre cette application dans Safari puis réessaie.');
+       }else if(e.code==='auth/popup-closed-by-user'){
+         say('Connexion Google annulée. Tu peux réessayer.');
+       }else{
+         say('Connexion impossible : '+(e.message||'réessaie'));
+       }
+     }finally{
+       signingIn=false;
+       button.disabled=false;
+     }
    });
    // Détecte les modifications sauvegardées localement et les pousse vers le cloud.
    previous=JSON.stringify(window.__congesGetData());
