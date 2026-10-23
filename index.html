@@ -281,6 +281,12 @@ img, canvas, video, iframe { max-width:100%; }
   <p class="footer-note">Les fiches restent sur cet appareil et ne sont pas envoyées sur GitHub. Pense à conserver une copie des documents importants.</p>
  </section>
  <section id="view-settings" class="view">
+  <div id="cloudSyncPanel" class="panel" style="margin-top:14px">
+    <div class="panel-head"><h2>☁️ Synchronisation Google</h2></div>
+    <div id="cloudSyncStatus" class="notice" style="margin-bottom:10px">Vérification de la connexion…</div>
+    <button id="cloudSyncButton" class="btn" type="button" style="width:100%">Connecter avec Google</button>
+    <p class="footer-note">Le planning et les réglages se synchronisent entre tes appareils connectés au même compte Google. Les photos et fiches de paie restent sur cet appareil.</p>
+  </div>
   <div class="panel"><div class="panel-head"><h2>🎨 Couleurs du calendrier</h2></div><p class="small muted">Touche directement le grand carré coloré sous chaque élément pour ouvrir le sélecteur de couleurs de ton téléphone. Choisis la couleur que tu veux : elle est enregistrée automatiquement sur cet appareil et appliquée au calendrier.</p><div class="form-grid" id="calendarColorFields">
    <div class="field"><label for="colorWeekA">Semaine A</label><input id="colorWeekA" type="color" value="#DCEBFF" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
    <div class="field"><label for="colorWeekB">Semaine B</label><input id="colorWeekB" type="color" value="#F3DFFF" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
@@ -1061,12 +1067,7 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
   }, { once: true });
 }
 </script>
-<div id="cloudSyncPanel" style="position:fixed;right:12px;bottom:calc(88px + env(safe-area-inset-bottom));z-index:9999;background:#fff;border:1px solid #dbe4f0;border-radius:16px;box-shadow:0 8px 24px rgba(20,40,70,.18);padding:12px;width:min(300px,calc(100vw - 24px));font-size:13px;color:#1f2937">
-  <div style="font-weight:800;margin-bottom:6px">Synchronisation Google</div>
-  <div id="cloudSyncStatus" style="color:#596579;margin-bottom:9px">Non connecté</div>
-  <button id="cloudSyncButton" type="button" style="background:#356df3;color:white;border:0;border-radius:10px;padding:10px 12px;font-weight:700;width:100%">Connecter avec Google</button>
-  <div style="font-size:11px;color:#6b7280;margin-top:7px">Les données du planning se synchronisent. Les photos et fiches de paie restent sur cet appareil.</div>
-</div>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
