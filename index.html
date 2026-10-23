@@ -1104,7 +1104,11 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
      previous=JSON.stringify(window.__congesGetData());
      say('Google connecté — synchronisation terminée');
      button.textContent='Synchroniser maintenant';
-   }catch(e){console.error(e);say('Erreur : '+(e.message||'vérifie Firebase et les règles Firestore'));}
+   }catch(e){
+     console.error('Congés & Horaires Firebase sync error',{code:e.code,message:e.message,uid:user&&user.uid,projectId:cfg.projectId,path:user?('users/'+user.uid+'/apps/conges-horaires'):'(aucun utilisateur connecté)'});
+     const details=(e.code?e.code+' — ':'')+(e.message||'erreur inconnue');
+     say('Erreur de synchronisation — UID '+(user&&user.uid?user.uid:'inconnu')+' — '+details);
+   }
    finally{syncing=false;button.disabled=false;}
  }
  try{
