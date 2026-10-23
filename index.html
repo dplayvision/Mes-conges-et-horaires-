@@ -388,7 +388,7 @@ function easterSunday(year){let a=year%19,b=Math.floor(year/100),c=year%100,d=Ma
 function iso(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 function addDays(date,n){let d=new Date(date+'T12:00:00');d.setDate(d.getDate()+n);return d}
 function luxHolidays(year){let easter=easterSunday(year), easterMonday=new Date(easter);easterMonday.setDate(easter.getDate()+1);let ascension=new Date(easter);ascension.setDate(easter.getDate()+39);let whitMonday=new Date(easter);whitMonday.setDate(easter.getDate()+50);return [{date:`${year}-01-01`,name:"Nouvel An"},{date:iso(easterMonday),name:"Lundi de Pâques"},{date:`${year}-05-01`,name:"Fête du Travail"},{date:`${year}-05-09`,name:"Journée de l’Europe"},{date:iso(ascension),name:"Ascension"},{date:iso(whitMonday),name:"Lundi de Pentecôte"},{date:`${year}-06-23`,name:"Fête nationale"},{date:`${year}-08-15`,name:"Assomption"},{date:`${year}-11-01`,name:"Toussaint"},{date:`${year}-12-25`,name:"Noël"},{date:`${year}-12-26`,name:"Saint-Étienne"}]}
-function defaultData(){let holidays={};[2026,2027].forEach(y=>holidays[y]=luxHolidays(y));return {version:1,settings:{anchorDate:'2026-10-05',weekStart:'A',weekCEnabled:false,shiftAStart:'06:00',shiftAEnd:'14:00',shiftBStart:'08:00',shiftBEnd:'16:00',shiftCStart:'08:00',shiftCEnd:'16:30',weeklyHours:40,initialLeave:27,leaveYear:2026,calendarColors:{weekA:'#DCEBFF',weekB:'#F3DFFF',weekC:'#DDF4F5',leave:'#d8f7e8',holiday:'#ffe1e1',overtime:'#fff0d8',manual:'#e8efff',appointment:'#e9e5ff',sickness:'#ffd9dc',today:'#356df3'}},entries:[],holidays,customHolidays:[]}}
+function defaultData(){let holidays={};[2026,2027].forEach(y=>holidays[y]=luxHolidays(y));return {version:1,settings:{anchorDate:'2026-10-05',weekStart:'A',weekCEnabled:false,shiftAStart:'06:00',shiftAEnd:'14:00',shiftBStart:'08:00',shiftBEnd:'16:00',shiftCStart:'08:00',shiftCEnd:'16:30',weeklyHours:40,initialLeave:27,leaveYear:2026,calendarColors:{weekA:'#DCEBFF',weekB:'#F3DFFF',weekC:'#DDF4F5',leave:'#d8f7e8',holiday:'#ffe1e1',overtime:'#fff0d8',manual:'#e8efff',appointment:'#e9e5ff',sickness:'#ffd9dc',today:'#356df3'}},entries:[],deletedEntryIds:[],holidays,customHolidays:[]}}
 let data=loadData(), currentYear=2026, selectedDate=iso(new Date()), selectedEntryDate=null;
 function loadData(){try{let raw=localStorage.getItem(STORAGE_KEY);if(raw){let x=JSON.parse(raw);if(x&&x.settings&&Array.isArray(x.entries)){let merged={...defaultData(),...x,settings:{...defaultData().settings,...x.settings}};if(!merged.settings.leaveEntitlements||typeof merged.settings.leaveEntitlements!=='object'||Array.isArray(merged.settings.leaveEntitlements)){merged.settings.leaveEntitlements={};merged.settings.leaveEntitlements[String(Number(merged.settings.leaveYear)||2026)]=Number(merged.settings.initialLeave??27)}else{merged.settings.leaveEntitlements={...merged.settings.leaveEntitlements};let legacyYear=String(Number(merged.settings.leaveYear)||2026);if(!Object.prototype.hasOwnProperty.call(merged.settings.leaveEntitlements,legacyYear))merged.settings.leaveEntitlements[legacyYear]=Number(merged.settings.initialLeave??27)}return merged}}}catch(e){}let fresh=defaultData();fresh.settings.leaveEntitlements={'2026':27};return fresh}
 function persist(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(data));return true}catch(e){toast('Sauvegarde impossible : espace de stockage insuffisant. Exporte tes données.');return false}}
@@ -813,13 +813,13 @@ if(type==='appointment')entry.time=document.getElementById('appointmentTime').va
 if(type==='leave'){entry.amount=Number(document.getElementById('leaveAmount').value);entry.period=entry.amount===0.5?document.getElementById('leavePeriod').value:''}
 if(type==='overtime'){entry.hours=Number(document.getElementById('overtimeAmount').value);entry.status=document.getElementById('overtimeStatus').value;if(!(entry.hours>0)){toast('Indique un nombre d’heures valide.');return}}
 if(type==='shift'){entry.start=document.getElementById('entryShiftStart').value;entry.end=document.getElementById('entryShiftEnd').value;if(!entry.start||!entry.end||shiftHours(entry.start,entry.end)<=0){toast('Vérifie les heures de début et de fin.');return}}
-let idx=data.entries.findIndex(x=>x.id===entry.id);if(idx>=0)data.entries[idx]=entry;else data.entries.push(entry);
+let idx=data.entries.findIndex(x=>x.id===entry.id);if(idx>=0)data.entries[idx]=entry;else data.entries.push(entry);data.deletedEntryIds=(data.deletedEntryIds||[]).filter(x=>String(x)!==String(entry.id));
 if(entry.alsoHoliday&&type!=='holiday'&&!holidayFor(date))data.customHolidays.push({date,name:entry.note||'Jour férié personnalisé'});
 if(type==='holiday'&&!holidayFor(date))data.customHolidays.push({date,name:entry.note||'Jour férié personnalisé'});
 persist();closeEntry();selectedDate=date;currentYear=dateYear(date);document.getElementById('headerYear').value=String(currentYear);renderAll();toast(idx>=0?'Entrée modifiée.':'Entrée enregistrée.')
 }
 function deleteCurrentEntry(){let id=document.getElementById('entryId').value;if(id)deleteEntry(id);closeEntry()}
-function deleteEntry(id){if(!confirm('Supprimer cette entrée ?'))return;data.entries=data.entries.filter(e=>e.id!==id);persist();renderAll();toast('Entrée supprimée.')}
+function deleteEntry(id){if(!confirm('Supprimer cette entrée ?'))return;data.deletedEntryIds=Array.from(new Set([...(data.deletedEntryIds||[]),String(id)]));data.entries=data.entries.filter(e=>String(e.id)!==String(id));persist();renderAll();toast('Entrée supprimée et suppression synchronisée.')}
 function saveSettings(){let s=data.settings;s.anchorDate=document.getElementById('anchorDate').value||'2026-10-05';s.weekCEnabled=document.getElementById('weekCEnabled').checked;s.weekStart=document.getElementById('weekStart').value;if(!s.weekCEnabled&&s.weekStart==='C')s.weekStart='A';s.shiftAStart=document.getElementById('shiftAStart').value;s.shiftAEnd=document.getElementById('shiftAEnd').value;s.shiftBStart=document.getElementById('shiftBStart').value;s.shiftBEnd=document.getElementById('shiftBEnd').value;s.shiftCStart=document.getElementById('shiftCStart').value;s.shiftCEnd=document.getElementById('shiftCEnd').value;s.weeklyHours=Number(document.getElementById('weeklyHours').value)||40;if(shiftHours(s.shiftAStart,s.shiftAEnd)<=0||shiftHours(s.shiftBStart,s.shiftBEnd)<=0||(s.weekCEnabled&&shiftHours(s.shiftCStart,s.shiftCEnd)<=0)){toast('Vérifie les horaires de début et de fin.');return}persist();renderSettingsForm();renderAll();toast('Horaires enregistrés.')}
 function saveLeaveSettings(){let n=Number(document.getElementById('initialLeave').value),y=Number(document.getElementById('leaveYear').value);if(!Number.isFinite(n)||n<0||n>365){toast('Le solde doit être compris entre 0 et 365 jours.');return}if(!data.settings.leaveEntitlements||typeof data.settings.leaveEntitlements!=='object')data.settings.leaveEntitlements={};data.settings.leaveEntitlements[String(y)]=n;data.settings.initialLeave=n;data.settings.leaveYear=y;persist();renderAll();toast('Solde enregistré pour '+y+'. Les autres années gardent leur propre solde.')}
 function addHoliday(){let date=prompt('Date du jour férié (AAAA-MM-JJ)');if(!date||!/^\d{4}-\d{2}-\d{2}$/.test(date)){if(date)toast('Format de date invalide.');return}let name=prompt('Nom du jour férié');if(!name)return;if(!data.customHolidays)data.customHolidays=[];data.customHolidays.push({date,name});persist();currentYear=dateYear(date);document.getElementById('headerYear').value=String(currentYear);renderAll();toast('Jour férié ajouté.')}
@@ -1046,9 +1046,11 @@ window.__congesApplyCloudData = function(cloudData){
     item && item.date ? [item.date,item.type||'',item.start||'',item.end||'',item.note||'',item.title||''].join('|') :
     'json:'+JSON.stringify(item);
   const mergeList = (cloud, here) => { const m=new Map(); [...(Array.isArray(cloud)?cloud:[]),...(Array.isArray(here)?here:[])].forEach(x=>m.set(keyOf(x),x)); return [...m.values()]; };
+  const deletedEntryIds=Array.from(new Set([...(cloudData.deletedEntryIds||[]),...(local.deletedEntryIds||[])].map(String)));
   data = {...cloudData,...local,
     settings:{...(cloudData.settings||{}),...(local.settings||{})},
-    entries:mergeList(cloudData.entries,local.entries),
+    deletedEntryIds,
+    entries:mergeList(cloudData.entries,local.entries).filter(e=>!deletedEntryIds.includes(String(e.id))),
     holidays:{...(cloudData.holidays||{}),...(local.holidays||{})},
     customHolidays:mergeList(cloudData.customHolidays,local.customHolidays)
   };
@@ -1086,11 +1088,11 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
  const keyOf=x=>x&&x.id!=null?'id:'+x.id:x&&x.date?[x.date,x.type||'',x.start||'',x.end||'',x.note||'',x.title||''].join('|'):'json:'+JSON.stringify(x);
  function merge(local,cloud){
    const mergeList=(a,b)=>{const m=new Map();[...(Array.isArray(a)?a:[]),...(Array.isArray(b)?b:[])].forEach(x=>m.set(keyOf(x),x));return [...m.values()];};
-   return {...cloud,...local,settings:{...(cloud.settings||{}),...(local.settings||{})},entries:mergeList(cloud.entries,local.entries),holidays:{...(cloud.holidays||{}),...(local.holidays||{})},customHolidays:mergeList(cloud.customHolidays,local.customHolidays)};
+   const deletedEntryIds=Array.from(new Set([...(cloud.deletedEntryIds||[]),...(local.deletedEntryIds||[])].map(String)));
+   return {...cloud,...local,settings:{...(cloud.settings||{}),...(local.settings||{})},deletedEntryIds,entries:mergeList(cloud.entries,local.entries).filter(e=>!deletedEntryIds.includes(String(e.id))),holidays:{...(cloud.holidays||{}),...(local.holidays||{})},customHolidays:mergeList(cloud.customHolidays,local.customHolidays)};
  }
- async function syncNow(user, manual=false){
-   if(syncing){ if(manual) say('Synchronisation déjà en cours…'); return; }
-   syncing=true; button.disabled=true;
+ async function syncNow(user){
+   if(syncing)return; syncing=true; button.disabled=true;
    try{
      const ref=firebase.firestore().collection('users').doc(user.uid).collection('apps').doc('conges-horaires');
      const local=window.__congesGetData();
@@ -1127,12 +1129,10 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
        button.textContent='Connecter avec Google';
      }
    });
-   const handleSyncButton = async (event)=>{
-     if(event){event.preventDefault();}
-     say(auth.currentUser ? 'Synchronisation demandée…' : 'Ouverture de la connexion Google…');
+   button.addEventListener('click',async()=>{
      // Évite deux fenêtres Google si le bouton est touché plusieurs fois.
      if(signingIn)return;
-     if(auth.currentUser){await syncNow(auth.currentUser,true);return;}
+     if(auth.currentUser){await syncNow(auth.currentUser);return;}
      signingIn=true;
      button.disabled=true;
      try{
@@ -1153,19 +1153,8 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
        signingIn=false;
        button.disabled=false;
      }
-   };
-   // onclick direct : fiable dans Safari iOS, même après navigation entre les onglets.
-   button.onclick = handleSyncButton;
-   button.addEventListener('touchend', function(event){
-     // Ne déclenche que si Safari n'a pas généré de click, sans double action.
-     if(event.cancelable) event.preventDefault();
-     handleSyncButton(event);
-   }, {passive:false});
+   });
    // Détecte les modifications sauvegardées localement et les pousse vers le cloud.
    previous=JSON.stringify(window.__congesGetData());
    setInterval(()=>{const user=auth.currentUser;if(!user||syncing)return;const current=JSON.stringify(window.__congesGetData());if(current!==previous)syncNow(user);},5000);
- }catch(e){console.error(e);say('Firebase indisponible : vérifie la connexion internet.');}
-})();
-</script>
-</body>
-</html>
+ }catch(e
