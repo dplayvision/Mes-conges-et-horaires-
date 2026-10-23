@@ -285,7 +285,7 @@ img, canvas, video, iframe { max-width:100%; }
   <div class="panel-head"><h2>☁️ Synchronisation Google</h2></div>
   <p class="small muted">Synchronise les données du planning entre tes appareils avec le même compte Google. Les photos et fiches de paie restent sur cet appareil.</p>
   <div id="cloudSyncStatus" class="notice" style="margin:10px 0">Vérification de la connexion Google…</div>
-  <button id="cloudSyncButton" class="btn" type="button" style="width:100%;position:relative;z-index:2;pointer-events:auto;touch-action:manipulation;min-height:56px" aria-live="polite">Connecter avec Google</button>
+  <button id="cloudSyncButton" class="btn" type="button" style="display:block;width:100%;position:relative;z-index:5;pointer-events:auto;touch-action:manipulation;-webkit-appearance:none;min-height:56px" aria-live="polite">Connecter avec Google</button>
 </div>
   <div class="panel"><div class="panel-head"><h2>🎨 Couleurs du calendrier</h2></div><p class="small muted">Touche directement le grand carré coloré sous chaque élément pour ouvrir le sélecteur de couleurs de ton téléphone. Choisis la couleur que tu veux : elle est enregistrée automatiquement sur cet appareil et appliquée au calendrier.</p><div class="form-grid" id="calendarColorFields">
    <div class="field"><label for="colorWeekA">Semaine A</label><input id="colorWeekA" type="color" value="#DCEBFF" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
@@ -1131,7 +1131,7 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
        button.disabled=false;
        syncNow(user);
      } else {
-       say('Non connecté — appuie sur Connecter avec Google pour activer la synchronisation.');
+       say('Ce navigateur n’est pas connecté à Google. Appuie sur Connecter avec Google pour ouvrir ta session ici.');
        button.textContent='Connecter avec Google';
        button.disabled=false;
      }
@@ -1142,9 +1142,18 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
    });
    button.addEventListener('click',async(event)=>{
      event.preventDefault();
-     if(signingIn)return;
-     if(syncing){manualSyncQueued=true;say('Synchronisation automatique en cours — ta demande manuelle est enregistrée et démarrera juste après.');return;}
-     if(auth.currentUser){await syncNow(auth.currentUser);return;}
+     event.stopPropagation();
+     if(signingIn){say('Connexion Google déjà en cours…');return;}
+     if(syncing){
+       manualSyncQueued=true;
+       say('Demande prise en compte : la synchronisation manuelle démarrera dès que la synchronisation en cours sera terminée.');
+       return;
+     }
+     if(auth.currentUser){
+       say('Synchronisation manuelle en cours…');
+       await syncNow(auth.currentUser);
+       return;
+     }
      signingIn=true;
      button.disabled=false;
      say('Ouverture de la connexion Google…');
