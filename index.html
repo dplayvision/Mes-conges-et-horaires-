@@ -1031,6 +1031,25 @@ function resetProvisionalPayroll(){
 
 
 document.addEventListener('DOMContentLoaded',()=>{const d=document.getElementById('ppRaiseDate');if(d&&!d.value)d.value=iso(new Date());const m=document.getElementById('ppMonth'),y=document.getElementById('ppYear');if(m)m.value=String(new Date().getMonth()+1);if(y)y.value=String(new Date().getFullYear());renderPayrollRaises();syncProvisionalPayrollFromCalendar();const refreshAll=()=>{const g=ppVal('ppBaseHours')*ppVal('ppRate')+ppVal('ppOt140')*ppVal('ppRate')*1.4+ppVal('ppOt150')*ppVal('ppRate')*1.5+ppVal('ppOtherGross');updateProvisionalCredits(g);calculateProvisionalPayroll(true)};['ppRate','ppOtherGross','ppKmRate','ppKmDay','ppAttendance','ppSickPenalty','ppFD','ppSocial','ppWeeklyHours','ppFullTimeHours','ppAdvance'].forEach(id=>{const e=document.getElementById(id);if(e){e.addEventListener('input',refreshAll);e.addEventListener('change',refreshAll)}});const workDaysInput=document.getElementById('ppWorkDays');if(workDaysInput){const updateManualDays=()=>{ppWorkDaysManual=true;const days=Math.max(0,Number(workDaysInput.value)||0);const base=ppCalendarScheduledDays>0?ppCalendarBaseHours*(days/ppCalendarScheduledDays):0;const hoursInput=document.getElementById('ppBaseHours');if(hoursInput)hoursInput.value=(Math.round(base*100)/100).toString();refreshAll()};workDaysInput.addEventListener('input',updateManualDays);workDaysInput.addEventListener('change',updateManualDays)}['ppMonth','ppYear'].forEach(id=>{const e=document.getElementById(id);if(e)e.addEventListener('change',()=>{ppWorkDaysManual=false;syncProvisionalPayrollFromCalendar()})});refreshAll();});
+// Accès contrôlé aux données de l'application pour la synchronisation Google.
+window.__congesGetData = function(){ return JSON.parse(JSON.stringify(data)); };
+window.__congesApplyCloudData = function(cloudData){
+  if(!cloudData || !cloudData.settings || !Array.isArray(cloudData.entries)) return;
+  const local = data;
+  const keyOf = item => item && item.id != null ? 'id:'+item.id :
+    item && item.date ? [item.date,item.type||'',item.start||'',item.end||'',item.note||'',item.title||''].join('|') :
+    'json:'+JSON.stringify(item);
+  const mergeList = (cloud, here) => { const m=new Map(); [...(Array.isArray(cloud)?cloud:[]),...(Array.isArray(here)?here:[])].forEach(x=>m.set(keyOf(x),x)); return [...m.values()]; };
+  data = {...cloudData,...local,
+    settings:{...(cloudData.settings||{}),...(local.settings||{})},
+    entries:mergeList(cloudData.entries,local.entries),
+    holidays:{...(cloudData.holidays||{}),...(local.holidays||{})},
+    customHolidays:mergeList(cloudData.customHolidays,local.customHolidays)
+  };
+  persist();
+  try{renderSettingsForm();renderAll();}catch(e){console.warn('Actualisation après synchronisation',e);}
+};
+
 </script>
 <script>
 // Enregistrement du service worker pour l’installation mobile, hors du script principal.
@@ -1041,3 +1060,69 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
     });
   }, { once: true });
 }
+</script>
+<div id="cloudSyncPanel" style="position:fixed;right:12px;bottom:calc(88px + env(safe-area-inset-bottom));z-index:9999;background:#fff;border:1px solid #dbe4f0;border-radius:16px;box-shadow:0 8px 24px rgba(20,40,70,.18);padding:12px;width:min(300px,calc(100vw - 24px));font-size:13px;color:#1f2937">
+  <div style="font-weight:800;margin-bottom:6px">Synchronisation Google</div>
+  <div id="cloudSyncStatus" style="color:#596579;margin-bottom:9px">Non connecté</div>
+  <button id="cloudSyncButton" type="button" style="background:#356df3;color:white;border:0;border-radius:10px;padding:10px 12px;font-weight:700;width:100%">Connecter avec Google</button>
+  <div style="font-size:11px;color:#6b7280;margin-top:7px">Les données du planning se synchronisent. Les photos et fiches de paie restent sur cet appareil.</div>
+</div>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+(function(){
+ const cfg={
+  apiKey:"AIzaSyD8FfX9uljCWJi1fg3hE5poocXOCAH-H9A",
+  authDomain:"mes-paiements-jeremy.firebaseapp.com",
+  projectId:"mes-paiements-jeremy",
+  storageBucket:"mes-paiements-jeremy.firebasestorage.app",
+  messagingSenderId:"1085958529684",
+  appId:"1:1085958529684:web:99e5514798cf0b8f098a81"
+ };
+ const status=document.getElementById('cloudSyncStatus'), button=document.getElementById('cloudSyncButton');
+ let syncing=false, previous='';
+ function say(t){if(status)status.textContent=t;}
+ const keyOf=x=>x&&x.id!=null?'id:'+x.id:x&&x.date?[x.date,x.type||'',x.start||'',x.end||'',x.note||'',x.title||''].join('|'):'json:'+JSON.stringify(x);
+ function merge(local,cloud){
+   const mergeList=(a,b)=>{const m=new Map();[...(Array.isArray(a)?a:[]),...(Array.isArray(b)?b:[])].forEach(x=>m.set(keyOf(x),x));return [...m.values()];};
+   return {...cloud,...local,settings:{...(cloud.settings||{}),...(local.settings||{})},entries:mergeList(cloud.entries,local.entries),holidays:{...(cloud.holidays||{}),...(local.holidays||{})},customHolidays:mergeList(cloud.customHolidays,local.customHolidays)};
+ }
+ async function syncNow(user){
+   if(syncing)return; syncing=true; button.disabled=true;
+   try{
+     const ref=firebase.firestore().collection('users').doc(user.uid).collection('apps').doc('conges-horaires');
+     const local=window.__congesGetData();
+     const snap=await ref.get();
+     const cloud=snap.exists?snap.data().data:null;
+     let combined;
+     if(!cloud){combined=local;}
+     else{combined=merge(local,cloud);window.__congesApplyCloudData(combined);}
+     const json=JSON.stringify(combined);
+     if(json.length>850000)throw new Error('Données trop volumineuses pour un seul document.');
+     await ref.set({data:combined,updatedAt:firebase.firestore.FieldValue.serverTimestamp(),appVersion:1},{merge:true});
+     previous=JSON.stringify(window.__congesGetData());
+     say('Google connecté — synchronisation terminée');
+     button.textContent='Synchroniser maintenant';
+   }catch(e){console.error(e);say('Erreur : '+(e.message||'vérifie Firebase et les règles Firestore'));}
+   finally{syncing=false;button.disabled=false;}
+ }
+ try{
+   if(!firebase.apps.length)firebase.initializeApp(cfg);
+   const auth=firebase.auth();
+   auth.onAuthStateChanged(user=>{
+     if(user){say('Connecté : '+(user.email||'compte Google'));button.textContent='Synchroniser maintenant';syncNow(user);}
+     else{say('Non connecté');button.textContent='Connecter avec Google';}
+   });
+   button.addEventListener('click',async()=>{
+     try{if(auth.currentUser){await syncNow(auth.currentUser);return;}await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());}
+     catch(e){console.error(e);say((e.code==='auth/popup-blocked'||e.code==='auth/operation-not-supported-in-this-environment')?'Ouvre l’application dans Safari puis réessaie.':'Connexion impossible : '+(e.message||'réessaie'));}
+   });
+   // Détecte les modifications sauvegardées localement et les pousse vers le cloud.
+   previous=JSON.stringify(window.__congesGetData());
+   setInterval(()=>{const user=auth.currentUser;if(!user||syncing)return;const current=JSON.stringify(window.__congesGetData());if(current!==previous)syncNow(user);},5000);
+ }catch(e){console.error(e);say('Firebase indisponible : vérifie la connexion internet.');}
+})();
+</script>
+</body>
+</html>
