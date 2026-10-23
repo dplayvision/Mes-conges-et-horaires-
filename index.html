@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+l<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -1041,18 +1041,16 @@ document.addEventListener('DOMContentLoaded',()=>{const d=document.getElementByI
 window.__congesGetData = function(){ return JSON.parse(JSON.stringify(data)); };
 window.__congesApplyCloudData = function(cloudData){
   if(!cloudData || !cloudData.settings || !Array.isArray(cloudData.entries)) return;
-  const local = data;
-  const keyOf = item => item && item.id != null ? 'id:'+item.id :
-    item && item.date ? [item.date,item.type||'',item.start||'',item.end||'',item.note||'',item.title||''].join('|') :
-    'json:'+JSON.stringify(item);
-  const mergeList = (cloud, here) => { const m=new Map(); [...(Array.isArray(cloud)?cloud:[]),...(Array.isArray(here)?here:[])].forEach(x=>m.set(keyOf(x),x)); return [...m.values()]; };
-  const deletedEntryIds=Array.from(new Set([...(cloudData.deletedEntryIds||[]),...(local.deletedEntryIds||[])].map(String)));
-  data = {...cloudData,...local,
-    settings:{...(cloudData.settings||{}),...(local.settings||{})},
-    deletedEntryIds,
-    entries:mergeList(cloudData.entries,local.entries).filter(e=>!deletedEntryIds.includes(String(e.id))),
-    holidays:{...(cloudData.holidays||{}),...(local.holidays||{})},
-    customHolidays:mergeList(cloudData.customHolidays,local.customHolidays)
+  // Les données cloud sont la référence lors d'un chargement. Ne pas réinjecter
+  // les réglages et les anciennes fiches locales par-dessus le solde synchronisé.
+  data = {
+    ...defaultData(),
+    ...cloudData,
+    settings:{...defaultData().settings,...(cloudData.settings||{})},
+    entries:Array.isArray(cloudData.entries)?cloudData.entries:[],
+    deletedEntryIds:Array.isArray(cloudData.deletedEntryIds)?cloudData.deletedEntryIds.map(String):[],
+    holidays:{...(cloudData.holidays||{})},
+    customHolidays:Array.isArray(cloudData.customHolidays)?cloudData.customHolidays:[]
   };
   persist();
   try{renderSettingsForm();renderAll();}catch(e){console.warn('Actualisation après synchronisation',e);}
@@ -1086,10 +1084,17 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
  let syncing=false, signingIn=false, manualSyncQueued=false, previous='';
  function say(t){if(status)status.textContent=t;}
  const keyOf=x=>x&&x.id!=null?'id:'+x.id:x&&x.date?[x.date,x.type||'',x.start||'',x.end||'',x.note||'',x.title||''].join('|'):'json:'+JSON.stringify(x);
- function merge(local,cloud){
-   const mergeList=(a,b)=>{const m=new Map();[...(Array.isArray(a)?a:[]),...(Array.isArray(b)?b:[])].forEach(x=>m.set(keyOf(x),x));return [...m.values()];};
+ function merge(local,cloud,preferLocal=false){
+   // Les éléments du cloud sont prioritaires par défaut : un site ouvert avec
+   // un ancien cache ne doit pas écraser le solde plus récent. Lorsqu'une
+   // modification locale a été détectée depuis la dernière synchro, elle gagne.
+   const mergeList=(first,second)=>{const m=new Map();[...(Array.isArray(first)?first:[]),...(Array.isArray(second)?second:[])].forEach(x=>m.set(keyOf(x),x));return [...m.values()];};
+   const firstEntries=preferLocal?cloud.entries:local.entries;
+   const secondEntries=preferLocal?local.entries:cloud.entries;
    const deletedEntryIds=Array.from(new Set([...(cloud.deletedEntryIds||[]),...(local.deletedEntryIds||[])].map(String)));
-   return {...cloud,...local,settings:{...(cloud.settings||{}),...(local.settings||{})},deletedEntryIds,entries:mergeList(cloud.entries,local.entries).filter(e=>!deletedEntryIds.includes(String(e.id))),holidays:{...(cloud.holidays||{}),...(local.holidays||{})},customHolidays:mergeList(cloud.customHolidays,local.customHolidays)};
+   const settings=preferLocal?{...(cloud.settings||{}),...(local.settings||{})}:{...(local.settings||{}),...(cloud.settings||{})};
+   const holidays=preferLocal?{...(cloud.holidays||{}),...(local.holidays||{})}:{...(local.holidays||{}),...(cloud.holidays||{})};
+   return {...local,...cloud,settings,deletedEntryIds,entries:mergeList(firstEntries,secondEntries).filter(e=>!deletedEntryIds.includes(String(e.id))),holidays,customHolidays:mergeList(preferLocal?cloud.customHolidays:local.customHolidays,preferLocal?local.customHolidays:cloud.customHolidays)};
  }
  async function syncNow(user){
    if(syncing){say('Synchronisation déjà en cours… attends quelques secondes puis réessaie.');return;} syncing=true;
@@ -1097,14 +1102,21 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
    try{
      const ref=firebase.firestore().collection('users').doc(user.uid).collection('apps').doc('conges-horaires');
      const local=window.__congesGetData();
+     // `previous` est le dernier état synchronisé sur cet appareil. Si le local
+     // n'a pas changé, on recharge le cloud; sinon on transmet les modifications locales.
+     const localChanged=!!previous && JSON.stringify(local)!==previous;
      const snap=await ref.get();
      const cloud=snap.exists?snap.data().data:null;
      let combined;
      if(!cloud){combined=local;}
-     else{combined=merge(local,cloud);window.__congesApplyCloudData(combined);}
+     else{
+       combined=merge(local,cloud,localChanged);
+       if(!localChanged) window.__congesApplyCloudData(combined);
+     }
      const json=JSON.stringify(combined);
      if(json.length>850000)throw new Error('Données trop volumineuses pour un seul document.');
      await ref.set({data:combined,updatedAt:firebase.firestore.FieldValue.serverTimestamp(),appVersion:1},{merge:true});
+     if(localChanged) window.__congesApplyCloudData(combined);
      previous=JSON.stringify(window.__congesGetData());
      say('Google connecté — synchronisation terminée');
      button.textContent='Synchroniser maintenant';
