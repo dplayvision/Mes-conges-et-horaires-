@@ -128,13 +128,7 @@ img, canvas, video, iframe { max-width:100%; }
    <input id="unlockPin" type="password" inputmode="numeric" autocomplete="current-password" maxlength="32" placeholder="Mot de passe" aria-label="Mot de passe" required>
    <button class="btn" type="submit">Déverrouiller</button>
   </form>
-   <div id="cloudSyncPanel" style="margin-top:14px;background:#fff;border:1px solid #dbe4f0;border-radius:16px;padding:12px;font-size:13px;color:#1f2937;text-align:left">
-    <div style="font-weight:800;margin-bottom:6px">Synchronisation Google</div>
-    <div id="cloudSyncStatus" style="color:#596579;margin-bottom:9px">Vérification de la connexion…</div>
-    <button id="cloudSyncButton" type="button" style="background:#356df3;color:white;border:0;border-radius:10px;padding:10px 12px;font-weight:700;width:100%">Connecter avec Google</button>
-    <div style="font-size:11px;color:#6b7280;margin-top:7px">Les données du planning se synchronisent. Les photos et fiches de paie restent sur cet appareil.</div>
-   </div>
-   <button class="btn secondary" id="faceIdUnlock" type="button" style="display:none"> Déverrouiller avec Face ID</button>
+  <button class="btn secondary" id="faceIdUnlock" type="button" style="display:none"> Déverrouiller avec Face ID</button>
   <div id="lockError" class="lock-error" aria-live="polite"></div>
   <p class="lock-note">Code initial : 1157. Tu pourras le modifier dans Réglages. Face ID nécessite Safari/HTTPS et un appareil compatible.</p>
  </div>
@@ -1067,6 +1061,12 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
   }, { once: true });
 }
 </script>
+<div id="cloudSyncPanel" style="position:fixed;right:12px;bottom:calc(88px + env(safe-area-inset-bottom));z-index:9999;background:#fff;border:1px solid #dbe4f0;border-radius:16px;box-shadow:0 8px 24px rgba(20,40,70,.18);padding:12px;width:min(300px,calc(100vw - 24px));font-size:13px;color:#1f2937">
+  <div style="font-weight:800;margin-bottom:6px">Synchronisation Google</div>
+  <div id="cloudSyncStatus" style="color:#596579;margin-bottom:9px">Non connecté</div>
+  <button id="cloudSyncButton" type="button" style="background:#356df3;color:white;border:0;border-radius:10px;padding:10px 12px;font-weight:700;width:100%">Connecter avec Google</button>
+  <div style="font-size:11px;color:#6b7280;margin-top:7px">Les données du planning se synchronisent. Les photos et fiches de paie restent sur cet appareil.</div>
+</div>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -1089,8 +1089,7 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
    return {...cloud,...local,settings:{...(cloud.settings||{}),...(local.settings||{})},entries:mergeList(cloud.entries,local.entries),holidays:{...(cloud.holidays||{}),...(local.holidays||{})},customHolidays:mergeList(cloud.customHolidays,local.customHolidays)};
  }
  async function syncNow(user){
-   if(syncing || !user)return;
-   syncing=true; button.disabled=true;
+   if(syncing)return; syncing=true; button.disabled=true;
    try{
      const ref=firebase.firestore().collection('users').doc(user.uid).collection('apps').doc('conges-horaires');
      const local=window.__congesGetData();
@@ -1106,50 +1105,64 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
      say('Google connecté — synchronisation terminée');
      button.textContent='Synchroniser maintenant';
    }catch(e){
-     console.error('Congés & Horaires Firebase sync error',{code:e.code,message:e.message,uid:user.uid,projectId:cfg.projectId,path:'users/'+user.uid+'/apps/conges-horaires'});
-     say('Erreur de synchronisation : '+(e.code?e.code+' — ':'')+(e.message||'erreur inconnue'));
-   }finally{syncing=false;button.disabled=false;}
+     console.error('Congés & Horaires Firebase sync error',{code:e.code,message:e.message,uid:user&&user.uid,projectId:cfg.projectId,path:user?('users/'+user.uid+'/apps/conges-horaires'):'(aucun utilisateur connecté)'});
+     const details=(e.code?e.code+' — ':'')+(e.message||'erreur inconnue');
+     say('Erreur de synchronisation — UID '+(user&&user.uid?user.uid:'inconnu')+' — '+details);
+   }
+   finally{syncing=false;button.disabled=false;}
  }
  try{
    if(!firebase.apps.length)firebase.initializeApp(cfg);
    const auth=firebase.auth();
+   // Garder la session Google sur cet appareil, comme dans Mes paiements.
    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(e=>console.warn('Persistance Google',e));
-   auth.getRedirectResult().then(result=>{
-     if(result && result.user) say('Compte Google connecté. Synchronisation en cours…');
-   }).catch(e=>say('Connexion Google impossible : '+(e.message||e)));
+   // Termine une connexion Google qui serait revenue par redirection sur iPhone.
+   auth.getRedirectResult().catch(e=>{
+     console.error('Retour Google Congés & Horaires',e);
+     say('Retour Google impossible : '+(e.message||e.code||'réessaie'));
+   });
    auth.onAuthStateChanged(user=>{
      if(user){
-       say('Connecté : '+(user.email||'compte Google')+' — synchronisation…');
+       say('Google connecté — synchronisation en cours…');
        button.textContent='Synchroniser maintenant';
        syncNow(user);
-     }else{
-       say('Connexion Google requise pour synchroniser les appareils.');
+     } else {
+       say('Non connecté — appuie sur Connecter avec Google pour activer la synchronisation.');
        button.textContent='Connecter avec Google';
      }
    });
    button.addEventListener('click',async()=>{
+     // Évite deux fenêtres Google si le bouton est touché plusieurs fois.
      if(signingIn)return;
      if(auth.currentUser){await syncNow(auth.currentUser);return;}
-     signingIn=true;button.disabled=true;
+     signingIn=true;
+     button.disabled=true;
      try{
        await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
        await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
      }catch(e){
        console.error('Connexion Google Congés & Horaires',e);
-       if(e.code==='auth/popup-blocked'||e.code==='auth/popup-closed-by-user'||e.code==='auth/cancelled-popup-request'){
+       if(e.code==='auth/cancelled-popup-request'){
+         say('Une autre fenêtre Google est déjà ouverte. Ferme-la puis réessaie une seule fois.');
+       }else if(['auth/popup-blocked','auth/operation-not-supported-in-this-environment','auth/popup-closed-by-user'].includes(e.code)){
+         // Sur certains navigateurs iOS, la redirection fonctionne mieux que la fenêtre popup.
          try{
-           say('Ouverture de la connexion Google…');
+           say('Ouverture de Google…');
            await auth.signInWithRedirect(new firebase.auth.GoogleAuthProvider());
+           return;
          }catch(redirectError){
-           say('Connexion Google impossible : '+(redirectError.message||redirectError));
+           console.error('Redirection Google Congés & Horaires',redirectError);
+           say('Connexion impossible : '+(redirectError.message||redirectError.code||'réessaie dans Safari'));
          }
        }else{
-         say('Connexion impossible : '+(e.message||'réessaie'));
+         say('Connexion impossible : '+(e.message||e.code||'réessaie'));
        }
      }finally{
-       signingIn=false;button.disabled=false;
+       signingIn=false;
+       button.disabled=false;
      }
    });
+   // Détecte les modifications sauvegardées localement et les pousse vers le cloud.
    previous=JSON.stringify(window.__congesGetData());
    setInterval(()=>{const user=auth.currentUser;if(!user||syncing)return;const current=JSON.stringify(window.__congesGetData());if(current!==previous)syncNow(user);},5000);
  }catch(e){console.error(e);say('Firebase indisponible : vérifie la connexion internet.');}
