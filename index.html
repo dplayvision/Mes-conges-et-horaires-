@@ -285,7 +285,7 @@ img, canvas, video, iframe { max-width:100%; }
   <div class="panel-head"><h2>☁️ Synchronisation Google</h2></div>
   <p class="small muted">Synchronise les données du planning entre tes appareils avec le même compte Google. Les photos et fiches de paie restent sur cet appareil.</p>
   <div id="cloudSyncStatus" class="notice" style="margin:10px 0">Vérification de la connexion Google…</div>
-  <button id="cloudSyncButton" class="btn" type="button" style="width:100%">Connecter avec Google</button>
+  <button id="cloudSyncButton" class="btn" type="button" style="width:100%;position:relative;z-index:2;pointer-events:auto;touch-action:manipulation;min-height:56px" aria-live="polite">Connecter avec Google</button>
 </div>
   <div class="panel"><div class="panel-head"><h2>🎨 Couleurs du calendrier</h2></div><p class="small muted">Touche directement le grand carré coloré sous chaque élément pour ouvrir le sélecteur de couleurs de ton téléphone. Choisis la couleur que tu veux : elle est enregistrée automatiquement sur cet appareil et appliquée au calendrier.</p><div class="form-grid" id="calendarColorFields">
    <div class="field"><label for="colorWeekA">Semaine A</label><input id="colorWeekA" type="color" value="#DCEBFF" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
@@ -1092,7 +1092,8 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
    return {...cloud,...local,settings:{...(cloud.settings||{}),...(local.settings||{})},deletedEntryIds,entries:mergeList(cloud.entries,local.entries).filter(e=>!deletedEntryIds.includes(String(e.id))),holidays:{...(cloud.holidays||{}),...(local.holidays||{})},customHolidays:mergeList(cloud.customHolidays,local.customHolidays)};
  }
  async function syncNow(user){
-   if(syncing)return; syncing=true; button.disabled=true;
+   if(syncing){say('Synchronisation déjà en cours… attends quelques secondes puis réessaie.');return;} syncing=true;
+   if(button){button.disabled=false;button.setAttribute('aria-busy','true');}
    try{
      const ref=firebase.firestore().collection('users').doc(user.uid).collection('apps').doc('conges-horaires');
      const local=window.__congesGetData();
@@ -1112,7 +1113,7 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
      const details=(e.code?e.code+' — ':'')+(e.message||'erreur inconnue');
      say('Erreur de synchronisation — UID '+(user&&user.uid?user.uid:'inconnu')+' — '+details);
    }
-   finally{syncing=false;button.disabled=false;}
+   finally{syncing=false;if(button){button.disabled=false;button.removeAttribute('aria-busy');}}
  }
  try{
    if(!firebase.apps.length)firebase.initializeApp(cfg);
@@ -1127,6 +1128,7 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
      if(user){
        say('Google connecté — synchronisation en cours…');
        button.textContent='Synchroniser maintenant';
+       button.disabled=false;
        syncNow(user);
      } else {
        say('Non connecté — appuie sur Connecter avec Google pour activer la synchronisation.');
@@ -1143,7 +1145,7 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
      if(signingIn||syncing)return;
      if(auth.currentUser){await syncNow(auth.currentUser);return;}
      signingIn=true;
-     button.disabled=true;
+     button.disabled=false;
      say('Ouverture de la connexion Google…');
      try{
        await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
