@@ -1119,7 +1119,11 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
    const auth=firebase.auth();
    // Garder la session Google sur cet appareil, comme dans Mes paiements.
    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(e=>console.warn('Persistance Google',e));
+   // État initial explicite : le bouton reste disponible pendant la vérification Firebase.
+   let authReady=false;
+   const provider=new firebase.auth.GoogleAuthProvider();
    auth.onAuthStateChanged(user=>{
+     authReady=true;
      if(user){
        say('Google connecté — synchronisation en cours…');
        button.textContent='Synchroniser maintenant';
@@ -1127,34 +1131,55 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
      } else {
        say('Non connecté — appuie sur Connecter avec Google pour activer la synchronisation.');
        button.textContent='Connecter avec Google';
+       button.disabled=false;
      }
+   },e=>{
+     console.error('État de connexion Firebase',e);
+     say('Vérification Google impossible : '+(e.message||'vérifie Internet puis réessaie.'));
+     button.disabled=false;
    });
-   button.addEventListener('click',async()=>{
-     // Évite deux fenêtres Google si le bouton est touché plusieurs fois.
-     if(signingIn)return;
+   button.addEventListener('click',async(event)=>{
+     event.preventDefault();
+     if(signingIn||syncing)return;
      if(auth.currentUser){await syncNow(auth.currentUser);return;}
      signingIn=true;
      button.disabled=true;
+     say('Ouverture de la connexion Google…');
      try{
        await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-       await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+       // Safari iOS / navigateur intégré : la connexion par redirection est plus fiable
+       // que les fenêtres popup, souvent bloquées dans ces environnements.
+       const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+       if(isIOS){await auth.signInWithRedirect(provider);return;}
+       await auth.signInWithPopup(provider);
      }catch(e){
        console.error('Connexion Google Congés & Horaires',e);
-       if(e.code==='auth/cancelled-popup-request'){
+       if(e.code==='auth/popup-blocked'||e.code==='auth/operation-not-supported-in-this-environment'){
+         try{await auth.signInWithRedirect(provider);return;}catch(redirectError){console.error('Connexion Google par redirection',redirectError);say('Connexion Google impossible : '+(redirectError.message||redirectError.code||'réessaie dans Safari.'));}
+       }else if(e.code==='auth/cancelled-popup-request'){
          say('Une autre fenêtre Google est déjà ouverte. Ferme-la puis réessaie une seule fois.');
-       }else if(e.code==='auth/popup-blocked'||e.code==='auth/operation-not-supported-in-this-environment'){
-         say('La fenêtre Google est bloquée. Ouvre cette application dans Safari puis réessaie.');
        }else if(e.code==='auth/popup-closed-by-user'){
          say('Connexion Google annulée. Tu peux réessayer.');
        }else{
-         say('Connexion impossible : '+(e.message||'réessaie'));
+         say('Connexion impossible : '+(e.message||e.code||'réessaie'));
        }
      }finally{
        signingIn=false;
        button.disabled=false;
      }
    });
+   // Récupère le résultat après retour de la page Google.
+   auth.getRedirectResult().catch(e=>{
+     console.error('Retour de connexion Google',e);
+     say('Retour Google : '+(e.message||e.code||'réessaie la connexion.'));
+   });
+   // Évite de laisser le message « Vérification… » indéfiniment si le SDK ne répond pas.
+   setTimeout(()=>{if(!authReady){say('La connexion Google prend trop de temps. Appuie sur le bouton pour réessayer.');button.disabled=false;}},8000);
    // Détecte les modifications sauvegardées localement et les pousse vers le cloud.
    previous=JSON.stringify(window.__congesGetData());
    setInterval(()=>{const user=auth.currentUser;if(!user||syncing)return;const current=JSON.stringify(window.__congesGetData());if(current!==previous)syncNow(user);},5000);
- }catch(e
+ }catch(e){console.error(e);say('Firebase indisponible : vérifie la connexion internet.');}
+})();
+</script>
+</body>
+</html>
