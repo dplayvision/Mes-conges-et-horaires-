@@ -281,12 +281,12 @@ img, canvas, video, iframe { max-width:100%; }
   <p class="footer-note">Les fiches restent sur cet appareil et ne sont pas envoyées sur GitHub. Pense à conserver une copie des documents importants.</p>
  </section>
  <section id="view-settings" class="view">
-  <div id="cloudSyncPanel" class="panel" style="margin-top:14px">
-    <div class="panel-head"><h2>☁️ Synchronisation Google</h2></div>
-    <div id="cloudSyncStatus" class="notice" style="margin-bottom:10px">Vérification de la connexion…</div>
-    <button id="cloudSyncButton" class="btn" type="button" style="width:100%">Connecter avec Google</button>
-    <p class="footer-note">Le planning et les réglages se synchronisent entre tes appareils connectés au même compte Google. Les photos et fiches de paie restent sur cet appareil.</p>
-  </div>
+<div class="panel" id="cloudSyncPanel">
+  <div class="panel-head"><h2>☁️ Synchronisation Google</h2></div>
+  <p class="small muted">Synchronise les données du planning entre tes appareils avec le même compte Google. Les photos et fiches de paie restent sur cet appareil.</p>
+  <div id="cloudSyncStatus" class="notice" style="margin:10px 0">Vérification de la connexion Google…</div>
+  <button id="cloudSyncButton" class="btn" type="button" style="width:100%">Connecter avec Google</button>
+</div>
   <div class="panel"><div class="panel-head"><h2>🎨 Couleurs du calendrier</h2></div><p class="small muted">Touche directement le grand carré coloré sous chaque élément pour ouvrir le sélecteur de couleurs de ton téléphone. Choisis la couleur que tu veux : elle est enregistrée automatiquement sur cet appareil et appliquée au calendrier.</p><div class="form-grid" id="calendarColorFields">
    <div class="field"><label for="colorWeekA">Semaine A</label><input id="colorWeekA" type="color" value="#DCEBFF" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
    <div class="field"><label for="colorWeekB">Semaine B</label><input id="colorWeekB" type="color" value="#F3DFFF" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
@@ -1067,7 +1067,6 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
   }, { once: true });
 }
 </script>
-
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -1089,8 +1088,9 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
    const mergeList=(a,b)=>{const m=new Map();[...(Array.isArray(a)?a:[]),...(Array.isArray(b)?b:[])].forEach(x=>m.set(keyOf(x),x));return [...m.values()];};
    return {...cloud,...local,settings:{...(cloud.settings||{}),...(local.settings||{})},entries:mergeList(cloud.entries,local.entries),holidays:{...(cloud.holidays||{}),...(local.holidays||{})},customHolidays:mergeList(cloud.customHolidays,local.customHolidays)};
  }
- async function syncNow(user){
-   if(syncing)return; syncing=true; button.disabled=true;
+ async function syncNow(user, manual=false){
+   if(syncing){ if(manual) say('Synchronisation déjà en cours…'); return; }
+   syncing=true; button.disabled=true;
    try{
      const ref=firebase.firestore().collection('users').doc(user.uid).collection('apps').doc('conges-horaires');
      const local=window.__congesGetData();
@@ -1117,11 +1117,6 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
    const auth=firebase.auth();
    // Garder la session Google sur cet appareil, comme dans Mes paiements.
    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(e=>console.warn('Persistance Google',e));
-   // Termine une connexion Google qui serait revenue par redirection sur iPhone.
-   auth.getRedirectResult().catch(e=>{
-     console.error('Retour Google Congés & Horaires',e);
-     say('Retour Google impossible : '+(e.message||e.code||'réessaie'));
-   });
    auth.onAuthStateChanged(user=>{
      if(user){
        say('Google connecté — synchronisation en cours…');
@@ -1132,10 +1127,12 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
        button.textContent='Connecter avec Google';
      }
    });
-   button.addEventListener('click',async()=>{
+   const handleSyncButton = async (event)=>{
+     if(event){event.preventDefault();}
+     say(auth.currentUser ? 'Synchronisation demandée…' : 'Ouverture de la connexion Google…');
      // Évite deux fenêtres Google si le bouton est touché plusieurs fois.
      if(signingIn)return;
-     if(auth.currentUser){await syncNow(auth.currentUser);return;}
+     if(auth.currentUser){await syncNow(auth.currentUser,true);return;}
      signingIn=true;
      button.disabled=true;
      try{
@@ -1145,24 +1142,25 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
        console.error('Connexion Google Congés & Horaires',e);
        if(e.code==='auth/cancelled-popup-request'){
          say('Une autre fenêtre Google est déjà ouverte. Ferme-la puis réessaie une seule fois.');
-       }else if(['auth/popup-blocked','auth/operation-not-supported-in-this-environment','auth/popup-closed-by-user'].includes(e.code)){
-         // Sur certains navigateurs iOS, la redirection fonctionne mieux que la fenêtre popup.
-         try{
-           say('Ouverture de Google…');
-           await auth.signInWithRedirect(new firebase.auth.GoogleAuthProvider());
-           return;
-         }catch(redirectError){
-           console.error('Redirection Google Congés & Horaires',redirectError);
-           say('Connexion impossible : '+(redirectError.message||redirectError.code||'réessaie dans Safari'));
-         }
+       }else if(e.code==='auth/popup-blocked'||e.code==='auth/operation-not-supported-in-this-environment'){
+         say('La fenêtre Google est bloquée. Ouvre cette application dans Safari puis réessaie.');
+       }else if(e.code==='auth/popup-closed-by-user'){
+         say('Connexion Google annulée. Tu peux réessayer.');
        }else{
-         say('Connexion impossible : '+(e.message||e.code||'réessaie'));
+         say('Connexion impossible : '+(e.message||'réessaie'));
        }
      }finally{
        signingIn=false;
        button.disabled=false;
      }
-   });
+   };
+   // onclick direct : fiable dans Safari iOS, même après navigation entre les onglets.
+   button.onclick = handleSyncButton;
+   button.addEventListener('touchend', function(event){
+     // Ne déclenche que si Safari n'a pas généré de click, sans double action.
+     if(event.cancelable) event.preventDefault();
+     handleSyncButton(event);
+   }, {passive:false});
    // Détecte les modifications sauvegardées localement et les pousse vers le cloud.
    previous=JSON.stringify(window.__congesGetData());
    setInterval(()=>{const user=auth.currentUser;if(!user||syncing)return;const current=JSON.stringify(window.__congesGetData());if(current!==previous)syncNow(user);},5000);
