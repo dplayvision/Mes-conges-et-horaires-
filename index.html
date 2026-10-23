@@ -1083,7 +1083,7 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
   appId:"1:1085958529684:web:99e5514798cf0b8f098a81"
  };
  const status=document.getElementById('cloudSyncStatus'), button=document.getElementById('cloudSyncButton');
- let syncing=false, signingIn=false, previous='';
+ let syncing=false, signingIn=false, manualSyncQueued=false, previous='';
  function say(t){if(status)status.textContent=t;}
  const keyOf=x=>x&&x.id!=null?'id:'+x.id:x&&x.date?[x.date,x.type||'',x.start||'',x.end||'',x.note||'',x.title||''].join('|'):'json:'+JSON.stringify(x);
  function merge(local,cloud){
@@ -1113,7 +1113,7 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
      const details=(e.code?e.code+' — ':'')+(e.message||'erreur inconnue');
      say('Erreur de synchronisation — UID '+(user&&user.uid?user.uid:'inconnu')+' — '+details);
    }
-   finally{syncing=false;if(button){button.disabled=false;button.removeAttribute('aria-busy');}}
+   finally{syncing=false;if(button){button.disabled=false;button.removeAttribute('aria-busy');}if(manualSyncQueued){manualSyncQueued=false;const currentUser=firebase.auth().currentUser;if(currentUser){say('Synchronisation manuelle demandée — lancement…');setTimeout(()=>syncNow(currentUser),0);}}}
  }
  try{
    if(!firebase.apps.length)firebase.initializeApp(cfg);
@@ -1142,7 +1142,8 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
    });
    button.addEventListener('click',async(event)=>{
      event.preventDefault();
-     if(signingIn||syncing)return;
+     if(signingIn)return;
+     if(syncing){manualSyncQueued=true;say('Synchronisation automatique en cours — ta demande manuelle est enregistrée et démarrera juste après.');return;}
      if(auth.currentUser){await syncNow(auth.currentUser);return;}
      signingIn=true;
      button.disabled=false;
