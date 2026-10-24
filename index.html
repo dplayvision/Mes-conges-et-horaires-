@@ -137,11 +137,10 @@ body { padding-bottom: calc(154px + env(safe-area-inset-bottom, 0px)) !important
 }
 
 
-/* Présentation uniquement : taille légèrement réduite, position inchangée */
+/* Modifications visuelles demandées : onglets plus compacts, position inchangée */
 .nav button{padding:6px 1px 5px;font-size:8.5px;gap:3px}
 .nav button span{font-size:17px}
 .panel-toggle{flex:0 0 auto;border:1px solid #dfe5ef;background:#f5f7fb;color:#344054;border-radius:9px;padding:6px 9px;font-size:12px;font-weight:750;min-height:32px}
-.panel-head{flex-wrap:wrap}
 
 </style>
 </head>
@@ -1422,45 +1421,51 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
 </script>
 
 <script>
-/* Amélioration visuelle isolée : sections repliables, sans modifier les données ni le verrouillage. */
+/* Sections repliables : ne touche pas au code PIN, à Firebase ni aux données. */
 (function () {
   function addCollapsibleSections() {
-    ['leave', 'pay', 'settings'].forEach(function (viewName) {
-      var view = document.getElementById('view-' + viewName);
+    var lock = document.getElementById('lockScreen');
+    if (lock && getComputedStyle(lock).display !== 'none') return;
+    ['view-leave', 'view-pay', 'view-settings'].forEach(function (viewId) {
+      var view = document.getElementById(viewId);
       if (!view) return;
-
-      Array.prototype.forEach.call(view.querySelectorAll('.panel'), function (panel) {
-        /* Ne traiter que les panneaux qui appartiennent directement à cette vue. */
+      var panels = view.querySelectorAll('.panel');
+      Array.prototype.forEach.call(panels, function (panel) {
         if (panel.closest('.view') !== view) return;
-        var head = panel.querySelector('.panel-head');
+        var head = panel.querySelector(':scope > .panel-head');
         if (!head || head.querySelector('.panel-toggle')) return;
-
-        var content = Array.prototype.filter.call(panel.children, function (child) {
+        var children = Array.prototype.filter.call(panel.children, function (child) {
           return child !== head;
         });
-        if (!content.length) return;
-
+        if (!children.length) return;
         var button = document.createElement('button');
         button.type = 'button';
         button.className = 'panel-toggle';
         button.textContent = '⌄ Réduire';
         button.setAttribute('aria-expanded', 'true');
-        button.addEventListener('click', function () {
-          var hide = button.getAttribute('aria-expanded') === 'true';
-          content.forEach(function (child) { child.hidden = hide; });
-          button.setAttribute('aria-expanded', hide ? 'false' : 'true');
-          button.textContent = hide ? '＋ Afficher' : '⌄ Réduire';
+        button.addEventListener('click', function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          var collapse = button.getAttribute('aria-expanded') === 'true';
+          children.forEach(function (child) { child.hidden = collapse; });
+          button.setAttribute('aria-expanded', collapse ? 'false' : 'true');
+          button.textContent = collapse ? '＋ Afficher' : '⌄ Réduire';
         });
         head.appendChild(button);
       });
     });
   }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', addCollapsibleSections);
-  } else {
-    addCollapsibleSections();
+  function scheduleEnhancement() {
+    window.setTimeout(addCollapsibleSections, 150);
   }
+  document.addEventListener('click', function (event) {
+    var target = event.target;
+    if (target && target.closest && target.closest('#unlockSubmit')) scheduleEnhancement();
+  });
+  document.addEventListener('DOMContentLoaded', function () {
+    var unlockForm = document.getElementById('unlockForm');
+    if (unlockForm) unlockForm.addEventListener('submit', scheduleEnhancement);
+  });
 })();
 </script>
 
