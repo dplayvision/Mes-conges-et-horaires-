@@ -314,30 +314,23 @@ body { padding-bottom: calc(154px + env(safe-area-inset-bottom, 0px)) !important
   <div id="cloudSyncStatus" class="notice" style="margin:10px 0">Vérification de la connexion Google…</div>
   <button id="cloudSyncButton" class="btn" type="button" style="display:block;width:100%;position:relative;z-index:5;pointer-events:auto;touch-action:manipulation;-webkit-appearance:none;min-height:56px" aria-live="polite">Connecter avec Google</button>
 </div>
-  <div class="panel"><div class="panel-head"><h2>🎨 Couleurs du calendrier</h2></div><p class="small muted">Touche directement le grand carré coloré sous chaque élément pour ouvrir le sélecteur de couleurs de ton téléphone. Choisis la couleur que tu veux : elle est enregistrée automatiquement sur cet appareil et appliquée au calendrier.</p><div class="form-grid" id="calendarColorFields">
-   <div class="field"><label for="colorWeekA">Semaine A</label><input id="colorWeekA" type="color" value="#DCEBFF" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
-   <div class="field"><label for="colorWeekB">Semaine B</label><input id="colorWeekB" type="color" value="#F3DFFF" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
-   <div class="field"><label for="colorWeekC">Semaine C</label><input id="colorWeekC" type="color" value="#DDF4F5" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
-   <div class="field"><label for="colorLeave">Congé</label><input id="colorLeave" type="color" value="#d8f7e8" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
-   <div class="field"><label for="colorHoliday">Jour férié</label><input id="colorHoliday" type="color" value="#ffe1e1" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
-   <div class="field"><label for="colorOvertime">Heures supp.</label><input id="colorOvertime" type="color" value="#fff0d8" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
-   <div class="field"><label for="colorManual">Horaire modifié</label><input id="colorManual" type="color" value="#e8efff" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
-   <div class="field"><label for="colorAppointment">Rendez-vous</label><input id="colorAppointment" type="color" value="#e9e5ff" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
-   <div class="field"><label for="colorSickness">Maladie</label><input id="colorSickness" type="color" value="#ffd9dc" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
-   <div class="field"><label for="colorToday">Aujourd’hui (contour)</label><input id="colorToday" type="color" value="#356df3" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
+  <div class="panel" id="calendarColorsPanel">
+   <div class="panel-head"><h2>🎨 Couleurs du calendrier</h2></div>
+   <p class="small muted">Touche directement le grand carré coloré sous chaque élément pour ouvrir le sélecteur de couleurs de ton téléphone. Choisis la couleur que tu veux : elle est enregistrée automatiquement sur cet appareil et appliquée au calendrier.</p>
+   <div class="form-grid" id="calendarColorFields">
+    <div class="field"><label for="colorWeekA">Semaine A</label><input id="colorWeekA" type="color" value="#DCEBFF" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
+    <div class="field"><label for="colorWeekB">Semaine B</label><input id="colorWeekB" type="color" value="#F3DFFF" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
+    <div class="field"><label for="colorWeekC">Semaine C</label><input id="colorWeekC" type="color" value="#DDF4F5" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
+    <div class="field"><label for="colorLeave">Congé</label><input id="colorLeave" type="color" value="#d8f7e8" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
+    <div class="field"><label for="colorHoliday">Jour férié</label><input id="colorHoliday" type="color" value="#ffe1e1" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
+    <div class="field"><label for="colorOvertime">Heures supp.</label><input id="colorOvertime" type="color" value="#fff0d8" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
+    <div class="field"><label for="colorManual">Horaire modifié</label><input id="colorManual" type="color" value="#e8efff" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
+    <div class="field"><label for="colorAppointment">Rendez-vous</label><input id="colorAppointment" type="color" value="#e9e5ff" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
+    <div class="field"><label for="colorSickness">Maladie</label><input id="colorSickness" type="color" value="#ffd9dc" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
+    <div class="field"><label for="colorToday">Aujourd’hui (contour)</label><input id="colorToday" type="color" value="#356df3" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
    </div>
-  <div class="panel"><div class="panel-head"><h2>🎨 Couleurs du calendrier</h2></div><p class="small muted">Touche directement le grand carré coloré sous chaque élément pour ouvrir le sélecteur de couleurs de ton téléphone. Choisis la couleur que tu veux : elle est enregistrée automatiquement sur cet appareil et appliquée au calendrier.</p><div class="form-grid" id="calendarColorFields">
-   <div class="field"><label for="colorWeekA">Semaine A</label><input id="colorWeekA" type="color" value="#DCEBFF" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
-   <div class="field"><label for="colorWeekB">Semaine B</label><input id="colorWeekB" type="color" value="#F3DFFF" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
-   <div class="field"><label for="colorWeekC">Semaine C</label><input id="colorWeekC" type="color" value="#DDF4F5" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
-   <div class="field"><label for="colorLeave">Congé</label><input id="colorLeave" type="color" value="#d8f7e8" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
-   <div class="field"><label for="colorHoliday">Jour férié</label><input id="colorHoliday" type="color" value="#ffe1e1" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
-   <div class="field"><label for="colorOvertime">Heures supp.</label><input id="colorOvertime" type="color" value="#fff0d8" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
-   <div class="field"><label for="colorManual">Horaire modifié</label><input id="colorManual" type="color" value="#e8efff" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
-   <div class="field"><label for="colorAppointment">Rendez-vous</label><input id="colorAppointment" type="color" value="#e9e5ff" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
-   <div class="field"><label for="colorSickness">Maladie</label><input id="colorSickness" type="color" value="#ffd9dc" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
-   <div class="field"><label for="colorToday">Aujourd’hui (contour)</label><input id="colorToday" type="color" value="#356df3" oninput="saveCalendarColors()" onchange="saveCalendarColors()"></div>
-   </div><button class="btn secondary sm" type="button" onclick="resetCalendarColors()" style="margin-top:12px">Restaurer les couleurs par défaut</button></div>
+   <button class="btn secondary sm" type="button" onclick="resetCalendarColors()" style="margin-top:12px">Restaurer les couleurs par défaut</button>
+  </div>
   <div class="panel" id="configHoursPanel">
    <div class="panel-head"><h2>Configuration des horaires</h2></div>
    <div class="notice">Par défaut, les semaines alternent du lundi au vendredi : semaine A de 6 h à 14 h, puis semaine B de 8 h à 16 h. Tu peux activer une semaine C et définir ses heures. La semaine A de référence commence le lundi 5 octobre 2026.</div>
