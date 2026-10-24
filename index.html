@@ -1447,7 +1447,19 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
           event.preventDefault();
           event.stopPropagation();
           var collapse = button.getAttribute('aria-expanded') === 'true';
-          children.forEach(function (child) { child.hidden = collapse; });
+          children.forEach(function (child) {
+            if (collapse) {
+              if (!child.hasAttribute('data-collapse-original-display')) {
+                child.setAttribute('data-collapse-original-display', child.style.display || '');
+              }
+              child.style.setProperty('display', 'none', 'important');
+            } else {
+              var originalDisplay = child.getAttribute('data-collapse-original-display');
+              child.style.removeProperty('display');
+              if (originalDisplay) child.style.display = originalDisplay;
+              child.removeAttribute('data-collapse-original-display');
+            }
+          });
           button.setAttribute('aria-expanded', collapse ? 'false' : 'true');
           button.textContent = collapse ? '＋ Afficher' : '⌄ Réduire';
         });
