@@ -137,11 +137,12 @@ body { padding-bottom: calc(154px + env(safe-area-inset-bottom, 0px)) !important
 }
 
 
-/* Ajustements prudents : onglets un peu plus compacts sans changer leur position */
+/* Présentation uniquement : taille légèrement réduite, position inchangée */
 .nav button{padding:6px 1px 5px;font-size:8.5px;gap:3px}
 .nav button span{font-size:17px}
 .panel-toggle{flex:0 0 auto;border:1px solid #dfe5ef;background:#f5f7fb;color:#344054;border-radius:9px;padding:6px 9px;font-size:12px;font-weight:750;min-height:32px}
 .panel-head{flex-wrap:wrap}
+
 </style>
 </head>
 <body>
@@ -678,39 +679,6 @@ async function renderPaySlips(){
 }
 async function getPaySlip(id){return (await getAllPhotoRecords()).find(p=>p.id===id&&p.category==='pay')}
 async function openPaySlip(id){try{const p=await getPaySlip(id);if(!p)return;const win=window.open();if(!win){toast('Autorise les fenêtres surgissantes pour afficher le document.');return}if((p.mime||'').includes('pdf')||(p.fileName||'').toLowerCase().endsWith('.pdf')){win.document.write(`<title>${escapeHtml(p.title||'Fiche de paie')}</title><iframe src="${p.dataUrl}" style="border:0;width:100%;height:100vh" title="Fiche de paie"></iframe>`)}else{win.document.write(`<title>${escapeHtml(p.title||'Fiche de paie')}</title><meta name="viewport" content="width=device-width,initial-scale=1"><body style="margin:0;background:#222;display:grid;place-items:center"><img src="${p.dataUrl}" style="max-width:100%;max-height:100vh;object-fit:contain">
-
-<script>
-/* Sections repliables dans Congés, Paie et Réglages.
-   Le contenu reste dans le DOM : aucune donnée, fonction ou sauvegarde n'est modifiée. */
-(function(){
-  try {
-    ['leave','pay','settings'].forEach(function(viewName){
-      var view=document.getElementById('view-'+viewName);
-      if(!view) return;
-      Array.prototype.forEach.call(view.children,function(panel){
-        if(!panel || !panel.classList || !panel.classList.contains('panel')) return;
-        var head=panel.querySelector(':scope > .panel-head');
-        if(!head || head.querySelector('.panel-toggle')) return;
-        var content=Array.prototype.filter.call(panel.children,function(child){return child!==head;});
-        if(!content.length) return;
-        var button=document.createElement('button');
-        button.type='button';
-        button.className='panel-toggle';
-        button.textContent='⌄ Réduire';
-        button.setAttribute('aria-expanded','true');
-        button.setAttribute('aria-label','Afficher ou masquer cette rubrique');
-        button.addEventListener('click',function(){
-          var willHide=button.getAttribute('aria-expanded')==='true';
-          content.forEach(function(child){child.hidden=willHide;});
-          button.setAttribute('aria-expanded',willHide?'false':'true');
-          button.textContent=willHide?'＋ Afficher':'⌄ Réduire';
-        });
-        head.appendChild(button);
-      });
-    });
-  } catch(e) { /* Ne jamais bloquer l'application si l'amélioration visuelle échoue. */ }
-})();
-</script>
 </body>`)}win.document.close()}catch(e){toast('Impossible d’ouvrir ce document.')}}
 async function editPaySlip(id){try{const p=await getPaySlip(id);if(!p)return;const title=prompt('Titre de la fiche :',p.title||'');if(title===null)return;const note=prompt('Note (facultatif) :',p.note||'');if(note===null)return;const db=await openPhotoDB();p.title=title.trim()||`Fiche de paie ${PAY_MONTHS[(p.payMonth||1)-1]} ${p.payYear}`;p.note=note.trim();await new Promise((resolve,reject)=>{const tx=db.transaction(PHOTO_STORE,'readwrite');tx.objectStore(PHOTO_STORE).put(p);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});renderPaySlips();toast('Fiche modifiée.')}catch(e){toast('Impossible de modifier cette fiche.')}}
 async function exportPaySlip(id){try{const p=await getPaySlip(id);if(!p)return;const a=document.createElement('a');a.href=p.dataUrl;a.download=(p.fileName||`${(p.title||'fiche-paie').replace(/[^\w-]+/g,'_')}.${(p.mime||'image/jpeg').includes('pdf')?'pdf':((p.mime||'image/jpeg').split('/')[1]||'jpg')}`);document.body.appendChild(a);a.click();a.remove()}catch(e){toast('Export impossible.')}}
@@ -1452,5 +1420,49 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
   if (active) active.setAttribute("aria-current", "page");
 })();
 </script>
+
+<script>
+/* Amélioration visuelle isolée : sections repliables, sans modifier les données ni le verrouillage. */
+(function () {
+  function addCollapsibleSections() {
+    ['leave', 'pay', 'settings'].forEach(function (viewName) {
+      var view = document.getElementById('view-' + viewName);
+      if (!view) return;
+
+      Array.prototype.forEach.call(view.querySelectorAll('.panel'), function (panel) {
+        /* Ne traiter que les panneaux qui appartiennent directement à cette vue. */
+        if (panel.closest('.view') !== view) return;
+        var head = panel.querySelector('.panel-head');
+        if (!head || head.querySelector('.panel-toggle')) return;
+
+        var content = Array.prototype.filter.call(panel.children, function (child) {
+          return child !== head;
+        });
+        if (!content.length) return;
+
+        var button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'panel-toggle';
+        button.textContent = '⌄ Réduire';
+        button.setAttribute('aria-expanded', 'true');
+        button.addEventListener('click', function () {
+          var hide = button.getAttribute('aria-expanded') === 'true';
+          content.forEach(function (child) { child.hidden = hide; });
+          button.setAttribute('aria-expanded', hide ? 'false' : 'true');
+          button.textContent = hide ? '＋ Afficher' : '⌄ Réduire';
+        });
+        head.appendChild(button);
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', addCollapsibleSections);
+  } else {
+    addCollapsibleSections();
+  }
+})();
+</script>
+
 </body>
 </html>
