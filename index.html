@@ -136,24 +136,6 @@ body { padding-bottom: calc(154px + env(safe-area-inset-bottom, 0px)) !important
   .app-switcher a { font-size: 12px; }
 }
 
-
-/* Sections repliables dans Congés, Paie et Réglages pour réduire le défilement */
-.panel-collapse-toggle{
-  flex:0 0 auto; display:inline-flex; align-items:center; justify-content:center;
-  gap:6px; min-height:36px; padding:7px 10px; border:1px solid #dbe3ef;
-  border-radius:10px; background:#f3f6fb; color:#344054; font-size:12px;
-  font-weight:750; white-space:nowrap; touch-action:manipulation;
-}
-.panel-collapse-toggle .collapse-chevron{display:inline-block;transition:transform .18s ease}
-.panel-collapse-toggle[aria-expanded="true"] .collapse-chevron{transform:rotate(180deg)}
-.panel-collapse-content{min-width:0}
-.panel.is-collapsed .panel-collapse-content{display:none!important}
-.panel-collapse-toggle:focus-visible{outline:3px solid #9bb7ff;outline-offset:2px}
-@media(max-width:480px){
-  .panel-head{flex-wrap:wrap}
-  .panel-collapse-toggle{margin-left:auto;min-height:38px}
-}
-
 </style>
 </head>
 <body>
@@ -690,57 +672,6 @@ async function renderPaySlips(){
 }
 async function getPaySlip(id){return (await getAllPhotoRecords()).find(p=>p.id===id&&p.category==='pay')}
 async function openPaySlip(id){try{const p=await getPaySlip(id);if(!p)return;const win=window.open();if(!win){toast('Autorise les fenêtres surgissantes pour afficher le document.');return}if((p.mime||'').includes('pdf')||(p.fileName||'').toLowerCase().endsWith('.pdf')){win.document.write(`<title>${escapeHtml(p.title||'Fiche de paie')}</title><iframe src="${p.dataUrl}" style="border:0;width:100%;height:100vh" title="Fiche de paie"></iframe>`)}else{win.document.write(`<title>${escapeHtml(p.title||'Fiche de paie')}</title><meta name="viewport" content="width=device-width,initial-scale=1"><body style="margin:0;background:#222;display:grid;place-items:center"><img src="${p.dataUrl}" style="max-width:100%;max-height:100vh;object-fit:contain">
-
-<script>
-/* Panneaux repliables : Congés, Paie et Réglages. Les données et fonctions restent inchangées. */
-(function(){
-  function setupCollapsiblePanels(){
-    ['view-leave','view-pay','view-settings'].forEach(function(viewId){
-      var view=document.getElementById(viewId);
-      if(!view) return;
-      var panels=Array.from(view.querySelectorAll(':scope > .panel'));
-      panels.forEach(function(panel,index){
-        var head=panel.querySelector(':scope > .panel-head');
-        if(!head || panel.dataset.collapseReady==='1') return;
-        var contentNodes=Array.from(panel.children).filter(function(node){return node!==head;});
-        if(!contentNodes.length) return;
-
-        var body=document.createElement('div');
-        body.className='panel-collapse-content';
-        body.id='panel-content-'+viewId+'-'+index;
-        contentNodes.forEach(function(node){body.appendChild(node);});
-        panel.appendChild(body);
-
-        var toggle=document.createElement('button');
-        toggle.type='button';
-        toggle.className='panel-collapse-toggle';
-        toggle.setAttribute('aria-controls',body.id);
-        toggle.innerHTML='<span class="collapse-label"></span><span class="collapse-chevron" aria-hidden="true">⌄</span>';
-
-        var expanded=(index===0);
-        panel.classList.toggle('is-collapsed',!expanded);
-        toggle.setAttribute('aria-expanded',expanded?'true':'false');
-        toggle.querySelector('.collapse-label').textContent=expanded?'Masquer':'Afficher';
-
-        toggle.addEventListener('click',function(){
-          var willExpand=panel.classList.contains('is-collapsed');
-          panel.classList.toggle('is-collapsed',!willExpand);
-          toggle.setAttribute('aria-expanded',willExpand?'true':'false');
-          toggle.querySelector('.collapse-label').textContent=willExpand?'Masquer':'Afficher';
-        });
-        head.appendChild(toggle);
-        panel.dataset.collapseReady='1';
-      });
-    });
-  }
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',setupCollapsiblePanels,{once:true});
-  }else{
-    setupCollapsiblePanels();
-  }
-})();
-</script>
-
 </body>`)}win.document.close()}catch(e){toast('Impossible d’ouvrir ce document.')}}
 async function editPaySlip(id){try{const p=await getPaySlip(id);if(!p)return;const title=prompt('Titre de la fiche :',p.title||'');if(title===null)return;const note=prompt('Note (facultatif) :',p.note||'');if(note===null)return;const db=await openPhotoDB();p.title=title.trim()||`Fiche de paie ${PAY_MONTHS[(p.payMonth||1)-1]} ${p.payYear}`;p.note=note.trim();await new Promise((resolve,reject)=>{const tx=db.transaction(PHOTO_STORE,'readwrite');tx.objectStore(PHOTO_STORE).put(p);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});renderPaySlips();toast('Fiche modifiée.')}catch(e){toast('Impossible de modifier cette fiche.')}}
 async function exportPaySlip(id){try{const p=await getPaySlip(id);if(!p)return;const a=document.createElement('a');a.href=p.dataUrl;a.download=(p.fileName||`${(p.title||'fiche-paie').replace(/[^\w-]+/g,'_')}.${(p.mime||'image/jpeg').includes('pdf')?'pdf':((p.mime||'image/jpeg').split('/')[1]||'jpg')}`);document.body.appendChild(a);a.click();a.remove()}catch(e){toast('Export impossible.')}}
