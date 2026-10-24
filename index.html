@@ -103,8 +103,13 @@ img, canvas, video, iframe { max-width:100%; }
 @media(hover:none){button:hover{filter:none}}
 
 
-/* Navigation rapide entre les applications — ajout indépendant des fonctions existantes */
-body { padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important; }
+/* Navigation rapide entre les applications — les deux barres restent visibles */
+body { padding-bottom: calc(154px + env(safe-area-inset-bottom, 0px)) !important; }
+/* La navigation interne de Congés & Horaires est placée juste au-dessus de la barre commune */
+.nav {
+  bottom: calc(68px + env(safe-area-inset-bottom, 0px)) !important;
+  z-index: 99998 !important;
+}
 .app-switcher {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 99999;
   display: grid; grid-template-columns: repeat(6, minmax(0, 1fr));
