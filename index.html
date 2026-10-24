@@ -1432,6 +1432,9 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
       var panels = view.querySelectorAll('.panel');
       Array.prototype.forEach.call(panels, function (panel) {
         if (panel.closest('.view') !== view) return;
+        /* Ne jamais ajouter de bouton au panneau parent qui contient d'autres panneaux :
+           cela éviter d'effacer toute une page lorsqu'on replie une seule rubrique. */
+        if (panel.querySelector('.panel')) return;
         var head = panel.querySelector(':scope > .panel-head');
         if (!head || head.querySelector('.panel-toggle')) return;
         var children = Array.prototype.filter.call(panel.children, function (child) {
