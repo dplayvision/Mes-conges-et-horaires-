@@ -136,32 +136,6 @@ body { padding-bottom: calc(154px + env(safe-area-inset-bottom, 0px)) !important
   .app-switcher a { font-size: 12px; }
 }
 
-
-/* Style compact et propre : cartes repliables, sans modifier les données ni les fonctions */
-.compact-section-head{
-  display:flex;align-items:center;gap:10px;width:100%;text-align:left;
-  padding:13px 15px;border:1px solid #e2e8f2;border-radius:14px;
-  background:linear-gradient(135deg,#f7f9ff,#eef4ff);color:#202b40;
-  cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;
-}
-.compact-section-head .compact-title{flex:1;min-width:0;font-size:15px;font-weight:750;line-height:1.3}
-.compact-section-head .compact-subtitle{display:block;margin-top:3px;font-size:11px;font-weight:500;color:#778196}
-.compact-section-head .compact-chevron{
-  flex:0 0 28px;width:28px;height:28px;display:grid;place-items:center;
-  border-radius:9px;background:#fff;border:1px solid #e1e7f1;color:#3c66b5;
-  font-size:17px;transition:transform .18s ease;
-}
-.compact-section-head[aria-expanded="true"] .compact-chevron{transform:rotate(180deg)}
-.compact-section-content{margin-top:10px}
-.compact-section.is-closed > .compact-section-content{display:none!important}
-.compact-section{padding:12px!important;scroll-margin-bottom:180px}
-.compact-section-head:focus-visible{outline:3px solid #a9c4ff;outline-offset:2px}
-@media(max-width:480px){
-  .compact-section{padding:10px!important;margin-bottom:10px!important}
-  .compact-section-head{padding:12px}
-  .compact-section-head .compact-title{font-size:14px}
-}
-
 </style>
 </head>
 <body>
@@ -698,72 +672,6 @@ async function renderPaySlips(){
 }
 async function getPaySlip(id){return (await getAllPhotoRecords()).find(p=>p.id===id&&p.category==='pay')}
 async function openPaySlip(id){try{const p=await getPaySlip(id);if(!p)return;const win=window.open();if(!win){toast('Autorise les fenêtres surgissantes pour afficher le document.');return}if((p.mime||'').includes('pdf')||(p.fileName||'').toLowerCase().endsWith('.pdf')){win.document.write(`<title>${escapeHtml(p.title||'Fiche de paie')}</title><iframe src="${p.dataUrl}" style="border:0;width:100%;height:100vh" title="Fiche de paie"></iframe>`)}else{win.document.write(`<title>${escapeHtml(p.title||'Fiche de paie')}</title><meta name="viewport" content="width=device-width,initial-scale=1"><body style="margin:0;background:#222;display:grid;place-items:center"><img src="${p.dataUrl}" style="max-width:100%;max-height:100vh;object-fit:contain">
-
-<script>
-/* Présentation uniquement : sections compactes dans Congés, Paie et Réglages.
-   Le contenu original reste intact et les panneaux s’ouvrent au toucher. */
-(function(){
-  function setupCompactSections(){
-    var targets=[
-      {view:'view-leave',titles:['Mon solde de congés']},
-      {view:'view-pay',titles:[]},
-      {view:'view-settings',titles:[]}
-    ];
-    targets.forEach(function(target){
-      var view=document.getElementById(target.view);
-      if(!view)return;
-      var panels=Array.prototype.slice.call(view.querySelectorAll(':scope > .panel'));
-      panels.forEach(function(panel,index){
-        if(panel.dataset.compactReady==='1')return;
-        var oldHead=panel.querySelector(':scope > .panel-head');
-        var heading=oldHead&&oldHead.querySelector('h2');
-        if(!heading)return;
-        var title=(heading.textContent||'').trim();
-        var contentNodes=Array.prototype.slice.call(panel.children).filter(function(el){return el!==oldHead;});
-        if(!contentNodes.length)return;
-
-        var body=document.createElement('div');
-        body.className='compact-section-content';
-        body.id='compact-'+target.view+'-'+index;
-        contentNodes.forEach(function(el){body.appendChild(el);});
-
-        var button=document.createElement('button');
-        button.type='button';
-        button.className='compact-section-head';
-        button.setAttribute('aria-controls',body.id);
-        button.innerHTML='<span class="compact-title"></span><span class="compact-chevron" aria-hidden="true">⌄</span>';
-        button.querySelector('.compact-title').textContent=title;
-
-        var isOpen=(index===0);
-        button.setAttribute('aria-expanded',isOpen?'true':'false');
-        panel.classList.add('compact-section');
-        panel.classList.toggle('is-closed',!isOpen);
-        panel.insertBefore(button,panel.firstChild);
-        panel.appendChild(body);
-
-        button.addEventListener('click',function(){
-          var open=panel.classList.contains('is-closed');
-          panel.classList.toggle('is-closed',!open);
-          button.setAttribute('aria-expanded',open?'true':'false');
-          if(open){
-            window.setTimeout(function(){
-              var r=button.getBoundingClientRect();
-              if(r.top<0||r.top>window.innerHeight-120){
-                button.scrollIntoView({behavior:'smooth',block:'start'});
-              }
-            },60);
-          }
-        });
-        panel.dataset.compactReady='1';
-      });
-    });
-  }
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',setupCompactSections,{once:true});
-  }else{setupCompactSections();}
-})();
-</script>
-
 </body>`)}win.document.close()}catch(e){toast('Impossible d’ouvrir ce document.')}}
 async function editPaySlip(id){try{const p=await getPaySlip(id);if(!p)return;const title=prompt('Titre de la fiche :',p.title||'');if(title===null)return;const note=prompt('Note (facultatif) :',p.note||'');if(note===null)return;const db=await openPhotoDB();p.title=title.trim()||`Fiche de paie ${PAY_MONTHS[(p.payMonth||1)-1]} ${p.payYear}`;p.note=note.trim();await new Promise((resolve,reject)=>{const tx=db.transaction(PHOTO_STORE,'readwrite');tx.objectStore(PHOTO_STORE).put(p);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});renderPaySlips();toast('Fiche modifiée.')}catch(e){toast('Impossible de modifier cette fiche.')}}
 async function exportPaySlip(id){try{const p=await getPaySlip(id);if(!p)return;const a=document.createElement('a');a.href=p.dataUrl;a.download=(p.fileName||`${(p.title||'fiche-paie').replace(/[^\w-]+/g,'_')}.${(p.mime||'image/jpeg').includes('pdf')?'pdf':((p.mime||'image/jpeg').split('/')[1]||'jpg')}`);document.body.appendChild(a);a.click();a.remove()}catch(e){toast('Export impossible.')}}
