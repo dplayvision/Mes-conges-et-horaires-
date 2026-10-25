@@ -1012,6 +1012,8 @@ function renderSettingsForm(){let s=data.settings;initHolidayCountry();for(let [
 function escapeHtml(str){return String(str??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 const PIN_KEY='conges_horaires_pin_v1';
 const FACE_KEY='conges_horaires_face_credential_v1';
+const SESSION_KEY='conges_horaires_unlocked_at_v1';
+const SESSION_DURATION=30*60*1000; // 30 minutes
 function getPin(){try{return localStorage.getItem(PIN_KEY)}catch(e){return null}}
 function configureLockScreen(){
  const pin=getPin(),intro=document.getElementById('lockIntro'),confirm=document.getElementById('firstPinConfirm'),submit=document.getElementById('unlockSubmit'),note=document.getElementById('lockNote'),face=document.getElementById('faceIdUnlock'),input=document.getElementById('unlockPin');
@@ -1026,8 +1028,14 @@ function configureLockScreen(){
 function b64url(bytes){let s='';for(const b of new Uint8Array(bytes))s+=String.fromCharCode(b);return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
 function fromB64url(s){s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';let raw=atob(s),out=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)out[i]=raw.charCodeAt(i);return out}
 function randomBytes(n=32){let a=new Uint8Array(n);crypto.getRandomValues(a);return a}
-function lockApp(){configureLockScreen();document.getElementById('lockScreen').style.display='flex';document.getElementById('unlockPin').value='';document.getElementById('firstPinConfirm').value='';document.getElementById('lockError').textContent='';document.getElementById('unlockPin').focus()}
-function unlockApp(){document.getElementById('lockScreen').style.display='none';document.getElementById('lockError').textContent=''}
+function clearUnlockSession(){try{localStorage.removeItem(SESSION_KEY)}catch(e){}}
+function hasValidUnlockSession(){try{const t=Number(localStorage.getItem(SESSION_KEY)||0);return t>0&&(Date.now()-t)<SESSION_DURATION&&(Date.now()-t)>=0}catch(e){return false}}
+function lockApp(){clearUnlockSession();configureLockScreen();document.getElementById('lockScreen').style.display='flex';document.getElementById('unlockPin').value='';document.getElementById('firstPinConfirm').value='';document.getElementById('lockError').textContent='';document.getElementById('unlockPin').focus()}
+function unlockApp(){try{localStorage.setItem(SESSION_KEY,String(Date.now()))}catch(e){}document.getElementById('lockScreen').style.display='none';document.getElementById('lockError').textContent=''}
+function checkUnlockSession(){const screen=document.getElementById('lockScreen');if(!screen)return;if(hasValidUnlockSession()){screen.style.display='none'}else if(getPin()){clearUnlockSession();screen.style.display='flex';document.getElementById('unlockPin').value=''}}
+document.addEventListener('visibilitychange',function(){if(!document.hidden)checkUnlockSession()});
+window.addEventListener('pageshow',checkUnlockSession);
+window.addEventListener('focus',checkUnlockSession);
 document.getElementById('unlockForm').addEventListener('submit',function(ev){
  ev.preventDefault();const entered=document.getElementById('unlockPin').value,confirm=document.getElementById('firstPinConfirm'),saved=getPin(),error=document.getElementById('lockError');
  if(!saved){if(entered.length<4){error.textContent='Choisis un mot de passe d’au moins 4 caractères.';return}if(entered!==confirm.value){error.textContent='Les deux mots de passe ne correspondent pas.';confirm.select();return}try{localStorage.setItem(PIN_KEY,entered);configureLockScreen();unlockApp()}catch(e){error.textContent='Impossible d’enregistrer le mot de passe sur cet appareil.'}return}
@@ -1039,7 +1047,7 @@ document.getElementById('faceIdUnlock').addEventListener('click',unlockWithFaceI
 function updateFaceButton(){try{document.getElementById('faceIdUnlock').style.display=localStorage.getItem(FACE_KEY)?'block':'none'}catch(e){}}
 function changePin(){let a=document.getElementById('newPin').value,b=document.getElementById('confirmPin').value;if(a.length<4){toast('Choisis un mot de passe d’au moins 4 caractères.');return}if(a!==b){toast('Les deux mots de passe ne correspondent pas.');return}try{localStorage.setItem(PIN_KEY,a);document.getElementById('newPin').value='';document.getElementById('confirmPin').value='';toast('Mot de passe modifié.')}catch(e){toast('Impossible d’enregistrer le mot de passe sur cet appareil.')}}
 window.addEventListener('error',function(e){const box=document.getElementById('appError');if(box){box.style.display='block';box.textContent='Une erreur JavaScript empêche certaines fonctions de marcher : '+(e.message||'erreur inconnue')}});
-function init(){configureLockScreen();updateFaceButton();renderProfileSelect();renderYearSelects();renderSettingsForm();document.getElementById('payMonth').value=String(new Date().getMonth()+1);document.getElementById('payYear').value=String(new Date().getFullYear());document.getElementById('periodStart').value=iso(new Date());document.getElementById('periodEnd').value=iso(addDays(iso(new Date()),6));renderAll();listLeavePhotos();document.getElementById('headerYear').value=String(currentYear);document.getElementById('entryDialog').addEventListener('click',e=>{if(e.target.id==='entryDialog')closeEntry()})}
+function init(){configureLockScreen();checkUnlockSession();updateFaceButton();renderProfileSelect();renderYearSelects();renderSettingsForm();document.getElementById('payMonth').value=String(new Date().getMonth()+1);document.getElementById('payYear').value=String(new Date().getFullYear());document.getElementById('periodStart').value=iso(new Date());document.getElementById('periodEnd').value=iso(addDays(iso(new Date()),6));renderAll();listLeavePhotos();document.getElementById('headerYear').value=String(currentYear);document.getElementById('entryDialog').addEventListener('click',e=>{if(e.target.id==='entryDialog')closeEntry()})}
 try{init()}catch(err){const box=document.getElementById("appError");if(box){box.style.display="block";box.textContent="Erreur au démarrage : "+(err.message||err)}else alert("Erreur au démarrage de l’application.")}
 document.addEventListener('DOMContentLoaded',initLeavePhotoDate);
 
